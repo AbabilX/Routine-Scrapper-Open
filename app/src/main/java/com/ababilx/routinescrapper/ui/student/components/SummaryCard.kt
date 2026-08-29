@@ -15,6 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.ababilx.routinescrapper.domain.model.StudentSummary
 import com.ababilx.routinescrapper.ui.icons.AppIcons
@@ -30,6 +32,7 @@ fun SummaryCard(
     onDownload: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val haptic = LocalHapticFeedback.current
     val title = if (summary.section == "All") summary.batch else "${summary.batch}  ${summary.section}"
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -55,7 +58,10 @@ fun SummaryCard(
             Surface(
                 modifier = Modifier
                     .size(52.dp)
-                    .clickable(onClick = onDownload),
+                    .clickable {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onDownload()
+                    },
                 color = Ink,
                 shape = CircleShape,
             ) {

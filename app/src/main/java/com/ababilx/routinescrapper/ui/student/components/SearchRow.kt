@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import com.ababilx.routinescrapper.ui.icons.AppIcons
 import com.ababilx.routinescrapper.ui.theme.Ink
-import com.ababilx.routinescrapper.ui.theme.OnInk
 import com.ababilx.routinescrapper.ui.theme.RdiuTypography
 import com.ababilx.routinescrapper.ui.theme.Surface
 import com.ababilx.routinescrapper.ui.theme.TextMuted
@@ -26,60 +25,37 @@ import com.ababilx.routinescrapper.ui.theme.TextMuted
 @Composable
 fun SearchRow(
     query: String,
-    department: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(Surface, RoundedCornerShape(28.dp))
+            .padding(horizontal = 18.dp),
         verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
-        Row(
-            modifier = Modifier
-                .weight(1f)
-                .height(56.dp)
-                .background(Surface, RoundedCornerShape(28.dp))
-                .padding(horizontal = 18.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-        ) {
-            Icon(
-                imageVector = AppIcons.Search,
-                contentDescription = null,
-                tint = TextMuted,
-                modifier = Modifier.size(22.dp),
-            )
-            BasicTextField(
-                value = query,
-                onValueChange = onQueryChange,
-                singleLine = true,
-                textStyle = RdiuTypography.bodyLarge,
-                cursorBrush = SolidColor(Ink),
-                modifier = Modifier.weight(1f),
-                decorationBox = { inner ->
-                    if (query.isEmpty()) {
-                        Text("68_C", style = RdiuTypography.bodyMedium)
-                    }
-                    inner()
-                },
-            )
-        }
-        Row(
-            modifier = Modifier
-                .height(56.dp)
-                .background(Ink, RoundedCornerShape(28.dp))
-                .padding(horizontal = 16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Icon(
-                imageVector = AppIcons.Department,
-                contentDescription = null,
-                tint = OnInk,
-                modifier = Modifier.size(18.dp),
-            )
-            Text(department, style = RdiuTypography.labelLarge, color = OnInk)
-        }
+        Icon(
+            imageVector = AppIcons.Search,
+            contentDescription = null,
+            tint = TextMuted,
+            modifier = Modifier.size(22.dp),
+        )
+        BasicTextField(
+            value = query,
+            onValueChange = onQueryChange,
+            singleLine = true,
+            textStyle = RdiuTypography.bodyLarge,
+            cursorBrush = SolidColor(Ink),
+            modifier = Modifier.weight(1f),
+            decorationBox = { inner ->
+                if (query.isEmpty()) {
+                    Text("68_C", style = RdiuTypography.bodyMedium)
+                }
+                inner()
+            },
+        )
     }
 }

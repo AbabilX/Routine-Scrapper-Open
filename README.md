@@ -107,10 +107,10 @@ assets/routine/*.json                 ← অ্যাপে বান্ডল
 data/AssetRoutineRepository           ← JSON লোড
         │
         ▼
-domain/RoutineQueries                 ← সার্চ, সারাংশ, টাইমলাইন
+domain/RoutineQueries                 ← সার্চ, সারাংশ, টাইমলাইন, now/next, chips
         │
         ▼
-ui/student/StudentViewModel           ← স্ক্রিন স্টেট
+ui/student/StudentViewModel           ← স্ক্রিন স্টেট + শেষ সার্চ মনে রাখা
         │
         ▼
 ui/student/StudentScreen              ← Compose UI
@@ -118,9 +118,9 @@ ui/student/StudentScreen              ← Compose UI
 
 | ফোল্ডার | দায়িত্ব | এখানে কী লিখবে |
 |---|---|---|
-| `domain/` | মডেল + নিয়ম (Android UI নেই) | সার্চ ম্যাচ, ব্রেক হিসাব |
-| `data/` | JSON পড়া, PDF শেয়ার | নতুন ডেটা সোর্স |
-| `ui/student/` | Student স্ক্রিন | রং, কার্ড, সার্চ বার |
+| `domain/` | মডেল + নিয়ম (Android UI নেই) | সার্চ ম্যাচ, ব্রেক হিসাব, now/next |
+| `data/` | JSON পড়া, PDF শেয়ার, prefs | নতুন ডেটা সোর্স / মনে রাখা |
+| `ui/student/` | Student স্ক্রিন | রং, কার্ড, সার্চ বার, UX পলিশ |
 | `ui/theme/` | রং ও টাইপো | কিউট লাইট প্যালেট (ক্রিম + প্যাস্টেল) |
 | `app/src/main/assets/routine/` | JSON + সোর্স PDF | নতুন সেমিস্টার ফাইল |
 | `scripts/` | PDF → JSON | পার্সার বাগ ফিক্স |
@@ -137,16 +137,17 @@ app/src/main/java/com/ababilx/routinescrapper/
 ├── MainActivity.kt                 অ্যাপ এন্ট্রি, Theme
 ├── domain/
 │   ├── StudentQuery.kt             "68_C" পার্স ও ম্যাচ
-│   ├── RoutineQueries.kt           ফিল্টার, মার্জ ল্যাব, ব্রেক
-│   └── model/                      ClassSlot, RoutineDay, …
+│   ├── RoutineQueries.kt           ফিল্টার, মার্জ, now/next, chips
+│   └── model/                      ClassSlot, ClassStatus, …
 ├── data/
 │   ├── AssetRoutineRepository.kt   assets থেকে JSON
+│   ├── StudentPrefs.kt             শেষ ব্যাচ সার্চ (DataStore)
 │   ├── RoutineFileDto.kt           JSON আকৃতি
 │   └── PdfExporter.kt              PDF শেয়ার
 └── ui/student/
-    ├── StudentViewModel.kt         query + selected day
+    ├── StudentViewModel.kt         query + day + now/next
     ├── StudentScreen.kt            লেআউট জোড়া
-    └── components/                 Header, Search, Card, Date, Timeline, EmptyHint
+    └── components/                 Header, Search, Chips, Banner, Date, Timeline, EmptyHint
 ```
 
 JSON-এর একটা স্লট এরকম:
