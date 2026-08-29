@@ -50,7 +50,7 @@ DIU স্টুডেন্টদের জন্য **অফলাইন ক�
 ### যা লাগবে
 
 - [Android Studio](https://developer.android.com/studio) (Meerkat / নতুন ভার্সন)
-- JDK 17 (Studio-এর সাথেই JBR আসে — আলাদা ইনস্টল না করলেও চলে)
+- **JDK 17 বা 21** — Studio-এর সাথে JBR আসে। Homebrew **Java 26** দিয়ে সরাসরি AGP চলে না (এরর শুধু `26.0.1` দেখায়)। প্রজেক্ট Gradle ডেমনকে JDK 21-এ লক করে; Mac-এ Android Studio থাকলে আর কিছু করতে হয় না।
 - Android SDK (Studio প্রথমবার নিজে নামিয়ে নেয়)
 - একটি emulator, অথবা USB debugging চালু ফোন
 
@@ -67,13 +67,13 @@ DIU স্টুডেন্টদের জন্য **অফলাইন ক�
 
 ### টার্মিনাল
 
-ফোন বা emulator আগে চালু রাখো, তারপর প্রজেক্ট রুট থেকে:
+ফোন বা emulator **আগে চালু** রাখো (`adb devices`-এ ডিভাইস দেখা যাবে), তারপর প্রজেক্ট রুট থেকে:
 
 ```bash
 ./gradlew :app:installDebug
 ```
 
-শুধু APK বানাতে:
+শুধু APK বানাতে (ডিভাইস লাগে না):
 
 ```bash
 ./gradlew :app:assembleDebug
@@ -81,10 +81,11 @@ DIU স্টুডেন্টদের জন্য **অফলাইন ক�
 
 আউটপুট: `app/build/outputs/apk/debug/app-debug.apk`
 
-`JAVA_HOME` না পেলে Android Studio-এর JDK ব্যবহার করো:
+Android Studio `/Applications`-এ না থাকলে (বা আবার `26.0.1` এরর এলে):
 
 ```bash
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
+./gradlew :app:installDebug
 ```
 
 ---
@@ -241,9 +242,10 @@ scripts/.venv/bin/python scripts/parse_routine_pdf.py \
 
 | সমস্যা | কী করবে |
 |---|---|
+| বিল্ড ফেল, মেসেজ শুধু `26.0.1` | Homebrew Java 26। নতুন `gradle.properties` পুল করে আবার `./gradlew :app:installDebug`। না চললে নিচে `JAVA_HOME` সেট করো |
+| `Cannot find a Java installation … Java 21` | Android Studio ইনস্টল করো, অথবা `JAVA_HOME` Studio JBR-এ সেট করো |
 | Gradle Sync ফেল | ইন্টারনেট চেক, File → Invalidate Caches, আবার Sync |
-| `JAVA_HOME` এরর | উপরে Studio JBR পাথ সেট করো |
-| অ্যাপ ইনস্টল হয় না | emulator চালু আছে কিনা, বা ফোনে USB debugging |
+| অ্যাপ ইনস্টল হয় না | emulator/ফোন চালু আছে কিনা — `adb devices` খালি হলে `installDebug` ফেল করবে |
 | সার্চ খালি | ফরম্যাট `68_C` — স্পেস বাদ, ইংরেজি অক্ষর |
 | ভুল ক্লাস | পার্সার ইস্যু হতে পারে — JSON-এ সেই `group` খুঁজে দেখো |
 
