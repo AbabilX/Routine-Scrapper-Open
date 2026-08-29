@@ -2,6 +2,7 @@ package com.ababilx.routinescrapper.ui.student
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,12 +21,16 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ababilx.routinescrapper.data.PdfExporter
 import com.ababilx.routinescrapper.ui.student.components.ClassTimeline
 import com.ababilx.routinescrapper.ui.student.components.DateStrip
+import com.ababilx.routinescrapper.ui.student.components.DecorBlobs
+import com.ababilx.routinescrapper.ui.student.components.EmptyHint
 import com.ababilx.routinescrapper.ui.student.components.SearchRow
 import com.ababilx.routinescrapper.ui.student.components.StudentHeader
 import com.ababilx.routinescrapper.ui.student.components.SummaryCard
 import com.ababilx.routinescrapper.ui.theme.Bg
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
-import com.ababilx.routinescrapper.ui.theme.TextMuted
+import com.ababilx.routinescrapper.ui.theme.Mint
+import com.ababilx.routinescrapper.ui.theme.Peach
+import com.ababilx.routinescrapper.ui.theme.Rose
+import com.ababilx.routinescrapper.ui.theme.Sky
 
 @Composable
 fun StudentScreen(
@@ -35,48 +39,65 @@ fun StudentScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Bg)
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .background(Bg),
     ) {
-        StudentHeader()
-        SearchRow(
-            query = state.queryText,
-            department = state.meta?.department ?: "CSE",
-            onQueryChange = viewModel::onQueryChange,
-        )
-        when {
-            state.queryText.isBlank() -> Hint("ব্যাচ সার্চ করো — যেমন 68_C")
-            state.invalidQuery -> Hint("ফরম্যাট: 68_C অথবা শুধু 68")
-            !state.hasMatches -> Hint("এই ব্যাচের কোনো ক্লাস পাওয়া যায়নি")
-            else -> {
-                state.summary?.let { summary ->
-                    SummaryCard(
-                        summary = summary,
-                        onDownload = { PdfExporter.share(context) },
-                    )
-                }
-                DateStrip(
-                    selected = state.selectedDay,
-                    onSelect = viewModel::onDaySelected,
-                    modifier = Modifier.fillMaxWidth(),
+        DecorBlobs()
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 22.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp),
+        ) {
+            StudentHeader()
+            SearchRow(
+                query = state.queryText,
+                department = state.meta?.department ?: "CSE",
+                onQueryChange = viewModel::onQueryChange,
+            )
+            when {
+                state.queryText.isBlank() -> EmptyHint(
+                    title = "HELLO!",
+                    body = "ব্যাচ লিখো — যেমন 68_C",
+                    tint = Peach,
                 )
-                if (state.timeline.isEmpty()) {
-                    Hint("এই দিনে ক্লাস নেই")
-                } else {
-                    ClassTimeline(state.timeline)
+                state.invalidQuery -> EmptyHint(
+                    title = "উফ",
+                    body = "ফরম্যাট: 68_C অথবা শুধু 68",
+                    tint = Rose,
+                )
+                !state.hasMatches -> EmptyHint(
+                    title = "খালি",
+                    body = "এই ব্যাচের কোনো ক্লাস পাওয়া যায়নি",
+                    tint = Sky,
+                )
+                else -> {
+                    DateStrip(
+                        selected = state.selectedDay,
+                        onSelect = viewModel::onDaySelected,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    state.summary?.let { summary ->
+                        SummaryCard(
+                            summary = summary,
+                            onDownload = { PdfExporter.share(context) },
+                        )
+                    }
+                    if (state.timeline.isEmpty()) {
+                        EmptyHint(
+                            title = "Off day",
+                            body = "এই দিনে ক্লাস নেই",
+                            tint = Mint,
+                        )
+                    } else {
+                        ClassTimeline(state.timeline)
+                    }
                 }
             }
+            Spacer(Modifier.height(28.dp))
         }
-        Spacer(Modifier.height(24.dp))
     }
-}
-
-@Composable
-private fun Hint(text: String) {
-    Text(text, style = RdiuTypography.bodyMedium, color = TextMuted)
 }

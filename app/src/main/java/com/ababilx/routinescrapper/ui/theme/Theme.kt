@@ -1,29 +1,27 @@
 package com.ababilx.routinescrapper.ui.theme
 
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Color
 
-private val DarkColors = darkColorScheme(
-    primary = Accent,
-    onPrimary = OnAccent,
+private val LightColors = lightColorScheme(
+    primary = Ink,
+    onPrimary = OnInk,
     background = Bg,
-    onBackground = TextPrimary,
+    onBackground = Ink,
     surface = Surface,
-    onSurface = TextPrimary,
-    surfaceVariant = SurfaceRaised,
+    onSurface = Ink,
+    surfaceVariant = Peach,
     onSurfaceVariant = TextMuted,
     outline = Line,
-    secondary = AccentDeep,
-    tertiary = TeacherLink,
-    error = Color(0xFFFF8A80),
+    secondary = Mint,
+    tertiary = Lavender,
 )
 
 @Composable
 fun RdiuTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colorScheme = DarkColors,
+        colorScheme = LightColors,
         typography = RdiuTypography,
         content = content,
     )

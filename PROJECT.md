@@ -17,5 +17,6 @@ PDF  →  scripts/parse_routine_pdf.py  →  assets JSON
 - `domain` has no Android UI types.
 - `data` only loads JSON / shares the bundled PDF.
 - `ui/student/components` are one-job composables.
+- Theme is light and cute (`ui/theme/Color.kt`); screens must not hardcode colors.
 
 Future PDF upload should implement the same repository shape and keep `RoutineQueries` unchanged.

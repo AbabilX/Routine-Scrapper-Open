@@ -121,7 +121,7 @@ ui/student/StudentScreen              ← Compose UI
 | `domain/` | মডেল + নিয়ম (Android UI নেই) | সার্চ ম্যাচ, ব্রেক হিসাব |
 | `data/` | JSON পড়া, PDF শেয়ার | নতুন ডেটা সোর্স |
 | `ui/student/` | Student স্ক্রিন | রং, কার্ড, সার্চ বার |
-| `ui/theme/` | রং ও টাইপো | ডার্ক প্যালেট |
+| `ui/theme/` | রং ও টাইপো | কিউট লাইট প্যালেট (ক্রিম + প্যাস্টেল) |
 | `app/src/main/assets/routine/` | JSON + সোর্স PDF | নতুন সেমিস্টার ফাইল |
 | `scripts/` | PDF → JSON | পার্সার বাগ ফিক্স |
 | `data/raw/` | অরিজিনাল PDF | নতুন রুটিন পিডিএফ রাখা |
@@ -146,7 +146,7 @@ app/src/main/java/com/ababilx/routinescrapper/
 └── ui/student/
     ├── StudentViewModel.kt         query + selected day
     ├── StudentScreen.kt            লেআউট জোড়া
-    └── components/                 Header, Search, Card, Date, Timeline
+    └── components/                 Header, Search, Card, Date, Timeline, EmptyHint
 ```
 
 JSON-এর একটা স্লট এরকম:
