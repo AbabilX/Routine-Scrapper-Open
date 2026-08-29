@@ -41,7 +41,9 @@ Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফার�
 - `68_C` লিখলে `68_C1` / `68_C2` ল্যাব সাবসেকশনও মিলে
 - শনি–বৃহস্পতি ডেট স্ট্রিপ
 - পাশাপাশি ল্যাব স্লট এক কার্ডে, মাঝের ফাঁক **Break**
-- Enrolled Courses সারাংশ + অফিসিয়াল PDF শেয়ার
+- Enrolled Courses সারাংশ + ডাউনলোড: সার্চ করা সেকশনের সাপ্তাহিক PDF (যে দিনে ক্লাস আছে)
+- ক্লাস কার্ডে বেল — ৫ / ১০ / ১৫ / ২০ / ৩০ মিনিট আগে লোকাল রিমাইন্ডার (নেট লাগে না)
+- শেষ সার্চ ও রিমাইন্ডার পছন্দ ফোনে JSON ক্যাশে থাকে
 - ইন্টারনেট লাগে না
 
 অ্যাপে ঢুকে **`68_C`** দিয়ে ট্রাই করো — ডেমোর জন্য ভালো উদাহরণ।
@@ -92,22 +94,25 @@ scripts/parse_routine_pdf.py          ← PDF পড়ে
 assets/routine/*.json                 ← অ্যাপে বান্ডল
         │
         ▼
+data/LocalRoutineStore                ← অ্যাসেট → ফোনের routine.json
+        │
+        ▼
 data/AssetRoutineRepository           ← JSON লোড
         │
         ▼
 domain/RoutineQueries                 ← সার্চ, সারাংশ, টাইমলাইন, now/next, chips
         │
         ▼
-ui/student/StudentViewModel           ← স্ক্রিন স্টেট + শেষ সার্চ মনে রাখা
+ui/student/StudentViewModel           ← স্ক্রিন স্টেট + student_cache.json
         │
-        ▼
-ui/student/StudentScreen              ← Flutter UI
+        ├─ ui/student/StudentScreen   ← Flutter UI + বেল
+        └─ data/ClassReminderScheduler ← OS নোটিফিকেশন
 ```
 
 | ফোল্ডার | দায়িত্ব | এখানে কী লিখবে |
 |---|---|---|
 | `lib/domain/` | মডেল + নিয়ম (Flutter UI নেই) | সার্চ ম্যাচ, ব্রেক হিসাব, now/next |
-| `lib/data/` | JSON পড়া, PDF শেয়ার, prefs | নতুন ডেটা সোর্স / মনে রাখা |
+| `lib/data/` | JSON পড়া, লোকাল কপি, PDF শেয়ার, রিমাইন্ডার শিডিউল, student cache | নতুন ডেটা সোর্স / মনে রাখা |
 | `lib/ui/student/` | Student স্ক্রিন | রং, কার্ড, সার্চ বার, UX পলিশ |
 | `lib/ui/theme/` | রং ও টাইপো | কিউট লাইট প্যালেট (ক্রিম + প্যাস্টেল) |
 | `assets/routine/` | JSON + সোর্স PDF | নতুন সেমিস্টার ফাইল |
@@ -127,19 +132,26 @@ lib/
 ├── domain/
 │   ├── student_query.dart         "68_C" পার্স ও ম্যাচ
 │   ├── routine_queries.dart       ফিল্টার, মার্জ, now/next, chips
-│   └── model/                      ClassSlot, ClassStatus, …
+│   ├── reminder_rules.dart        start − minutesBefore
+│   ├── course_label.dart          "OOP - CSE221(68_A)"
+│   └── model/                      ClassSlot, ClassReminder, ClassStatus, …
 ├── data/
 │   ├── asset_routine_repository.dart   assets থেকে JSON
-│   ├── student_prefs.dart         শেষ ব্যাচ সার্চ (SharedPreferences)
-│   ├── routine_file_dto.dart      JSON আকৃতি
-│   └── pdf_exporter.dart          PDF শেয়ার
+│   ├── local_routine_store.dart   অ্যাসেট → ফোনের routine.json
+│   ├── student_cache.dart         শেষ সার্চ + রিমাইন্ডার (JSON)
+│   ├── student_prefs.dart         লিগ্যাসি SharedPreferences মাইগ্রেশন
+│   ├── class_reminder_scheduler.dart  OS লোকাল নোটিফিকেশন
+│   ├── course_catalog.dart        কোর্স কোড → নাম
+│   ├── schedule_pdf_builder.dart  সেকশন সাপ্তাহিক PDF
+│   ├── routine_file_dto.dart      JSON আকৃতি (schemaVersion)
+│   └── pdf_exporter.dart          জেনারেটেড PDF শেয়ার
 └── ui/student/
     ├── student_view_model.dart    query + day + now/next
     ├── student_screen.dart        লেআউট জোড়া
     └── components/                 Header, Search, Chips, Banner, Date, Timeline, EmptyHint
 ```
 
-JSON-এর একটা স্লট এরকম:
+JSON `meta.schemaVersion` এখন `1` — স্লট ফিল্ড আগের মতোই:
 
 ```json
 {
@@ -237,6 +249,7 @@ scripts/.venv/bin/python scripts/parse_routine_pdf.py \
 | সার্চ খালি | ফরম্যাট `68_C` — স্পেস বাদ, ইংরেজি অক্ষর |
 | ভুল ক্লাস | পার্সার ইস্যু হতে পারে — JSON-এ সেই `group` খুঁজে দেখো |
 | PDF শেয়ার খোলে না | emulator-এ শেয়ার টার্গেট নাও থাকতে পারে — ফোনে ট্রাই করো |
+| কোর্সের নাম ভুল | `assets/routine/course_names.json` আপডেট করো — PDF সেখান থেকে নাম পড়ে |
 
 ---
 

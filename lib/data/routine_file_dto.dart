@@ -21,8 +21,12 @@ class RoutineMetaDto {
     required this.semester,
     required this.effectiveFrom,
     required this.sourcePdf,
+    this.schemaVersion = 1,
+    this.origin = 'bundled',
   });
 
+  final int schemaVersion;
+  final String origin;
   final String department;
   final String version;
   final String semester;
@@ -31,6 +35,8 @@ class RoutineMetaDto {
 
   factory RoutineMetaDto.fromJson(Map<String, dynamic> json) {
     return RoutineMetaDto(
+      schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? 1,
+      origin: json['origin'] as String? ?? 'bundled',
       department: json['department'] as String,
       version: json['version'] as String,
       semester: json['semester'] as String,
@@ -38,6 +44,9 @@ class RoutineMetaDto {
       sourcePdf: json['sourcePdf'] as String,
     );
   }
+
+  String get fingerprint =>
+      '$department|$version|$effectiveFrom|$schemaVersion';
 }
 
 class ClassSlotDto {

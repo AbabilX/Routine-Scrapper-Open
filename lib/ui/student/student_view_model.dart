@@ -3,7 +3,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../../data/asset_routine_repository.dart';
-import '../../data/student_prefs.dart';
+import '../../data/class_reminder_scheduler.dart';
+import '../../data/pdf_exporter.dart';
+import '../../data/student_cache.dart';
+import '../../domain/model/class_reminder.dart';
 import '../../domain/model/class_status.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/routine_meta.dart';
@@ -26,6 +29,7 @@ class StudentUiState {
     this.meta,
     this.invalidQuery = false,
     this.restored = false,
+    this.reminders = const [],
   });
 
   final String queryText;
@@ -41,11 +45,20 @@ class StudentUiState {
   final RoutineMeta? meta;
   final bool invalidQuery;
   final bool restored;
+  final List<ClassReminder> reminders;
 
   RoutineDay get resolvedSelectedDay =>
       selectedDay ?? RoutineQueries.todayOrSaturday();
 
   RoutineDay get resolvedToday => today ?? RoutineQueries.todayOrSaturday();
+
+  int? reminderMinutesFor(ClassBlock block) {
+    final id = ClassReminderId.fromBlock(block);
+    for (final reminder in reminders) {
+      if (reminder.id == id) return reminder.minutesBefore;
+    }
+    return null;
+  }
 
   StudentUiState copyWith({
     String? queryText,
@@ -64,6 +77,7 @@ class StudentUiState {
     RoutineMeta? meta,
     bool? invalidQuery,
     bool? restored,
+    List<ClassReminder>? reminders,
   }) {
     return StudentUiState(
       queryText: queryText ?? this.queryText,
@@ -79,6 +93,7 @@ class StudentUiState {
       meta: meta ?? this.meta,
       invalidQuery: invalidQuery ?? this.invalidQuery,
       restored: restored ?? this.restored,
+      reminders: reminders ?? this.reminders,
     );
   }
 }
@@ -86,19 +101,22 @@ class StudentUiState {
 class StudentViewModel extends ChangeNotifier {
   StudentViewModel({
     required this.repository,
-    required this.prefs,
+    required this.cache,
+    required this.scheduler,
   }) : _state = StudentUiState(
           selectedDay: RoutineQueries.todayOrSaturday(),
           today: RoutineQueries.todayOrSaturday(),
           meta: repository.meta,
           suggestions: RoutineQueries.suggestChips(repository.slots, ''),
+          reminders: cache.reminders,
         ) {
     _restore();
     _tick = Timer.periodic(const Duration(seconds: 30), (_) => rebuild());
   }
 
   final AssetRoutineRepository repository;
-  final StudentPrefs prefs;
+  final StudentCache cache;
+  final ClassReminderScheduler scheduler;
   StudentUiState _state;
   Timer? _saveJob;
   Timer? _tick;
@@ -106,11 +124,12 @@ class StudentViewModel extends ChangeNotifier {
   StudentUiState get state => _state;
 
   Future<void> _restore() async {
-    final saved = prefs.lastQuery();
+    final saved = cache.lastQuery();
     if (saved.isNotEmpty) {
       applyQuery(saved, persist: false);
     }
-    _state = _state.copyWith(restored: true);
+    await scheduler.sync(cache.reminders);
+    _state = _state.copyWith(restored: true, reminders: cache.reminders);
     notifyListeners();
   }
 
@@ -136,9 +155,34 @@ class StudentViewModel extends ChangeNotifier {
     if (persist && parsed != null) {
       _saveJob?.cancel();
       _saveJob = Timer(const Duration(milliseconds: 350), () {
-        prefs.saveQuery(parsed.label);
+        cache.saveQuery(parsed.label);
       });
     }
+  }
+
+  Future<void> downloadSchedule() async {
+    final parsed = _state.parsedQuery;
+    if (parsed == null) return;
+    final matched = RoutineQueries.forStudent(repository.slots, parsed);
+    await PdfExporter.shareSchedule(
+      queryLabel: parsed.label,
+      meta: repository.meta,
+      week: RoutineQueries.weeklyBlocks(matched),
+    );
+  }
+
+  Future<bool> onReminderPicked(ClassBlock block, int? minutes) async {
+    if (minutes == null) {
+      await cache.removeReminder(ClassReminderId.fromBlock(block));
+    } else {
+      final allowed = await scheduler.requestPermission();
+      if (!allowed) return false;
+      await cache.upsertReminder(ClassReminder.fromBlock(block, minutes));
+    }
+    await scheduler.sync(cache.reminders);
+    _state = _state.copyWith(reminders: cache.reminders);
+    notifyListeners();
+    return true;
   }
 
   void rebuild() {

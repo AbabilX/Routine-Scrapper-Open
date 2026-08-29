@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../../../domain/model/class_reminder.dart';
 import '../../../domain/model/class_status.dart';
 import '../../../domain/model/student_summary.dart';
+import '../../../domain/reminder_rules.dart';
 import '../../../domain/routine_queries.dart';
 import '../../theme/app_colors.dart';
 
@@ -10,10 +12,14 @@ class ClassTimeline extends StatelessWidget {
     super.key,
     required this.items,
     this.statuses = const {},
+    this.reminderMinutes = const {},
+    this.onReminderTap,
   });
 
   final List<TimelineItem> items;
   final Map<ClassBlock, ClassStatus> statuses;
+  final Map<String, int> reminderMinutes;
+  final ValueChanged<ClassBlock>? onReminderTap;
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +33,8 @@ class ClassTimeline extends StatelessWidget {
             block: item.block,
             tint: cardPastels[classIndex % cardPastels.length],
             status: statuses[item.block] ?? ClassStatus.later,
+            reminderMinutes: reminderMinutes[ClassReminderId.fromBlock(item.block)],
+            onReminderTap: onReminderTap,
           ),
         );
         classIndex += 1;
@@ -54,11 +62,15 @@ class _ClassCard extends StatelessWidget {
     required this.block,
     required this.tint,
     required this.status,
+    this.reminderMinutes,
+    this.onReminderTap,
   });
 
   final ClassBlock block;
   final Color tint;
   final ClassStatus status;
+  final int? reminderMinutes;
+  final ValueChanged<ClassBlock>? onReminderTap;
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +91,21 @@ class _ClassCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(child: Text(block.course, style: text.headlineSmall)),
-                  _StatusPill(status: status),
+                  if (onReminderTap != null)
+                    _ReminderBell(
+                      minutes: reminderMinutes,
+                      start: block.start,
+                      onTap: () => onReminderTap!(block),
+                    ),
+                  _StatusPill(
+                    status: status,
+                    ringTime: reminderMinutes == null
+                        ? null
+                        : ReminderRules.formatFireTime(
+                            block.start,
+                            reminderMinutes!,
+                          ),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
@@ -101,18 +127,57 @@ class _ClassCard extends StatelessWidget {
   }
 }
 
+class _ReminderBell extends StatelessWidget {
+  const _ReminderBell({
+    required this.minutes,
+    required this.start,
+    required this.onTap,
+  });
+
+  final int? minutes;
+  final String start;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final on = minutes != null;
+    final ringTime = on
+        ? ReminderRules.formatFireTime(start, minutes!)
+        : null;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: Tooltip(
+        message: on ? 'রিং $ringTime' : 'রিমাইন্ডার',
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Padding(
+            padding: const EdgeInsets.all(4),
+            child: Icon(
+              on ? Icons.notifications_active_rounded : Icons.notifications_none_rounded,
+              size: 22,
+              color: ink,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _StatusPill extends StatelessWidget {
-  const _StatusPill({required this.status});
+  const _StatusPill({required this.status, this.ringTime});
 
   final ClassStatus status;
+  final String? ringTime;
 
   @override
   Widget build(BuildContext context) {
     final (String? label, Color? color) = switch (status) {
       ClassStatus.now => ('এখন', mint),
-      ClassStatus.next => ('পরের', sky),
+      ClassStatus.next => (ringTime ?? 'পরের', sky),
       ClassStatus.done => ('শেষ', ink.withValues(alpha: 0.18)),
-      ClassStatus.later => (null, null),
+      ClassStatus.later => (ringTime, sky),
     };
     if (label == null) return const SizedBox.shrink();
     return DecoratedBox(

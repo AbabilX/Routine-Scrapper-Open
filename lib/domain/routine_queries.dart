@@ -17,6 +17,16 @@ class RoutineQueries {
     return matched;
   }
 
+  /// Days that actually have classes, Sat–Thu, labs already merged.
+  static Map<RoutineDay, List<ClassBlock>> weeklyBlocks(List<ClassSlot> slots) {
+    final week = <RoutineDay, List<ClassBlock>>{};
+    for (final day in RoutineDay.values) {
+      final blocks = merge(slots.where((slot) => slot.day == day).toList());
+      if (blocks.isNotEmpty) week[day] = blocks;
+    }
+    return week;
+  }
+
   static StudentSummary summary(
     List<ClassSlot> slots,
     StudentQuery query,

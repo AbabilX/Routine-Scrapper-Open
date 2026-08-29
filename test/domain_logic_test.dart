@@ -95,6 +95,30 @@ void main() {
       );
     });
 
+    test('weeklyBlocks keeps only days that have classes', () {
+      final week = RoutineQueries.weeklyBlocks([
+        _slot(day: RoutineDay.saturday, slot: 1, start: '10:00', end: '11:30'),
+        _slot(
+          day: RoutineDay.saturday,
+          slot: 2,
+          start: '11:30',
+          end: '01:00',
+          course: 'AOL101',
+          teacher: 'AAM',
+          room: 'G1-027',
+        ),
+        _slot(
+          day: RoutineDay.thursday,
+          slot: 1,
+          start: '10:00',
+          end: '11:30',
+        ),
+      ]);
+      expect(week.keys, [RoutineDay.saturday, RoutineDay.thursday]);
+      expect(week[RoutineDay.saturday], hasLength(2));
+      expect(week.containsKey(RoutineDay.sunday), isFalse);
+    });
+
     test('merges adjacent lab slots into one block', () {
       final blocks = RoutineQueries.merge([
         _slot(slot: 1, start: '10:00', end: '11:30'),
@@ -203,6 +227,7 @@ void main() {
             ),
           )
           .toList();
+      expect(file.meta.schemaVersion, 1);
       expect(file.meta.version, '5.0');
       expect(
         RoutineQueries.forStudent(slots, StudentQuery.parse('68_C')!),

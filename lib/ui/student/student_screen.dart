@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/pdf_exporter.dart';
 import '../../domain/model/class_status.dart';
 import '../../domain/model/routine_day.dart';
+import '../../domain/model/student_summary.dart';
 import '../theme/app_colors.dart';
 import 'components/class_timeline.dart';
 import 'components/date_strip.dart';
@@ -11,6 +11,7 @@ import 'components/decor_blobs.dart';
 import 'components/empty_hint.dart';
 import 'components/next_class_banner.dart';
 import 'components/quick_chips.dart';
+import 'components/reminder_picker_sheet.dart';
 import 'components/search_row.dart';
 import 'components/student_header.dart';
 import 'components/summary_card.dart';
@@ -102,7 +103,8 @@ class StudentScreen extends StatelessWidget {
         return _ReadyBody(
           state: state,
           onDaySelected: viewModel.onDaySelected,
-          onDownload: () { PdfExporter.share(); },
+          onDownload: viewModel.downloadSchedule,
+          onReminderPicked: viewModel.onReminderPicked,
         );
     }
   }
@@ -113,17 +115,22 @@ class _ReadyBody extends StatelessWidget {
     required this.state,
     required this.onDaySelected,
     required this.onDownload,
+    required this.onReminderPicked,
   });
 
   final StudentUiState state;
   final ValueChanged<RoutineDay> onDaySelected;
-  final VoidCallback onDownload;
+  final Future<void> Function() onDownload;
+  final Future<bool> Function(ClassBlock block, int? minutes) onReminderPicked;
 
   @override
   Widget build(BuildContext context) {
     final statuses = state.classStatuses.values;
     final allDone = statuses.isNotEmpty &&
         statuses.every((status) => status == ClassStatus.done);
+    final reminderMinutes = {
+      for (final reminder in state.reminders) reminder.id: reminder.minutesBefore,
+    };
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -156,13 +163,38 @@ class _ReadyBody extends StatelessWidget {
             tint: lavender,
           ),
           const SizedBox(height: 18),
-          ClassTimeline(items: state.timeline, statuses: state.classStatuses),
+          ClassTimeline(
+            items: state.timeline,
+            statuses: state.classStatuses,
+            reminderMinutes: reminderMinutes,
+            onReminderTap: (block) => _pickReminder(context, block),
+          ),
         ] else ...[
           const SizedBox(height: 18),
-          ClassTimeline(items: state.timeline, statuses: state.classStatuses),
+          ClassTimeline(
+            items: state.timeline,
+            statuses: state.classStatuses,
+            reminderMinutes: reminderMinutes,
+            onReminderTap: (block) => _pickReminder(context, block),
+          ),
         ],
       ],
     );
+  }
+
+  Future<void> _pickReminder(BuildContext context, ClassBlock block) async {
+    final choice = await showReminderPickerSheet(
+      context: context,
+      course: block.course,
+      selected: state.reminderMinutesFor(block),
+    );
+    if (choice == null || !context.mounted) return;
+    final allowed = await onReminderPicked(block, choice.minutes);
+    if (!allowed && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('নোটিফিকেশন পারমিশন দরকার')),
+      );
+    }
   }
 }
 
