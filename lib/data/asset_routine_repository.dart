@@ -9,23 +9,30 @@ import 'local_routine_store.dart';
 import 'routine_file_dto.dart';
 
 class AssetRoutineRepository {
-  AssetRoutineRepository._(this.meta, this.slots);
+  AssetRoutineRepository._(this.meta, this.slots, {this.hasRoutine = true});
 
   final RoutineMeta meta;
   final List<ClassSlot> slots;
+  final bool hasRoutine;
 
-  static const assetPath = LocalRoutineStore.defaultAssetPath;
+  static const assetPath = 'assets/routine/cse_summer_2026_v5.json';
   static const pdfAsset = 'assets/routine/cse_summer_2026_v5.pdf';
 
-  static Future<AssetRoutineRepository> load([
-    LocalRoutineStore? store,
-  ]) async {
-    final raw = store == null
-        ? await rootBundle.loadString(assetPath)
-        : await store.loadOrSeed();
-    final file = RoutineFileDto.fromJson(
-      jsonDecode(raw) as Map<String, dynamic>,
+  static AssetRoutineRepository empty() {
+    return AssetRoutineRepository._(
+      const RoutineMeta(
+        department: '',
+        version: '',
+        semester: '',
+        effectiveFrom: '',
+        sourcePdf: '',
+      ),
+      const [],
+      hasRoutine: false,
     );
+  }
+
+  static AssetRoutineRepository fromFile(RoutineFileDto file) {
     return AssetRoutineRepository._(
       RoutineMeta(
         schemaVersion: file.meta.schemaVersion,
@@ -49,6 +56,22 @@ class AssetRoutineRepository {
             ),
           )
           .toList(),
+      hasRoutine: file.slots.isNotEmpty,
     );
+  }
+
+  static Future<AssetRoutineRepository> load([
+    LocalRoutineStore? store,
+  ]) async {
+    if (store != null) {
+      final user = await store.loadUser();
+      if (user == null) return AssetRoutineRepository.empty();
+      return AssetRoutineRepository.fromFile(user);
+    }
+    final raw = await rootBundle.loadString(assetPath);
+    final file = RoutineFileDto.fromJson(
+      jsonDecode(raw) as Map<String, dynamic>,
+    );
+    return AssetRoutineRepository.fromFile(file);
   }
 }

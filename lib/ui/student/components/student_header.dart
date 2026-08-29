@@ -7,9 +7,13 @@ class StudentHeader extends StatelessWidget {
   const StudentHeader({
     super.key,
     this.profile = StudentProfile.empty,
+    this.onReplacePdf,
+    this.replacing = false,
   });
 
   final StudentProfile profile;
+  final VoidCallback? onReplacePdf;
+  final bool replacing;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +40,18 @@ class StudentHeader extends StatelessWidget {
             ],
           ),
         ),
+        if (onReplacePdf != null)
+          IconButton(
+            tooltip: 'নতুন PDF',
+            onPressed: replacing ? null : onReplacePdf,
+            icon: replacing
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.upload_file_outlined),
+          ),
       ],
     );
   }

@@ -46,6 +46,7 @@ Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফার�
 - শেষ সার্চ ও রিমাইন্ডার পছন্দ ফোনে JSON ক্যাশে থাকে
 - ইন্টারনেট লাগে না
 - অনবোর্ডিং একবারই (স্টোরেজ ক্লিয়ার / অ্যাপ রিসেট না করা পর্যন্ত)
+- অনবোর্ডিংয়ের পর নিজের CSE রুটিন PDF আপলোড — না থাকলে খালি মেসেজ; আপলোড থাকলে আগেরটা রাখে
 - হেডারে জেন্ডার অনুযায়ী ১২ ফেস: মেয়ে (bunny/cat/chick/deer), ছেলে (fox/wolf/raccoon/bear), বলব না → টাক মাথা পুরুষ (হাসি/উইংক/চশমা/টাই)
 
 অ্যাপে ঢুকে **`68_C`** দিয়ে ট্রাই করো — ডেমোর জন্য ভালো উদাহরণ।
@@ -141,7 +142,9 @@ lib/
 │   └── model/                      ClassSlot, ClassReminder, ClassStatus, …
 ├── data/
 │   ├── asset_routine_repository.dart   assets থেকে JSON
-│   ├── local_routine_store.dart   অ্যাসেট → ফোনের routine.json
+│   ├── local_routine_store.dart   ইউজার PDF + routine.json
+│   ├── routine_pdf_parser.dart    Python পার্সারের Dart পোর্ট
+│   ├── pdf_word_extractor.dart    PDF থেকে শব্দ+পজিশন
 │   ├── student_cache.dart         সার্চ + রিমাইন্ডার + নাম/জেন্ডার + seenOnboarding
 │   ├── student_prefs.dart         লিগ্যাসি SharedPreferences মাইগ্রেশন
 │   ├── class_reminder_scheduler.dart  OS লোকাল নোটিফিকেশন

@@ -5,9 +5,10 @@ DIU keeps UI, query logic, and data files separate so Teacher/Room views and PDF
 The running app is **Flutter**. Kotlin + Compose remains under `app/` as a behavior reference.
 
 ```
-PDF  →  scripts/parse_routine_pdf.py  →  assets JSON (schemaVersion)
-                                         ↓ first launch / newer bundled
-                              device routine.json   (LocalRoutineStore)
+User PDF  →  PdfWordExtractor + RoutinePdfParser  →  device routine.json (origin: user)
+                                                    + user_routine.pdf
+                                         ↓
+                              AssetRoutineRepository (empty until first upload)
                                          ↓
                               AssetRoutineRepository
                                          ↓
@@ -24,7 +25,7 @@ PDF  →  scripts/parse_routine_pdf.py  →  assets JSON (schemaVersion)
 ```
 
 - `lib/domain` has no Flutter UI types.
-- `lib/data` loads JSON, copies it onto the device, builds the section schedule PDF, and stores student cache / schedules reminders.
+- `lib/data` parses an uploaded DIU CSE routine PDF (same rules as `scripts/parse_routine_pdf.py`), stores JSON + PDF, and builds the section schedule export.
 - `lib/ui/onboarding` is once-per-install; `seenOnboarding` lives in `student_cache.json` and SharedPreferences. Clears only when app storage is reset.
 - `lib/ui/student/components` are one-job widgets.
 - Theme is light and cute (`lib/ui/theme/app_colors.dart`); screens must not hardcode colors.
@@ -38,7 +39,8 @@ Local files (app documents):
 
 | File | Role |
 |---|---|
-| `routine.json` | Device copy of the bundled routine. Replaced when bundled fingerprint changes. `origin: user` (future upload) is never overwritten. |
+| `routine.json` | Parsed user routine (`origin: user`). Missing/bundled file = no routine shown. |
+| `user_routine.pdf` | Last uploaded source PDF. Replaced on the next upload. |
 | `student_cache.json` | Last search, reminders, `seenOnboarding`, `displayName`, `gender`. |
 
-Future PDF upload should write `routine.json` with `meta.origin = "user"` and keep `RoutineQueries` unchanged.
+Re-upload replaces both files. `RoutineQueries` stays unchanged.

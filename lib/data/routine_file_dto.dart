@@ -12,6 +12,13 @@ class RoutineFileDto {
           .toList(),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'meta': meta.toJson(),
+      'slots': slots.map((slot) => slot.toJson()).toList(),
+    };
+  }
 }
 
 class RoutineMetaDto {
@@ -47,6 +54,18 @@ class RoutineMetaDto {
 
   String get fingerprint =>
       '$department|$version|$effectiveFrom|$schemaVersion';
+
+  Map<String, dynamic> toJson() {
+    return {
+      'schemaVersion': schemaVersion,
+      'origin': origin,
+      'department': department,
+      'version': version,
+      'semester': semester,
+      'effectiveFrom': effectiveFrom,
+      'sourcePdf': sourcePdf,
+    };
+  }
 }
 
 class ClassSlotDto {
@@ -81,5 +100,18 @@ class ClassSlotDto {
       teacher: json['teacher'] as String,
       room: json['room'] as String,
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'day': day,
+      'slot': slot,
+      'start': start,
+      'end': end,
+      'course': course,
+      'group': group,
+      'teacher': teacher,
+      'room': room,
+    };
   }
 }

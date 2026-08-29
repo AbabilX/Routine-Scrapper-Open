@@ -1,54 +1,45 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
-import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 import 'routine_file_dto.dart';
 
-/// Copies the bundled routine JSON onto the device so later updates
-/// (download / PDF parse) can replace one file without touching domain code.
+/// Device copies of the student's uploaded PDF and parsed JSON.
 class LocalRoutineStore {
-  LocalRoutineStore({this.assetPath = defaultAssetPath});
+  static const jsonFileName = 'routine.json';
+  static const pdfFileName = 'user_routine.pdf';
 
-  static const defaultAssetPath = 'assets/routine/cse_summer_2026_v5.json';
-  static const fileName = 'routine.json';
+  Future<Directory> _dir() => getApplicationDocumentsDirectory();
 
-  final String assetPath;
+  Future<File> jsonFile() async => File('${(await _dir()).path}/$jsonFileName');
 
-  Future<String> loadOrSeed() async {
-    final bundled = await rootBundle.loadString(assetPath);
-    final local = await _localFile();
-    if (!await local.exists()) {
-      await local.writeAsString(bundled);
-      return bundled;
-    }
+  Future<File> pdfFile() async => File('${(await _dir()).path}/$pdfFileName');
 
-    final localRaw = await local.readAsString();
-    if (_shouldReplaceWithBundled(bundled, localRaw)) {
-      await local.writeAsString(bundled);
-      return bundled;
-    }
-    return localRaw;
-  }
-
-  Future<File> _localFile() async {
-    final dir = await getApplicationDocumentsDirectory();
-    return File('${dir.path}/$fileName');
-  }
-
-  bool _shouldReplaceWithBundled(String bundled, String localRaw) {
+  Future<RoutineFileDto?> loadUser() async {
+    final file = await jsonFile();
+    if (!await file.exists()) return null;
     try {
-      final localDto = RoutineFileDto.fromJson(
-        jsonDecode(localRaw) as Map<String, dynamic>,
+      final dto = RoutineFileDto.fromJson(
+        jsonDecode(await file.readAsString()) as Map<String, dynamic>,
       );
-      if (localDto.meta.origin == 'user') return false;
-      final bundledDto = RoutineFileDto.fromJson(
-        jsonDecode(bundled) as Map<String, dynamic>,
-      );
-      return bundledDto.meta.fingerprint != localDto.meta.fingerprint;
+      if (dto.meta.origin != 'user' || dto.slots.isEmpty) return null;
+      return dto;
     } catch (_) {
-      return true;
+      return null;
     }
+  }
+
+  Future<void> saveUser({
+    required RoutineFileDto routine,
+    required Uint8List pdfBytes,
+  }) async {
+    final json = await jsonFile();
+    final pdf = await pdfFile();
+    await json.writeAsString(
+      const JsonEncoder.withIndent('  ').convert(routine.toJson()),
+    );
+    await pdf.writeAsBytes(pdfBytes, flush: true);
   }
 }

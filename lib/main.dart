@@ -11,7 +11,8 @@ import 'ui/theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final repository = await AssetRoutineRepository.load(LocalRoutineStore());
+  final store = LocalRoutineStore();
+  final repository = await AssetRoutineRepository.load(store);
   final cache = await StudentCache.load();
   final scheduler = await ClassReminderScheduler.create();
   runApp(
@@ -19,6 +20,7 @@ Future<void> main() async {
       repository: repository,
       cache: cache,
       scheduler: scheduler,
+      store: store,
     ),
   );
 }
@@ -29,11 +31,13 @@ class DIUApp extends StatelessWidget {
     required this.repository,
     required this.cache,
     required this.scheduler,
+    required this.store,
   });
 
   final AssetRoutineRepository repository;
   final StudentCache cache;
   final ClassReminderScheduler scheduler;
+  final LocalRoutineStore store;
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +46,7 @@ class DIUApp extends StatelessWidget {
         repository: repository,
         cache: cache,
         scheduler: scheduler,
+        store: store,
       ),
       child: MaterialApp(
         title: 'DIU',

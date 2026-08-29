@@ -15,6 +15,7 @@ import 'components/reminder_picker_sheet.dart';
 import 'components/search_row.dart';
 import 'components/student_header.dart';
 import 'components/summary_card.dart';
+import 'components/upload_routine_card.dart';
 import 'student_view_model.dart';
 
 class StudentScreen extends StatelessWidget {
@@ -36,20 +37,28 @@ class StudentScreen extends StatelessWidget {
           ListView(
             padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
             children: [
-              StudentHeader(profile: state.profile),
-              const SizedBox(height: 18),
-              SearchRow(
-                query: state.queryText,
-                onQueryChange: viewModel.onQueryChange,
+              StudentHeader(
+                profile: state.profile,
+                onReplacePdf: state.hasRoutine
+                    ? () => _upload(context, viewModel)
+                    : null,
+                replacing: state.isImporting,
               ),
-              if (showChips) ...[
-                const SizedBox(height: 18),
-                QuickChips(
-                  chips: state.suggestions,
-                  onSelect: viewModel.onChipSelected,
-                ),
-              ],
               const SizedBox(height: 18),
+              if (state.hasRoutine) ...[
+                SearchRow(
+                  query: state.queryText,
+                  onQueryChange: viewModel.onQueryChange,
+                ),
+                if (showChips) ...[
+                  const SizedBox(height: 18),
+                  QuickChips(
+                    chips: state.suggestions,
+                    onSelect: viewModel.onChipSelected,
+                  ),
+                ],
+                const SizedBox(height: 18),
+              ],
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 280),
                 switchInCurve: Curves.easeOut,
@@ -68,7 +77,7 @@ class StudentScreen extends StatelessWidget {
                 },
                 child: KeyedSubtree(
                   key: ValueKey(_contentKey(state)),
-                  child: _body(state, viewModel),
+                  child: _body(context, state, viewModel),
                 ),
               ),
               const SizedBox(height: 28),
@@ -79,8 +88,24 @@ class StudentScreen extends StatelessWidget {
     );
   }
 
-  Widget _body(StudentUiState state, StudentViewModel viewModel) {
+  Future<void> _upload(BuildContext context, StudentViewModel viewModel) async {
+    final error = await viewModel.importRoutinePdf();
+    if (error != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+    }
+  }
+
+  Widget _body(
+    BuildContext context,
+    StudentUiState state,
+    StudentViewModel viewModel,
+  ) {
     switch (_contentKey(state)) {
+      case _BodyKey.needsUpload:
+        return UploadRoutineCard(
+          busy: state.isImporting,
+          onUpload: () => _upload(context, viewModel),
+        );
       case _BodyKey.blank:
         return const EmptyHint(
           title: 'শুরু করো',
@@ -198,9 +223,10 @@ class _ReadyBody extends StatelessWidget {
   }
 }
 
-enum _BodyKey { blank, invalid, noMatch, ready }
+enum _BodyKey { needsUpload, blank, invalid, noMatch, ready }
 
 _BodyKey _contentKey(StudentUiState state) {
+  if (!state.hasRoutine) return _BodyKey.needsUpload;
   if (state.queryText.trim().isEmpty) return _BodyKey.blank;
   if (state.invalidQuery) return _BodyKey.invalid;
   if (!state.hasMatches) return _BodyKey.noMatch;

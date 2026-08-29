@@ -1,10 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../data/asset_routine_repository.dart';
 import '../../data/class_reminder_scheduler.dart';
+import '../../data/local_routine_store.dart';
 import '../../data/pdf_exporter.dart';
+import '../../data/pdf_word_extractor.dart';
+import '../../data/routine_pdf_parser.dart';
 import '../../data/student_cache.dart';
 import '../../domain/model/class_reminder.dart';
 import '../../domain/model/class_status.dart';
@@ -32,6 +37,8 @@ class StudentUiState {
     this.restored = false,
     this.reminders = const [],
     this.profile = StudentProfile.empty,
+    this.hasRoutine = false,
+    this.isImporting = false,
   });
 
   final String queryText;
@@ -49,6 +56,8 @@ class StudentUiState {
   final bool restored;
   final List<ClassReminder> reminders;
   final StudentProfile profile;
+  final bool hasRoutine;
+  final bool isImporting;
 
   RoutineDay get resolvedSelectedDay =>
       selectedDay ?? RoutineQueries.todayOrSaturday();
@@ -82,6 +91,8 @@ class StudentUiState {
     bool? restored,
     List<ClassReminder>? reminders,
     StudentProfile? profile,
+    bool? hasRoutine,
+    bool? isImporting,
   }) {
     return StudentUiState(
       queryText: queryText ?? this.queryText,
@@ -99,6 +110,8 @@ class StudentUiState {
       restored: restored ?? this.restored,
       reminders: reminders ?? this.reminders,
       profile: profile ?? this.profile,
+      hasRoutine: hasRoutine ?? this.hasRoutine,
+      isImporting: isImporting ?? this.isImporting,
     );
   }
 }
@@ -108,6 +121,7 @@ class StudentViewModel extends ChangeNotifier {
     required this.repository,
     required this.cache,
     required this.scheduler,
+    required this.store,
   }) : _state = StudentUiState(
           selectedDay: RoutineQueries.todayOrSaturday(),
           today: RoutineQueries.todayOrSaturday(),
@@ -115,14 +129,16 @@ class StudentViewModel extends ChangeNotifier {
           suggestions: RoutineQueries.suggestChips(repository.slots, ''),
           reminders: cache.reminders,
           profile: cache.profile,
+          hasRoutine: repository.hasRoutine,
         ) {
     _restore();
     _tick = Timer.periodic(const Duration(seconds: 30), (_) => rebuild());
   }
 
-  final AssetRoutineRepository repository;
+  AssetRoutineRepository repository;
   final StudentCache cache;
   final ClassReminderScheduler scheduler;
+  final LocalRoutineStore store;
   StudentUiState _state;
   Timer? _saveJob;
   Timer? _tick;
@@ -147,6 +163,46 @@ class StudentViewModel extends ChangeNotifier {
     await cache.completeOnboarding(profile);
     _state = _state.copyWith(profile: cache.profile);
     notifyListeners();
+  }
+
+  Future<String?> importRoutinePdf() async {
+    final picked = await FilePicker.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: const ['pdf'],
+      withData: true,
+    );
+    if (picked == null || picked.files.isEmpty) return null;
+    final file = picked.files.first;
+    final bytes = file.bytes ??
+        (file.path == null ? null : await File(file.path!).readAsBytes());
+    if (bytes == null) return 'PDF পড়া যায়নি';
+
+    _state = _state.copyWith(isImporting: true);
+    notifyListeners();
+    try {
+      final extracted = await PdfWordExtractor.extract(bytes);
+      final parsed = RoutinePdfParser.parse(
+        extracted,
+        sourcePdf: file.name,
+      );
+      if (parsed.slots.isEmpty) {
+        return 'এই PDF থেকে ক্লাস পাওয়া যায়নি — DIU CSE রুটিন PDF দাও';
+      }
+      await store.saveUser(routine: parsed, pdfBytes: bytes);
+      repository = AssetRoutineRepository.fromFile(parsed);
+      _state = _state.copyWith(
+        hasRoutine: true,
+        meta: repository.meta,
+        suggestions: RoutineQueries.suggestChips(repository.slots, _state.queryText),
+      );
+      applyQuery(_state.queryText, persist: false);
+      return null;
+    } catch (_) {
+      return 'PDF পার্স করা যায়নি — অন্য ফাইল চেষ্টা করো';
+    } finally {
+      _state = _state.copyWith(isImporting: false);
+      notifyListeners();
+    }
   }
 
   void onQueryChange(String value) => applyQuery(value, persist: true);
