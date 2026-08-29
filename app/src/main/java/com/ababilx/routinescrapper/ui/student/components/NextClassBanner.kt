@@ -20,7 +20,7 @@ import com.ababilx.routinescrapper.domain.model.ClassStatus
 import com.ababilx.routinescrapper.domain.model.NowNextHint
 import com.ababilx.routinescrapper.ui.theme.Ink
 import com.ababilx.routinescrapper.ui.theme.Mint
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
+import com.ababilx.routinescrapper.ui.theme.DIUTypography
 import com.ababilx.routinescrapper.ui.theme.Sky
 import com.ababilx.routinescrapper.ui.theme.TextMuted
 
@@ -50,17 +50,17 @@ fun NextClassBanner(
                 Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                     Text(
                         if (isNow) "এখন চলছে" else "পরের ক্লাস",
-                        style = RdiuTypography.labelSmall,
+                        style = DIUTypography.labelSmall,
                         color = TextMuted,
                     )
-                    Text(data.block.course, style = RdiuTypography.titleLarge, color = Ink)
+                    Text(data.block.course, style = DIUTypography.titleLarge, color = Ink)
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         "${data.block.start} – ${data.block.end}",
-                        style = RdiuTypography.labelLarge,
+                        style = DIUTypography.labelLarge,
                     )
-                    Text(data.block.room, style = RdiuTypography.labelSmall, color = TextMuted)
+                    Text(data.block.room, style = DIUTypography.labelSmall, color = TextMuted)
                 }
             }
         }

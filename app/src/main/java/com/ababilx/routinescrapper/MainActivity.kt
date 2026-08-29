@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.ui.Modifier
 import com.ababilx.routinescrapper.ui.student.StudentScreen
-import com.ababilx.routinescrapper.ui.theme.RdiuTheme
+import com.ababilx.routinescrapper.ui.theme.DIUTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT),
         )
         setContent {
-            RdiuTheme {
+            DIUTheme {
                 Box(
                     Modifier
                         .fillMaxSize()

@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'data/asset_routine_repository.dart';
 import 'data/class_reminder_scheduler.dart';
 import 'data/local_routine_store.dart';
 import 'data/student_cache.dart';
-import 'ui/student/student_screen.dart';
+import 'ui/app_shell.dart';
 import 'ui/student/student_view_model.dart';
-import 'ui/theme/app_colors.dart';
 import 'ui/theme/app_theme.dart';
 
 Future<void> main() async {
@@ -17,7 +15,7 @@ Future<void> main() async {
   final cache = await StudentCache.load();
   final scheduler = await ClassReminderScheduler.create();
   runApp(
-    RdiuApp(
+    DIUApp(
       repository: repository,
       cache: cache,
       scheduler: scheduler,
@@ -25,8 +23,8 @@ Future<void> main() async {
   );
 }
 
-class RdiuApp extends StatelessWidget {
-  const RdiuApp({
+class DIUApp extends StatelessWidget {
+  const DIUApp({
     super.key,
     required this.repository,
     required this.cache,
@@ -46,22 +44,10 @@ class RdiuApp extends StatelessWidget {
         scheduler: scheduler,
       ),
       child: MaterialApp(
-        title: 'rDIU',
+        title: 'DIU',
         debugShowCheckedModeBanner: false,
-        theme: rdiuTheme(),
-        home: const AnnotatedRegion<SystemUiOverlayStyle>(
-          value: SystemUiOverlayStyle(
-            statusBarColor: Colors.transparent,
-            statusBarIconBrightness: Brightness.dark,
-            statusBarBrightness: Brightness.light,
-            systemNavigationBarColor: bg,
-            systemNavigationBarIconBrightness: Brightness.dark,
-          ),
-          child: Scaffold(
-            backgroundColor: bg,
-            body: SafeArea(child: StudentScreen()),
-          ),
-        ),
+        theme: DIUTheme(),
+        home: AppShell(cache: cache),
       ),
     );
   }

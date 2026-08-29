@@ -18,7 +18,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import com.ababilx.routinescrapper.ui.theme.Lavender
 import com.ababilx.routinescrapper.ui.theme.Peach
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
+import com.ababilx.routinescrapper.ui.theme.DIUTypography
 import com.ababilx.routinescrapper.ui.theme.Sky
 
 @Composable
@@ -41,7 +41,7 @@ fun QuickChips(
                 val tint = tints[chip.hashCode().and(Int.MAX_VALUE) % tints.size]
                 Text(
                     text = chip,
-                    style = RdiuTypography.labelLarge,
+                    style = DIUTypography.labelLarge,
                     modifier = Modifier
                         .background(tint, RoundedCornerShape(22.dp))
                         .clickable {

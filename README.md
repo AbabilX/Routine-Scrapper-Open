@@ -1,4 +1,4 @@
-# rDIU Routine Scrapper
+# DIU Routine Scrapper
 
 DIU স্টুডেন্টদের জন্য **অফলাইন ক্লাস রুটিন** অ্যাপ। PDF ঘেঁটে ব্যাচ খুঁজে বের করার বদলে ব্যাচ কোড লিখলেই দিনভিত্তিক রুটিন দেখা যায়।
 
@@ -8,7 +8,7 @@ DIU স্টুডেন্টদের জন্য **অফলাইন ক�
 |---|---|
 | প্ল্যাটফর্ম | Flutter (Android + iOS) |
 | প্যাকেজ | `com.ababilx.routinescrapper` |
-| অ্যাপ নাম | rDIU |
+| অ্যাপ নাম | DIU |
 | ভার্সন | 0.1.0 |
 | ডেটা | CSE Routine **V5 · Summer 2026** (অ্যাপে বান্ডল) |
 | লাইসেন্স | [MIT](LICENSE) |
@@ -45,6 +45,8 @@ Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফার�
 - ক্লাস কার্ডে বেল — ৫ / ১০ / ১৫ / ২০ / ৩০ মিনিট আগে লোকাল রিমাইন্ডার (নেট লাগে না)
 - শেষ সার্চ ও রিমাইন্ডার পছন্দ ফোনে JSON ক্যাশে থাকে
 - ইন্টারনেট লাগে না
+- অনবোর্ডিং একবারই (স্টোরেজ ক্লিয়ার / অ্যাপ রিসেট না করা পর্যন্ত)
+- হেডারে জেন্ডার অনুযায়ী ১২ ফেস: মেয়ে (bunny/cat/chick/deer), ছেলে (fox/wolf/raccoon/bear), বলব না → টাক মাথা পুরুষ (হাসি/উইংক/চশমা/টাই)
 
 অ্যাপে ঢুকে **`68_C`** দিয়ে ট্রাই করো — ডেমোর জন্য ভালো উদাহরণ।
 
@@ -70,7 +72,7 @@ flutter run
 flutter build apk
 ```
 
-অ্যাপে নাম **rDIU** — সার্চ বক্সে `68_C`।
+অ্যাপে নাম **DIU** — সার্চ বক্সে `68_C`।
 
 লজিক টেস্ট:
 
@@ -105,6 +107,7 @@ domain/RoutineQueries                 ← সার্চ, সারাংশ, �
         ▼
 ui/student/StudentViewModel           ← স্ক্রিন স্টেট + student_cache.json
         │
+        ├─ ui/app_shell               ← প্রথম লঞ্চ ট্যুর / Student
         ├─ ui/student/StudentScreen   ← Flutter UI + বেল
         └─ data/ClassReminderScheduler ← OS নোটিফিকেশন
 ```
@@ -113,6 +116,7 @@ ui/student/StudentViewModel           ← স্ক্রিন স্টেট 
 |---|---|---|
 | `lib/domain/` | মডেল + নিয়ম (Flutter UI নেই) | সার্চ ম্যাচ, ব্রেক হিসাব, now/next |
 | `lib/data/` | JSON পড়া, লোকাল কপি, PDF শেয়ার, রিমাইন্ডার শিডিউল, student cache | নতুন ডেটা সোর্স / মনে রাখা |
+| `lib/ui/onboarding/` | প্রথম লঞ্চ ট্যুর | ফিচার + open source / privacy কপি |
 | `lib/ui/student/` | Student স্ক্রিন | রং, কার্ড, সার্চ বার, UX পলিশ |
 | `lib/ui/theme/` | রং ও টাইপো | কিউট লাইট প্যালেট (ক্রিম + প্যাস্টেল) |
 | `assets/routine/` | JSON + সোর্স PDF | নতুন সেমিস্টার ফাইল |
@@ -138,17 +142,20 @@ lib/
 ├── data/
 │   ├── asset_routine_repository.dart   assets থেকে JSON
 │   ├── local_routine_store.dart   অ্যাসেট → ফোনের routine.json
-│   ├── student_cache.dart         শেষ সার্চ + রিমাইন্ডার (JSON)
+│   ├── student_cache.dart         সার্চ + রিমাইন্ডার + নাম/জেন্ডার + seenOnboarding
 │   ├── student_prefs.dart         লিগ্যাসি SharedPreferences মাইগ্রেশন
 │   ├── class_reminder_scheduler.dart  OS লোকাল নোটিফিকেশন
 │   ├── course_catalog.dart        কোর্স কোড → নাম
 │   ├── schedule_pdf_builder.dart  সেকশন সাপ্তাহিক PDF
 │   ├── routine_file_dto.dart      JSON আকৃতি (schemaVersion)
 │   └── pdf_exporter.dart          জেনারেটেড PDF শেয়ার
-└── ui/student/
-    ├── student_view_model.dart    query + day + now/next
-    ├── student_screen.dart        লেআউট জোড়া
-    └── components/                 Header, Search, Chips, Banner, Date, Timeline, EmptyHint
+└── ui/
+    ├── app_shell.dart             ট্যুর গেট + Student
+    ├── onboarding/                পেজ কপি + PageView
+    └── student/
+        ├── student_view_model.dart    query + day + now/next
+        ├── student_screen.dart        লেআউট জোড়া
+        └── components/                 Header, Search, Chips, Banner, Date, Timeline, EmptyHint
 ```
 
 JSON `meta.schemaVersion` এখন `1` — স্লট ফিল্ড আগের মতোই:

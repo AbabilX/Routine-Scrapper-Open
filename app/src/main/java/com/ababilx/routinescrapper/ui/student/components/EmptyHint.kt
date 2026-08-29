@@ -16,7 +16,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ababilx.routinescrapper.ui.theme.Lavender
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
+import com.ababilx.routinescrapper.ui.theme.DIUTypography
 import com.ababilx.routinescrapper.ui.theme.TextMuted
 
 @Composable
@@ -41,8 +41,8 @@ fun EmptyHint(
         ) {
             CuteFace(size = faceSize)
             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                Text(title, style = RdiuTypography.titleLarge)
-                Text(body, style = RdiuTypography.bodyMedium, color = TextMuted)
+                Text(title, style = DIUTypography.titleLarge)
+                Text(body, style = DIUTypography.bodyMedium, color = TextMuted)
             }
         }
     }

@@ -1,24 +1,40 @@
 import 'package:flutter/material.dart';
 
+import '../../../domain/model/student_profile.dart';
 import 'cute_face.dart';
 
 class StudentHeader extends StatelessWidget {
-  const StudentHeader({super.key});
+  const StudentHeader({
+    super.key,
+    this.profile = StudentProfile.empty,
+  });
+
+  final StudentProfile profile;
 
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     return Row(
       children: [
-        const CuteFace(),
+        CyclingCuteFace(
+          size: 52,
+          gender: profile.gender,
+        ),
         const SizedBox(width: 14),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Hello', style: text.headlineSmall),
-            const SizedBox(height: 2),
-            Text('আজকের ক্লাস খুঁজে নাও', style: text.labelSmall),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                profile.greeting,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: text.headlineSmall,
+              ),
+              const SizedBox(height: 2),
+              Text('আজকের ক্লাস খুঁজে নাও', style: text.labelSmall),
+            ],
+          ),
         ),
       ],
     );

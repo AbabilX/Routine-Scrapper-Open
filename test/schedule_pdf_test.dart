@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:rdiu/data/course_catalog.dart';
-import 'package:rdiu/data/schedule_pdf_builder.dart';
-import 'package:rdiu/domain/model/routine_day.dart';
-import 'package:rdiu/domain/model/routine_meta.dart';
-import 'package:rdiu/domain/model/student_summary.dart';
+import 'package:DIU/data/course_catalog.dart';
+import 'package:DIU/data/schedule_pdf_builder.dart';
+import 'package:DIU/domain/model/routine_day.dart';
+import 'package:DIU/domain/model/routine_meta.dart';
+import 'package:DIU/domain/model/student_summary.dart';
 
 void main() {
   test('builds a PDF for the searched section week', () async {

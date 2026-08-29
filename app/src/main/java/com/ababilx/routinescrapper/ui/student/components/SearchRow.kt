@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import com.ababilx.routinescrapper.ui.icons.AppIcons
 import com.ababilx.routinescrapper.ui.theme.Ink
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
+import com.ababilx.routinescrapper.ui.theme.DIUTypography
 import com.ababilx.routinescrapper.ui.theme.Surface
 import com.ababilx.routinescrapper.ui.theme.TextMuted
 
@@ -47,12 +47,12 @@ fun SearchRow(
             value = query,
             onValueChange = onQueryChange,
             singleLine = true,
-            textStyle = RdiuTypography.bodyLarge,
+            textStyle = DIUTypography.bodyLarge,
             cursorBrush = SolidColor(Ink),
             modifier = Modifier.weight(1f),
             decorationBox = { inner ->
                 if (query.isEmpty()) {
-                    Text("68_C", style = RdiuTypography.bodyMedium)
+                    Text("68_C", style = DIUTypography.bodyMedium)
                 }
                 inner()
             },

@@ -27,7 +27,7 @@ import com.ababilx.routinescrapper.ui.icons.AppIcons
 import com.ababilx.routinescrapper.ui.theme.CardPastels
 import com.ababilx.routinescrapper.ui.theme.Ink
 import com.ababilx.routinescrapper.ui.theme.Mint
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
+import com.ababilx.routinescrapper.ui.theme.DIUTypography
 import com.ababilx.routinescrapper.ui.theme.Sky
 import com.ababilx.routinescrapper.ui.theme.TextMuted
 
@@ -82,13 +82,13 @@ private fun ClassCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(block.course, style = RdiuTypography.headlineSmall)
+                Text(block.course, style = DIUTypography.headlineSmall)
                 StatusPill(status)
             }
             MetaRow(AppIcons.Time, "${block.start}  –  ${block.end}")
             MetaRow(AppIcons.Room, block.room)
-            Text(block.teacher, style = RdiuTypography.titleMedium)
-            Text("Section ${block.group}", style = RdiuTypography.labelSmall)
+            Text(block.teacher, style = DIUTypography.titleMedium)
+            Text("Section ${block.group}", style = DIUTypography.labelSmall)
         }
     }
 }
@@ -104,7 +104,7 @@ private fun StatusPill(status: ClassStatus) {
     Surface(color = color, shape = RoundedCornerShape(14.dp)) {
         Text(
             label,
-            style = RdiuTypography.labelSmall,
+            style = DIUTypography.labelSmall,
             color = if (status == ClassStatus.DONE) TextMuted else Ink,
             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
         )
@@ -121,7 +121,7 @@ private fun BreakChip(item: TimelineItem.Break) {
     ) {
         Text(
             "$label break  ·  ${item.start} – ${item.end}",
-            style = RdiuTypography.labelLarge,
+            style = DIUTypography.labelLarge,
             modifier = Modifier.padding(horizontal = 18.dp, vertical = 12.dp),
         )
     }
@@ -134,6 +134,6 @@ private fun MetaRow(icon: ImageVector, text: String) {
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         Icon(icon, contentDescription = null, tint = Ink, modifier = Modifier.size(18.dp))
-        Text(text, style = RdiuTypography.bodyLarge, color = TextMuted)
+        Text(text, style = DIUTypography.bodyLarge, color = TextMuted)
     }
 }

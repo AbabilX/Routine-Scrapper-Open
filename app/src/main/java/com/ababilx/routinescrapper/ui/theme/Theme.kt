@@ -19,10 +19,10 @@ private val LightColors = lightColorScheme(
 )
 
 @Composable
-fun RdiuTheme(content: @Composable () -> Unit) {
+fun DIUTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = LightColors,
-        typography = RdiuTypography,
+        typography = DIUTypography,
         content = content,
     )
 }

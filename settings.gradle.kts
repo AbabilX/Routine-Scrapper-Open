@@ -18,5 +18,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "rDIU"
+rootProject.name = "DIU"
 include(":app")

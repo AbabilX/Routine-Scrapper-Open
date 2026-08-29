@@ -30,7 +30,7 @@ import com.ababilx.routinescrapper.ui.theme.Ink
 import com.ababilx.routinescrapper.ui.theme.Line
 import com.ababilx.routinescrapper.ui.theme.Mint
 import com.ababilx.routinescrapper.ui.theme.OnInk
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
+import com.ababilx.routinescrapper.ui.theme.DIUTypography
 import com.ababilx.routinescrapper.ui.theme.TextMuted
 import java.util.Calendar
 
@@ -99,13 +99,13 @@ fun DateStrip(
                 ) {
                     Text(
                         "${chip.date}",
-                        style = RdiuTypography.titleMedium,
+                        style = DIUTypography.titleMedium,
                         color = if (active) OnInk else Ink,
                     )
                 }
                 Text(
                     if (chip.isToday) "আজ" else chip.day.shortLabel.uppercase(),
-                    style = RdiuTypography.labelSmall,
+                    style = DIUTypography.labelSmall,
                     color = if (active || chip.isToday) Ink else TextMuted,
                 )
             }

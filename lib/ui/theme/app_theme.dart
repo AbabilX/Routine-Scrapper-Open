@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'app_colors.dart';
 import 'app_type.dart';
 
-ThemeData rdiuTheme() {
+ThemeData DIUTheme() {
   return ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
@@ -19,7 +19,7 @@ ThemeData rdiuTheme() {
       outline: line,
     ),
     scaffoldBackgroundColor: bg,
-    textTheme: rdiuTextTheme,
+    textTheme: DIUTextTheme,
     appBarTheme: const AppBarTheme(
       systemOverlayStyle: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,

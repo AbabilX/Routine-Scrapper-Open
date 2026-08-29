@@ -50,7 +50,7 @@ class SchedulePdfBuilder {
 
   static pw.Widget _header(RoutineMeta meta, String queryLabel) {
     final qrPayload =
-        'rDIU Routine Scrapper\n$queryLabel\n${meta.department} ${meta.semester} v${meta.version}';
+        'DIU Routine Scrapper\n$queryLabel\n${meta.department} ${meta.semester} v${meta.version}';
     return pw.Row(
       crossAxisAlignment: pw.CrossAxisAlignment.start,
       children: [

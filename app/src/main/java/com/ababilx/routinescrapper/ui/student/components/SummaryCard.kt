@@ -23,7 +23,7 @@ import com.ababilx.routinescrapper.ui.icons.AppIcons
 import com.ababilx.routinescrapper.ui.theme.Ink
 import com.ababilx.routinescrapper.ui.theme.OnInk
 import com.ababilx.routinescrapper.ui.theme.Peach
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
+import com.ababilx.routinescrapper.ui.theme.DIUTypography
 import com.ababilx.routinescrapper.ui.theme.TextMuted
 
 @Composable
@@ -48,10 +48,10 @@ fun SummaryCard(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.spacedBy(6.dp),
             ) {
-                Text(title, style = RdiuTypography.headlineSmall)
+                Text(title, style = DIUTypography.headlineSmall)
                 Text(
                     "${summary.totalCourses} courses  ·  ${summary.classesPerWeek} classes",
-                    style = RdiuTypography.bodyMedium,
+                    style = DIUTypography.bodyMedium,
                     color = TextMuted,
                 )
             }

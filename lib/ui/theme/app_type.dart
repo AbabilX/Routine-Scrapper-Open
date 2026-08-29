@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 
-const rdiuTextTheme = TextTheme(
+const DIUTextTheme = TextTheme(
   headlineSmall: TextStyle(
     fontFamily: 'sans-serif',
     fontWeight: FontWeight.w800,

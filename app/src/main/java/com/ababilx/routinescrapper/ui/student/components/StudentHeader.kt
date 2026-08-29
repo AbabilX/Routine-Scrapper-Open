@@ -9,7 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.ababilx.routinescrapper.ui.theme.RdiuTypography
+import com.ababilx.routinescrapper.ui.theme.DIUTypography
 import com.ababilx.routinescrapper.ui.theme.TextMuted
 
 @Composable
@@ -21,8 +21,8 @@ fun StudentHeader(modifier: Modifier = Modifier) {
     ) {
         CuteFace()
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-            Text("Hello", style = RdiuTypography.headlineSmall)
-            Text("আজকের ক্লাস খুঁজে নাও", style = RdiuTypography.labelSmall, color = TextMuted)
+            Text("Hello", style = DIUTypography.headlineSmall)
+            Text("আজকের ক্লাস খুঁজে নাও", style = DIUTypography.labelSmall, color = TextMuted)
         }
     }
 }

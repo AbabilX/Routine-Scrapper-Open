@@ -10,6 +10,7 @@ import '../../domain/model/class_reminder.dart';
 import '../../domain/model/class_status.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/routine_meta.dart';
+import '../../domain/model/student_profile.dart';
 import '../../domain/model/student_summary.dart';
 import '../../domain/routine_queries.dart';
 import '../../domain/student_query.dart';
@@ -30,6 +31,7 @@ class StudentUiState {
     this.invalidQuery = false,
     this.restored = false,
     this.reminders = const [],
+    this.profile = StudentProfile.empty,
   });
 
   final String queryText;
@@ -46,6 +48,7 @@ class StudentUiState {
   final bool invalidQuery;
   final bool restored;
   final List<ClassReminder> reminders;
+  final StudentProfile profile;
 
   RoutineDay get resolvedSelectedDay =>
       selectedDay ?? RoutineQueries.todayOrSaturday();
@@ -78,6 +81,7 @@ class StudentUiState {
     bool? invalidQuery,
     bool? restored,
     List<ClassReminder>? reminders,
+    StudentProfile? profile,
   }) {
     return StudentUiState(
       queryText: queryText ?? this.queryText,
@@ -94,6 +98,7 @@ class StudentUiState {
       invalidQuery: invalidQuery ?? this.invalidQuery,
       restored: restored ?? this.restored,
       reminders: reminders ?? this.reminders,
+      profile: profile ?? this.profile,
     );
   }
 }
@@ -109,6 +114,7 @@ class StudentViewModel extends ChangeNotifier {
           meta: repository.meta,
           suggestions: RoutineQueries.suggestChips(repository.slots, ''),
           reminders: cache.reminders,
+          profile: cache.profile,
         ) {
     _restore();
     _tick = Timer.periodic(const Duration(seconds: 30), (_) => rebuild());
@@ -129,7 +135,17 @@ class StudentViewModel extends ChangeNotifier {
       applyQuery(saved, persist: false);
     }
     await scheduler.sync(cache.reminders);
-    _state = _state.copyWith(restored: true, reminders: cache.reminders);
+    _state = _state.copyWith(
+      restored: true,
+      reminders: cache.reminders,
+      profile: cache.profile,
+    );
+    notifyListeners();
+  }
+
+  Future<void> completeOnboarding(StudentProfile profile) async {
+    await cache.completeOnboarding(profile);
+    _state = _state.copyWith(profile: cache.profile);
     notifyListeners();
   }
 

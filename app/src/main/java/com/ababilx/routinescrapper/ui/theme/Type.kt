@@ -9,7 +9,7 @@ import androidx.compose.ui.unit.sp
 
 private val AppFont = FontFamily.SansSerif
 
-val RdiuTypography = Typography(
+val DIUTypography = Typography(
     headlineSmall = TextStyle(
         fontFamily = AppFont,
         fontWeight = FontWeight.ExtraBold,

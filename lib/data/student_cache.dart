@@ -5,19 +5,29 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../domain/model/class_reminder.dart';
+import '../domain/model/student_gender.dart';
+import '../domain/model/student_profile.dart';
 
 class StudentCacheData {
   const StudentCacheData({
     this.schemaVersion = 1,
     this.lastQuery = '',
     this.reminders = const [],
+    this.seenOnboarding = false,
+    this.displayName = '',
+    this.gender = StudentGender.unspecified,
   });
 
   final int schemaVersion;
   final String lastQuery;
   final List<ClassReminder> reminders;
+  final bool seenOnboarding;
+  final String displayName;
+  final StudentGender gender;
 
   factory StudentCacheData.empty() => const StudentCacheData();
+
+  StudentProfile get profile => StudentProfile(name: displayName, gender: gender);
 
   factory StudentCacheData.fromJson(Map<String, dynamic> json) {
     return StudentCacheData(
@@ -26,6 +36,9 @@ class StudentCacheData {
       reminders: (json['reminders'] as List<dynamic>? ?? [])
           .map((item) => _reminderFromJson(item as Map<String, dynamic>))
           .toList(),
+      seenOnboarding: json['seenOnboarding'] as bool? ?? false,
+      displayName: (json['displayName'] as String? ?? '').trim(),
+      gender: StudentGender.fromWire(json['gender'] as String?),
     );
   }
 
@@ -34,17 +47,26 @@ class StudentCacheData {
       'schemaVersion': schemaVersion,
       'lastQuery': lastQuery,
       'reminders': reminders.map(_reminderToJson).toList(),
+      'seenOnboarding': seenOnboarding,
+      'displayName': displayName,
+      'gender': gender.wireName,
     };
   }
 
   StudentCacheData copyWith({
     String? lastQuery,
     List<ClassReminder>? reminders,
+    bool? seenOnboarding,
+    String? displayName,
+    StudentGender? gender,
   }) {
     return StudentCacheData(
       schemaVersion: schemaVersion,
       lastQuery: lastQuery ?? this.lastQuery,
       reminders: reminders ?? this.reminders,
+      seenOnboarding: seenOnboarding ?? this.seenOnboarding,
+      displayName: displayName ?? this.displayName,
+      gender: gender ?? this.gender,
     );
   }
 
@@ -81,11 +103,16 @@ class StudentCache {
 
   static const fileName = 'student_cache.json';
   static const _legacyQueryKey = 'last_query';
+  static const _onboardingPrefKey = 'seen_onboarding';
 
   final File _file;
   StudentCacheData _data;
 
   String lastQuery() => _data.lastQuery;
+
+  bool get seenOnboarding => _data.seenOnboarding;
+
+  StudentProfile get profile => _data.profile;
 
   List<ClassReminder> get reminders => List.unmodifiable(_data.reminders);
 
@@ -109,13 +136,23 @@ class StudentCache {
         data = StudentCacheData.empty();
       }
     }
+    final prefs = await SharedPreferences.getInstance();
+    var dirty = false;
+    if (prefs.getBool(_onboardingPrefKey) == true && !data.seenOnboarding) {
+      data = data.copyWith(seenOnboarding: true);
+      dirty = true;
+    }
     if (data.lastQuery.isEmpty) {
-      final prefs = await SharedPreferences.getInstance();
       final legacy = prefs.getString(_legacyQueryKey) ?? '';
       if (legacy.isNotEmpty) {
         data = data.copyWith(lastQuery: legacy.trim().toUpperCase());
-        await file.writeAsString(const JsonEncoder.withIndent('  ').convert(data.toJson()));
+        dirty = true;
       }
+    }
+    if (dirty) {
+      await file.writeAsString(
+        const JsonEncoder.withIndent('  ').convert(data.toJson()),
+      );
     }
     return StudentCache._(file, data);
   }
@@ -124,6 +161,17 @@ class StudentCache {
     final cleaned = query.trim().toUpperCase();
     _data = _data.copyWith(lastQuery: cleaned);
     await _persist();
+  }
+
+  Future<void> completeOnboarding(StudentProfile profile) async {
+    _data = _data.copyWith(
+      displayName: profile.name.trim(),
+      gender: profile.gender,
+      seenOnboarding: true,
+    );
+    await _persist();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_onboardingPrefKey, true);
   }
 
   Future<void> upsertReminder(ClassReminder reminder) async {

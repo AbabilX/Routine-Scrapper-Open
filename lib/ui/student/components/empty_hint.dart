@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/app_colors.dart';
 import 'cute_face.dart';
+import 'cute_face_kind.dart';
 
 class EmptyHint extends StatelessWidget {
   const EmptyHint({
@@ -31,7 +32,10 @@ class EmptyHint extends StatelessWidget {
           padding: const EdgeInsets.all(22),
           child: Row(
             children: [
-              CuteFace(size: faceSize),
+              CuteFace(
+                size: faceSize,
+                kind: CuteFaceKind.values[title.hashCode.abs() % CuteFaceKind.values.length],
+              ),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(

@@ -1,12 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:rdiu/data/routine_file_dto.dart';
-import 'package:rdiu/data/student_cache.dart';
-import 'package:rdiu/domain/model/class_reminder.dart';
-import 'package:rdiu/domain/model/routine_day.dart';
-import 'package:rdiu/domain/model/student_summary.dart';
-import 'package:rdiu/domain/course_label.dart';
-import 'package:rdiu/domain/reminder_rules.dart';
+import 'package:DIU/data/routine_file_dto.dart';
+import 'package:DIU/data/student_cache.dart';
+import 'package:DIU/domain/model/class_reminder.dart';
+import 'package:DIU/domain/model/routine_day.dart';
+import 'package:DIU/domain/model/student_gender.dart';
+import 'package:DIU/domain/model/student_profile.dart';
+import 'package:DIU/domain/model/student_summary.dart';
+import 'package:DIU/domain/course_label.dart';
+import 'package:DIU/domain/reminder_rules.dart';
 
 void main() {
   final block = ClassBlock(
@@ -82,6 +84,28 @@ void main() {
       expect(parsed.reminders, hasLength(1));
       expect(parsed.reminders.first.minutesBefore, 15);
       expect(parsed.reminders.first.id, reminder.id);
+    });
+
+    test('student cache round-trips seenOnboarding', () {
+      final parsed = StudentCacheData.fromJson(
+        const StudentCacheData(seenOnboarding: true).toJson(),
+      );
+      expect(parsed.seenOnboarding, isTrue);
+      expect(StudentCacheData.fromJson({}).seenOnboarding, isFalse);
+    });
+
+    test('student cache round-trips name and gender', () {
+      final parsed = StudentCacheData.fromJson(
+        const StudentCacheData(
+          displayName: 'Murad',
+          gender: StudentGender.boy,
+        ).toJson(),
+      );
+      expect(parsed.displayName, 'Murad');
+      expect(parsed.gender, StudentGender.boy);
+      expect(parsed.profile.greeting, 'Hello, Murad');
+      expect(StudentGender.fromWire(null), StudentGender.unspecified);
+      expect(StudentProfile.empty.greeting, 'Hello');
     });
   });
 }

@@ -36,7 +36,7 @@ class StudentScreen extends StatelessWidget {
           ListView(
             padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
             children: [
-              const StudentHeader(),
+              StudentHeader(profile: state.profile),
               const SizedBox(height: 18),
               SearchRow(
                 query: state.queryText,
