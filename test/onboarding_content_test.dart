@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:DIU/ui/onboarding/onboarding_pages.dart';
+import 'package:diu/ui/onboarding/onboarding_pages.dart';
 
 void main() {
   test('tour covers search, reminder, PDF, and privacy', () {

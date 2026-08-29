@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:DIU/domain/student_query.dart';
+import 'package:diu/domain/student_query.dart';
 
 void main() {
   test('StudentQuery still parses the demo batch', () {

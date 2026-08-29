@@ -1,14 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:DIU/data/routine_file_dto.dart';
-import 'package:DIU/data/student_cache.dart';
-import 'package:DIU/domain/model/class_reminder.dart';
-import 'package:DIU/domain/model/routine_day.dart';
-import 'package:DIU/domain/model/student_gender.dart';
-import 'package:DIU/domain/model/student_profile.dart';
-import 'package:DIU/domain/model/student_summary.dart';
-import 'package:DIU/domain/course_label.dart';
-import 'package:DIU/domain/reminder_rules.dart';
+import 'package:diu/data/routine_file_dto.dart';
+import 'package:diu/data/student_cache.dart';
+import 'package:diu/domain/model/class_reminder.dart';
+import 'package:diu/domain/model/routine_day.dart';
+import 'package:diu/domain/model/student_gender.dart';
+import 'package:diu/domain/model/student_profile.dart';
+import 'package:diu/domain/model/student_summary.dart';
+import 'package:diu/domain/course_label.dart';
+import 'package:diu/domain/reminder_rules.dart';
 
 void main() {
   final block = ClassBlock(

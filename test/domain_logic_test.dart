@@ -3,14 +3,14 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:DIU/data/routine_file_dto.dart';
-import 'package:DIU/domain/model/class_slot.dart';
-import 'package:DIU/domain/model/class_status.dart';
-import 'package:DIU/domain/model/routine_day.dart';
-import 'package:DIU/domain/model/student_summary.dart';
-import 'package:DIU/domain/routine_queries.dart';
-import 'package:DIU/domain/student_query.dart';
-import 'package:DIU/ui/student/components/date_strip.dart';
+import 'package:diu/data/routine_file_dto.dart';
+import 'package:diu/domain/model/class_slot.dart';
+import 'package:diu/domain/model/class_status.dart';
+import 'package:diu/domain/model/routine_day.dart';
+import 'package:diu/domain/model/student_summary.dart';
+import 'package:diu/domain/routine_queries.dart';
+import 'package:diu/domain/student_query.dart';
+import 'package:diu/ui/student/components/date_strip.dart';
 
 ClassSlot _slot({
   RoutineDay day = RoutineDay.saturday,

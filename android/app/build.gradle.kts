@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.ababilx.DIU"
+    namespace = "com.ababilx.diu"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 

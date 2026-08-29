@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:DIU/domain/model/student_gender.dart';
-import 'package:DIU/ui/student/components/cute_face_kind.dart';
+import 'package:diu/domain/model/student_gender.dart';
+import 'package:diu/ui/student/components/cute_face_kind.dart';
 
 void main() {
   test('twelve faces split by gender; no-gender is bald men', () {
