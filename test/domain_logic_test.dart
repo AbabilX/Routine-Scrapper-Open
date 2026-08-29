@@ -1,5 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:rdiu/data/routine_file_dto.dart';
 import 'package:rdiu/domain/model/class_slot.dart';
 import 'package:rdiu/domain/model/class_status.dart';
 import 'package:rdiu/domain/model/routine_day.dart';
@@ -175,6 +179,39 @@ void main() {
       expect(chips.first.date, 29);
       expect(chips.first.isToday, isFalse);
       expect(chips[1].isToday, isTrue);
+    });
+  });
+
+  group('bundled routine JSON', () {
+    test('68_C and 71_B have classes in the Summer 2026 file', () {
+      final raw =
+          File('assets/routine/cse_summer_2026_v5.json').readAsStringSync();
+      final file = RoutineFileDto.fromJson(
+        jsonDecode(raw) as Map<String, dynamic>,
+      );
+      final slots = file.slots
+          .map(
+            (dto) => ClassSlot(
+              day: RoutineDay.fromName(dto.day),
+              slot: dto.slot,
+              start: dto.start,
+              end: dto.end,
+              course: dto.course,
+              group: dto.group,
+              teacher: dto.teacher,
+              room: dto.room,
+            ),
+          )
+          .toList();
+      expect(file.meta.version, '5.0');
+      expect(
+        RoutineQueries.forStudent(slots, StudentQuery.parse('68_C')!),
+        isNotEmpty,
+      );
+      expect(
+        RoutineQueries.forStudent(slots, StudentQuery.parse('71_B')!),
+        isNotEmpty,
+      );
     });
   });
 }
