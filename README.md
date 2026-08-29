@@ -97,7 +97,10 @@ scripts/parse_routine_pdf.py          ← PDF পড়ে
 assets/routine/*.json                 ← অ্যাপে বান্ডল
         │
         ▼
-data/LocalRoutineStore                ← অ্যাসেট → ফোনের routine.json
+data/RoutinePdfPicker                 ← Kotlin SAF / iOS document picker
+        │
+        ▼
+data/LocalRoutineStore                ← ইউজার PDF → ফোনের routine.json
         │
         ▼
 data/AssetRoutineRepository           ← JSON লোড
@@ -143,6 +146,8 @@ lib/
 ├── data/
 │   ├── asset_routine_repository.dart   assets থেকে JSON
 │   ├── local_routine_store.dart   ইউজার PDF + routine.json
+│   ├── routine_pdf_picker.dart    MethodChannel → Kotlin SAF
+│   ├── picked_pdf.dart            path + file name
 │   ├── routine_pdf_parser.dart    Python পার্সারের Dart পোর্ট
 │   ├── pdf_word_extractor.dart    PDF থেকে শব্দ+পজিশন
 │   ├── student_cache.dart         সার্চ + রিমাইন্ডার + নাম/জেন্ডার + seenOnboarding
@@ -182,7 +187,7 @@ JSON `meta.schemaVersion` এখন `1` — স্লট ফিল্ড আগ�
 
 ## নতুন রুটিন PDF থেকে JSON
 
-অ্যাপ PDF সরাসরি পড়ে না (মোবাইলে গ্রিড পার্স অস্থির)। পিসিতে একবার পার্স করে JSON বান্ডল করা হয়।
+স্টুডেন্ট অ্যাপে নিজের রুটিন PDF আপলোড করে — Android-এ Kotlin SAF পিকার (`MainActivity` + `PdfPicker.kt`)। ডেভ সময়ে পুরো সেমিস্টার JSON বান্ডল করতে পিসির স্ক্রিপ্টও আছে।
 
 ```bash
 cd /path/to/this/repo

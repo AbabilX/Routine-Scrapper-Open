@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 
 import '../../data/asset_routine_repository.dart';
 import '../../data/class_reminder_scheduler.dart';
@@ -10,6 +10,8 @@ import '../../data/local_routine_store.dart';
 import '../../data/pdf_exporter.dart';
 import '../../data/pdf_word_extractor.dart';
 import '../../data/routine_pdf_parser.dart';
+import '../../data/picked_pdf.dart';
+import '../../data/routine_pdf_picker.dart';
 import '../../data/student_cache.dart';
 import '../../domain/model/class_reminder.dart';
 import '../../domain/model/class_status.dart';
@@ -122,7 +124,9 @@ class StudentViewModel extends ChangeNotifier {
     required this.cache,
     required this.scheduler,
     required this.store,
-  }) : _state = StudentUiState(
+    RoutinePdfPicker? picker,
+  }) : picker = picker ?? RoutinePdfPicker(),
+       _state = StudentUiState(
           selectedDay: RoutineQueries.todayOrSaturday(),
           today: RoutineQueries.todayOrSaturday(),
           meta: repository.meta,
@@ -139,6 +143,7 @@ class StudentViewModel extends ChangeNotifier {
   final StudentCache cache;
   final ClassReminderScheduler scheduler;
   final LocalRoutineStore store;
+  final RoutinePdfPicker picker;
   StudentUiState _state;
   Timer? _saveJob;
   Timer? _tick;
@@ -166,16 +171,18 @@ class StudentViewModel extends ChangeNotifier {
   }
 
   Future<String?> importRoutinePdf() async {
-    final picked = await FilePicker.pickFiles(
-      type: FileType.custom,
-      allowedExtensions: const ['pdf'],
-      withData: true,
-    );
-    if (picked == null || picked.files.isEmpty) return null;
-    final file = picked.files.first;
-    final bytes = file.bytes ??
-        (file.path == null ? null : await File(file.path!).readAsBytes());
-    if (bytes == null) return 'PDF পড়া যায়নি';
+    final PickedPdf? picked;
+    try {
+      picked = await picker.pick();
+    } on PlatformException catch (error) {
+      if (error.code == 'busy') return null;
+      return 'PDF পড়া যায়নি';
+    } on MissingPluginException {
+      return 'এই প্ল্যাটফর্মে PDF পিকার নেই';
+    }
+    if (picked == null) return null;
+    final bytes = await File(picked.path).readAsBytes();
+    if (bytes.isEmpty) return 'PDF পড়া যায়নি';
 
     _state = _state.copyWith(isImporting: true);
     notifyListeners();
@@ -183,7 +190,7 @@ class StudentViewModel extends ChangeNotifier {
       final extracted = await PdfWordExtractor.extract(bytes);
       final parsed = RoutinePdfParser.parse(
         extracted,
-        sourcePdf: file.name,
+        sourcePdf: picked.name,
       );
       if (parsed.slots.isEmpty) {
         return 'এই PDF থেকে ক্লাস পাওয়া যায়নি — DIU CSE রুটিন PDF দাও';

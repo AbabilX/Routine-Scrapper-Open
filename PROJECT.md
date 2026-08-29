@@ -5,12 +5,12 @@ DIU keeps UI, query logic, and data files separate so Teacher/Room views and PDF
 The running app is **Flutter**. Kotlin + Compose remains under `app/` as a behavior reference.
 
 ```
+SAF / document picker  (Kotlin PdfPicker · iOS PdfPicker.swift)
+                    ↓
 User PDF  →  PdfWordExtractor + RoutinePdfParser  →  device routine.json (origin: user)
                                                     + user_routine.pdf
                                          ↓
                               AssetRoutineRepository (empty until first upload)
-                                         ↓
-                              AssetRoutineRepository
                                          ↓
                                    RoutineQueries
                                          ↓
@@ -26,6 +26,7 @@ User PDF  →  PdfWordExtractor + RoutinePdfParser  →  device routine.json (or
 
 - `lib/domain` has no Flutter UI types.
 - `lib/data` parses an uploaded DIU CSE routine PDF (same rules as `scripts/parse_routine_pdf.py`), stores JSON + PDF, and builds the section schedule export.
+- PDF pick is native: Android Kotlin SAF (`PdfPicker` + MethodChannel `com.ababilx.diu/pdf_picker`). No `file_picker` plugin.
 - `lib/ui/onboarding` is once-per-install; `seenOnboarding` lives in `student_cache.json` and SharedPreferences. Clears only when app storage is reset.
 - `lib/ui/student/components` are one-job widgets.
 - Theme is light and cute (`lib/ui/theme/app_colors.dart`); screens must not hardcode colors.
