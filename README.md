@@ -6,11 +6,14 @@ DIU স্টুডেন্টদের জন্য **অফলাইন ক�
 
 | | |
 |---|---|
-| প্ল্যাটফর্ম | Android (Kotlin + Jetpack Compose) |
+| প্ল্যাটফর্ম | Flutter (Android + iOS) |
 | প্যাকেজ | `com.ababilx.routinescrapper` |
-| minSdk / targetSdk | 24 / 36 |
+| অ্যাপ নাম | rDIU |
+| ভার্সন | 0.1.0 |
 | ডেটা | CSE Routine **V5 · Summer 2026** (অ্যাপে বান্ডল) |
 | লাইসেন্স | [MIT](LICENSE) |
+
+Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফারেন্স)। রান করার ডিফল্ট এখন Flutter।
 
 ---
 
@@ -20,15 +23,15 @@ DIU স্টুডেন্টদের জন্য **অফলাইন ক�
 
 1. **UI আলাদা, বিজনেস লজিক আলাদা** — স্ক্রিন বদলালে সার্চ ভাঙে না
 2. **ডেটা সোর্স আলাদা** — আজ JSON, কাল PDF আপলোড; কোয়েরি একই থাকে
-3. **Compose** — ছোট ছোট কম্পোনেন্ট জোড়া লাগিয়ে একটা স্ক্রিন
+3. **Flutter widgets** — ছোট ছোট কম্পোনেন্ট জোড়া লাগিয়ে একটা স্ক্রিন
 4. **PDF scraper** — ইউনিভার্সিটি রুটিন PDF কীভাবে স্ট্রাকচার্ড JSON হয়
 
 পড়ার অর্ডার (প্রথম দিন):
 
 1. এই README
-2. `MainActivity.kt` → `StudentScreen.kt`
-3. `StudentViewModel.kt` → `RoutineQueries.kt`
-4. `AssetRoutineRepository.kt`
+2. `lib/main.dart` → `lib/ui/student/student_screen.dart`
+3. `student_view_model.dart` → `lib/domain/routine_queries.dart`
+4. `lib/data/asset_routine_repository.dart`
 
 ---
 
@@ -49,43 +52,28 @@ DIU স্টুডেন্টদের জন্য **অফলাইন ক�
 
 ### যা লাগবে
 
-- [Android Studio](https://developer.android.com/studio) (Meerkat / নতুন ভার্সন)
-- **JDK 17 বা 21** — Studio-এর সাথে JBR আসে। Homebrew **Java 26** দিয়ে সরাসরি AGP চলে না (এরর শুধু `26.0.1` দেখায়)। প্রজেক্ট Gradle ডেমনকে JDK 21-এ লক করে; Mac-এ Android Studio থাকলে আর কিছু করতে হয় না।
-- Android SDK (Studio প্রথমবার নিজে নামিয়ে নেয়)
-- একটি emulator, অথবা USB debugging চালু ফোন
+- [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.12+)
+- Android emulator / USB debugging ফোন, অথবা iOS Simulator (Mac)
 
-### Android Studio (রিকমেন্ডেড)
-
-1. **Open** → এই রিপোর রুট ফোল্ডার (`kotlin` / যে নামে ক্লোন করেছ)
-2. নিচে **Gradle Sync** শেষ হওয়া পর্যন্ত অপেক্ষা
-3. উপরের ডিভাইস লিস্ট থেকে emulator বা ফোন বাছো  
-   - Emulator না থাকলে: **Device Manager** → **Create Device** → Pixel → সিস্টেম ইমেজ ডাউনলোড
-4. সবুজ **Run ▶** (`⌃R` / `Ctrl+R`)
-5. অ্যাপ নাম **rDIU** — সার্চ বক্সে `68_C`
-
-প্রথমবার Gradle ডিপেন্ডেন্সি ডাউনলোডে কয়েক মিনিট লাগতে পারে।
-
-### টার্মিনাল
-
-ফোন বা emulator **আগে চালু** রাখো (`adb devices`-এ ডিভাইস দেখা যাবে), তারপর প্রজেক্ট রুট থেকে:
+### কমান্ড
 
 ```bash
-./gradlew :app:installDebug
+flutter pub get
+flutter run
 ```
 
-শুধু APK বানাতে (ডিভাইস লাগে না):
+শুধু APK:
 
 ```bash
-./gradlew :app:assembleDebug
+flutter build apk
 ```
 
-আউটপুট: `app/build/outputs/apk/debug/app-debug.apk`
+অ্যাপে নাম **rDIU** — সার্চ বক্সে `68_C`।
 
-Android Studio `/Applications`-এ না থাকলে (বা আবার `26.0.1` এরর এলে):
+লজিক টেস্ট:
 
 ```bash
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-./gradlew :app:installDebug
+flutter test
 ```
 
 ---
@@ -113,40 +101,41 @@ domain/RoutineQueries                 ← সার্চ, সারাংশ, �
 ui/student/StudentViewModel           ← স্ক্রিন স্টেট + শেষ সার্চ মনে রাখা
         │
         ▼
-ui/student/StudentScreen              ← Compose UI
+ui/student/StudentScreen              ← Flutter UI
 ```
 
 | ফোল্ডার | দায়িত্ব | এখানে কী লিখবে |
 |---|---|---|
-| `domain/` | মডেল + নিয়ম (Android UI নেই) | সার্চ ম্যাচ, ব্রেক হিসাব, now/next |
-| `data/` | JSON পড়া, PDF শেয়ার, prefs | নতুন ডেটা সোর্স / মনে রাখা |
-| `ui/student/` | Student স্ক্রিন | রং, কার্ড, সার্চ বার, UX পলিশ |
-| `ui/theme/` | রং ও টাইপো | কিউট লাইট প্যালেট (ক্রিম + প্যাস্টেল) |
-| `app/src/main/assets/routine/` | JSON + সোর্স PDF | নতুন সেমিস্টার ফাইল |
+| `lib/domain/` | মডেল + নিয়ম (Flutter UI নেই) | সার্চ ম্যাচ, ব্রেক হিসাব, now/next |
+| `lib/data/` | JSON পড়া, PDF শেয়ার, prefs | নতুন ডেটা সোর্স / মনে রাখা |
+| `lib/ui/student/` | Student স্ক্রিন | রং, কার্ড, সার্চ বার, UX পলিশ |
+| `lib/ui/theme/` | রং ও টাইপো | কিউট লাইট প্যালেট (ক্রিম + প্যাস্টেল) |
+| `assets/routine/` | JSON + সোর্স PDF | নতুন সেমিস্টার ফাইল |
 | `scripts/` | PDF → JSON | পার্সার বাগ ফিক্স |
 | `data/raw/` | অরিজিনাল PDF | নতুন রুটিন পিডিএফ রাখা |
+| `app/` | Kotlin অরিজিনাল | রেফারেন্স; নতুন ফিচার Flutter `lib/`-এ লিখো |
 
-**নিয়ম:** কম্পোজেবলে সার্চ লজিক লিখো না। `RoutineQueries` বা `StudentQuery` ব্যবহার করো। নতুন ট্যাব = নতুন `ui/teacher/` — `domain` কপি করে ভাঙবে না।
+**নিয়ম:** উইজেটে সার্চ লজিক লিখো না। `RoutineQueries` বা `StudentQuery` ব্যবহার করো। নতুন ট্যাব = নতুন `ui/teacher/` — `domain` কপি করে ভাঙবে না।
 
 ---
 
 ## কোড ম্যাপ (কন্ট্রিবিউটের আগে)
 
 ```
-app/src/main/java/com/ababilx/routinescrapper/
-├── MainActivity.kt                 অ্যাপ এন্ট্রি, Theme
+lib/
+├── main.dart                       অ্যাপ এন্ট্রি, Theme
 ├── domain/
-│   ├── StudentQuery.kt             "68_C" পার্স ও ম্যাচ
-│   ├── RoutineQueries.kt           ফিল্টার, মার্জ, now/next, chips
+│   ├── student_query.dart         "68_C" পার্স ও ম্যাচ
+│   ├── routine_queries.dart       ফিল্টার, মার্জ, now/next, chips
 │   └── model/                      ClassSlot, ClassStatus, …
 ├── data/
-│   ├── AssetRoutineRepository.kt   assets থেকে JSON
-│   ├── StudentPrefs.kt             শেষ ব্যাচ সার্চ (DataStore)
-│   ├── RoutineFileDto.kt           JSON আকৃতি
-│   └── PdfExporter.kt              PDF শেয়ার
+│   ├── asset_routine_repository.dart   assets থেকে JSON
+│   ├── student_prefs.dart         শেষ ব্যাচ সার্চ (SharedPreferences)
+│   ├── routine_file_dto.dart      JSON আকৃতি
+│   └── pdf_exporter.dart          PDF শেয়ার
 └── ui/student/
-    ├── StudentViewModel.kt         query + day + now/next
-    ├── StudentScreen.kt            লেআউট জোড়া
+    ├── student_view_model.dart    query + day + now/next
+    ├── student_screen.dart        লেআউট জোড়া
     └── components/                 Header, Search, Chips, Banner, Date, Timeline, EmptyHint
 ```
 
@@ -181,7 +170,7 @@ scripts/.venv/bin/pip install -r scripts/requirements.txt
 
 scripts/.venv/bin/python scripts/parse_routine_pdf.py \
   data/raw/CSE_Class_Routine_V5_Summer-2026.pdf \
-  app/src/main/assets/routine/cse_summer_2026_v5.json
+  assets/routine/cse_summer_2026_v5.json
 ```
 
 নতুন সেমিস্টার:
@@ -211,14 +200,15 @@ scripts/.venv/bin/python scripts/parse_routine_pdf.py \
 ### কোড স্টাইল
 
 - এক ফাইল = এক কাজ; নতুন স্ক্রিন সেকশন = নতুন কম্পোনেন্ট ফাইল
-- `domain`-এ Compose / `Context` আনবে না
+- `domain`-এ Flutter / `BuildContext` আনবে না
 - সার্চ নিয়ম বদলালে `StudentQuery` / `RoutineQueries`-এ বদলাও, UI-তে নয়
-- রং হার্ডকোড না করে `ui/theme/Color.kt`
+- রং হার্ডকোড না করে `ui/theme/app_colors.dart`
 
 ### PR চেকলিস্ট
 
-- [ ] `./gradlew :app:compileDebugKotlin` চলে
-- [ ] নিজে emulator-এ `68_C` সার্চ করে দেখেছ
+- [ ] `flutter analyze` চলে
+- [ ] `flutter test` চলে
+- [ ] নিজে ডিভাইসে `68_C` সার্চ করে দেখেছ
 - [ ] JSON/পার্সার বদলালে আরও একটা ব্যাচ (`71_B`) চেক
 - [ ] README / `PROJECT.md` আপডেট (আর্কিটেকচার বদলালে)
 
@@ -243,12 +233,10 @@ scripts/.venv/bin/python scripts/parse_routine_pdf.py \
 
 | সমস্যা | কী করবে |
 |---|---|
-| বিল্ড ফেল, মেসেজ শুধু `26.0.1` | Homebrew Java 26। নতুন `gradle.properties` পুল করে আবার `./gradlew :app:installDebug`। না চললে নিচে `JAVA_HOME` সেট করো |
-| `Cannot find a Java installation … Java 21` | Android Studio ইনস্টল করো, অথবা `JAVA_HOME` Studio JBR-এ সেট করো |
-| Gradle Sync ফেল | ইন্টারনেট চেক, File → Invalidate Caches, আবার Sync |
-| অ্যাপ ইনস্টল হয় না | emulator/ফোন চালু আছে কিনা — `adb devices` খালি হলে `installDebug` ফেল করবে |
+| `flutter` কমান্ড নেই | Flutter SDK PATH-এ দাও |
 | সার্চ খালি | ফরম্যাট `68_C` — স্পেস বাদ, ইংরেজি অক্ষর |
 | ভুল ক্লাস | পার্সার ইস্যু হতে পারে — JSON-এ সেই `group` খুঁজে দেখো |
+| PDF শেয়ার খোলে না | emulator-এ শেয়ার টার্গেট নাও থাকতে পারে — ফোনে ট্রাই করো |
 
 ---
 

@@ -12,3 +12,9 @@
 *.aab
 app/build
 scripts/.venv
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/coverage/
