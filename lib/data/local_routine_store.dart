@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'routine_file_dto.dart';
 
-/// Device copies of the student's uploaded PDF and parsed JSON.
+/// Device copies of the chosen routine JSON and optional uploaded PDF.
 class LocalRoutineStore {
   static const jsonFileName = 'routine.json';
   static const pdfFileName = 'user_routine.pdf';
@@ -24,7 +24,7 @@ class LocalRoutineStore {
       final dto = RoutineFileDto.fromJson(
         jsonDecode(await file.readAsString()) as Map<String, dynamic>,
       );
-      if (dto.meta.origin != 'user' || dto.slots.isEmpty) return null;
+      if (!dto.isPersistedRoutine) return null;
       return dto;
     } catch (_) {
       return null;
@@ -34,12 +34,20 @@ class LocalRoutineStore {
   Future<void> saveUser({
     required RoutineFileDto routine,
     required Uint8List pdfBytes,
+  }) {
+    return saveRoutine(routine: routine, pdfBytes: pdfBytes);
+  }
+
+  Future<void> saveRoutine({
+    required RoutineFileDto routine,
+    Uint8List? pdfBytes,
   }) async {
     final json = await jsonFile();
-    final pdf = await pdfFile();
     await json.writeAsString(
       const JsonEncoder.withIndent('  ').convert(routine.toJson()),
     );
-    await pdf.writeAsBytes(pdfBytes, flush: true);
+    if (pdfBytes != null) {
+      await (await pdfFile()).writeAsBytes(pdfBytes, flush: true);
+    }
   }
 }

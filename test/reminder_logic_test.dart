@@ -72,6 +72,48 @@ void main() {
       expect(dto.origin, 'bundled');
     });
 
+    test('persisted routine accepts user upload or bundled fallback', () {
+      Map<String, dynamic> json({required String origin, int slots = 1}) {
+        return {
+          'meta': {
+            'department': 'CSE',
+            'version': '5.0',
+            'semester': 'Summer 2026',
+            'effectiveFrom': 'Saturday 11 July, 2026',
+            'sourcePdf': 'file.pdf',
+            'origin': origin,
+          },
+          'slots': [
+            for (var i = 0; i < slots; i++)
+              {
+                'day': 'SATURDAY',
+                'slot': 1,
+                'start': '10:00',
+                'end': '11:30',
+                'course': 'CSE114',
+                'group': '68_C',
+                'teacher': 'SRH',
+                'room': 'KT-503',
+              },
+          ],
+        };
+      }
+
+      expect(RoutineFileDto.fromJson(json(origin: 'user')).isPersistedRoutine, isTrue);
+      expect(
+        RoutineFileDto.fromJson(json(origin: 'bundled')).isPersistedRoutine,
+        isTrue,
+      );
+      expect(
+        RoutineFileDto.fromJson(json(origin: 'bundled', slots: 0)).isPersistedRoutine,
+        isFalse,
+      );
+      expect(
+        RoutineFileDto.fromJson(json(origin: 'unknown')).isPersistedRoutine,
+        isFalse,
+      );
+    });
+
     test('student cache round-trips reminders', () {
       final reminder = ClassReminder.fromBlock(block, 15);
       final data = StudentCacheData(

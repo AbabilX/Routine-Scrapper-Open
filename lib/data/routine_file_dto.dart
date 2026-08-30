@@ -19,6 +19,12 @@ class RoutineFileDto {
       'slots': slots.map((slot) => slot.toJson()).toList(),
     };
   }
+
+  /// Device copy we can reopen: uploaded PDF or the bundled fallback.
+  bool get isPersistedRoutine {
+    if (slots.isEmpty) return false;
+    return meta.origin == 'user' || meta.origin == 'bundled';
+  }
 }
 
 class RoutineMetaDto {

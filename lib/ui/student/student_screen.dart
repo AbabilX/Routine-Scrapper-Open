@@ -95,6 +95,16 @@ class StudentScreen extends StatelessWidget {
     }
   }
 
+  Future<void> _useExisting(
+    BuildContext context,
+    StudentViewModel viewModel,
+  ) async {
+    final error = await viewModel.useBundledRoutine();
+    if (error != null && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+    }
+  }
+
   Widget _body(
     BuildContext context,
     StudentUiState state,
@@ -105,6 +115,7 @@ class StudentScreen extends StatelessWidget {
         return UploadRoutineCard(
           busy: state.isImporting,
           onUpload: () => _upload(context, viewModel),
+          onUseExisting: () => _useExisting(context, viewModel),
         );
       case _BodyKey.blank:
         return const EmptyHint(

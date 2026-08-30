@@ -7,10 +7,10 @@ The running app is **Flutter**. Kotlin + Compose remains under `app/` as a behav
 ```
 SAF / document picker  (Kotlin PdfPicker · iOS PdfPicker.swift)
                     ↓
-User PDF  →  PdfWordExtractor + RoutinePdfParser  →  device routine.json (origin: user)
-                                                    + user_routine.pdf
+User PDF (optional)  →  PdfWordExtractor + RoutinePdfParser  →  device routine.json (origin: user)
+        or bundled CSE JSON (origin: bundled)                 + user_routine.pdf (upload only)
                                          ↓
-                              AssetRoutineRepository (empty until first upload)
+                              AssetRoutineRepository (empty until first choice)
                                          ↓
                                    RoutineQueries
                                          ↓
@@ -25,7 +25,7 @@ User PDF  →  PdfWordExtractor + RoutinePdfParser  →  device routine.json (or
 ```
 
 - `lib/domain` has no Flutter UI types.
-- `lib/data` parses an uploaded DIU CSE routine PDF (same rules as `scripts/parse_routine_pdf.py`), stores JSON + PDF, and builds the section schedule export.
+- `lib/data` parses an uploaded DIU CSE routine PDF (same rules as `scripts/parse_routine_pdf.py`), stores JSON + PDF, and builds the section schedule export. Upload is optional: students can continue with the bundled CSE JSON (`origin: bundled`); later uploads still replace it (`origin: user`).
 - PDF pick is native: Android Kotlin SAF (`PdfPicker` + MethodChannel `com.ababilx.diu/pdf_picker`). No `file_picker` plugin.
 - `lib/ui/onboarding` is once-per-install; `seenOnboarding` lives in `student_cache.json` and SharedPreferences. Clears only when app storage is reset.
 - `lib/ui/student/components` are one-job widgets.
@@ -40,8 +40,8 @@ Local files (app documents):
 
 | File | Role |
 |---|---|
-| `routine.json` | Parsed user routine (`origin: user`). Missing/bundled file = no routine shown. |
-| `user_routine.pdf` | Last uploaded source PDF. Replaced on the next upload. |
+| `routine.json` | Chosen routine: `origin: user` (uploaded PDF) or `origin: bundled` (asset fallback). Missing = upload/continue card. |
+| `user_routine.pdf` | Last uploaded source PDF. Only written on upload; replaced on the next upload. |
 | `student_cache.json` | Last search, reminders, `seenOnboarding`, `displayName`, `gender`. |
 
-Re-upload replaces both files. `RoutineQueries` stays unchanged.
+Choosing bundled writes `routine.json` only. Re-upload replaces JSON and `user_routine.pdf`. `RoutineQueries` stays unchanged.

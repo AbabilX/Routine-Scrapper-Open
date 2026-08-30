@@ -212,6 +212,31 @@ class StudentViewModel extends ChangeNotifier {
     }
   }
 
+  Future<String?> useBundledRoutine() async {
+    _state = _state.copyWith(isImporting: true);
+    notifyListeners();
+    try {
+      final bundled = await AssetRoutineRepository.loadBundledFile();
+      if (bundled.slots.isEmpty) {
+        return 'bundled রুটিন খালি — PDF আপলোড করো';
+      }
+      await store.saveRoutine(routine: bundled);
+      repository = AssetRoutineRepository.fromFile(bundled);
+      _state = _state.copyWith(
+        hasRoutine: true,
+        meta: repository.meta,
+        suggestions: RoutineQueries.suggestChips(repository.slots, _state.queryText),
+      );
+      applyQuery(_state.queryText, persist: false);
+      return null;
+    } catch (_) {
+      return 'bundled ডেটা লোড হয়নি — PDF আপলোড করে দেখো';
+    } finally {
+      _state = _state.copyWith(isImporting: false);
+      notifyListeners();
+    }
+  }
+
   void onQueryChange(String value) => applyQuery(value, persist: true);
 
   void onChipSelected(String chip) => applyQuery(chip, persist: true);
