@@ -16,26 +16,26 @@ class PdfWordExtractor {
         final text = await page.loadStructuredText();
         words.addAll(_tokensForPage(i, page.height, text));
       }
-      return ExtractedPdfText(words: _mergeNeighbors(words), pageWidth: pageWidth);
+      return ExtractedPdfText(
+        words: _mergeNeighbors(words),
+        pageWidth: pageWidth,
+      );
     } finally {
       await doc.dispose();
     }
   }
 
-  static List<PdfWord> _tokensForPage(int page, double pageHeight, PdfPageText text) {
+  static List<PdfWord> _tokensForPage(
+    int page,
+    double pageHeight,
+    PdfPageText text,
+  ) {
     final tokens = <PdfWord>[];
     for (final fragment in text.fragments) {
       final raw = fragment.text.trim();
       if (raw.isEmpty) continue;
       final y = pageHeight - fragment.bounds.top;
-      tokens.add(
-        PdfWord(
-          page: page,
-          y: y,
-          x: fragment.bounds.left,
-          text: raw,
-        ),
-      );
+      tokens.add(PdfWord(page: page, y: y, x: fragment.bounds.left, text: raw));
     }
     return tokens;
   }
@@ -43,20 +43,22 @@ class PdfWordExtractor {
   /// Glue split tokens like `CSE114` + `(68_C)` back together.
   static List<PdfWord> _mergeNeighbors(List<PdfWord> words) {
     if (words.length < 2) return words;
-    final sorted = [...words]..sort((a, b) {
-      final page = a.page.compareTo(b.page);
-      if (page != 0) return page;
-      final y = a.y.compareTo(b.y);
-      if (y != 0) return y;
-      return a.x.compareTo(b.x);
-    });
+    final sorted = [...words]
+      ..sort((a, b) {
+        final page = a.page.compareTo(b.page);
+        if (page != 0) return page;
+        final y = a.y.compareTo(b.y);
+        if (y != 0) return y;
+        return a.x.compareTo(b.x);
+      });
     final merged = <PdfWord>[sorted.first];
     for (var i = 1; i < sorted.length; i++) {
       final prev = merged.last;
       final next = sorted[i];
       final sameLine = prev.page == next.page && (next.y - prev.y).abs() < 5;
       final close = next.x - prev.x < 90;
-      final glue = sameLine &&
+      final glue =
+          sameLine &&
           close &&
           !prev.text.contains(' ') &&
           (next.text.startsWith('(') || prev.text.endsWith('('));

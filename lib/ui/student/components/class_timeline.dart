@@ -33,7 +33,8 @@ class ClassTimeline extends StatelessWidget {
             block: item.block,
             tint: cardPastels[classIndex % cardPastels.length],
             status: statuses[item.block] ?? ClassStatus.later,
-            reminderMinutes: reminderMinutes[ClassReminderId.fromBlock(item.block)],
+            reminderMinutes:
+                reminderMinutes[ClassReminderId.fromBlock(item.block)],
             onReminderTap: onReminderTap,
           ),
         );
@@ -90,7 +91,9 @@ class _ClassCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Expanded(child: Text(block.course, style: text.headlineSmall)),
+                  Expanded(
+                    child: Text(block.course, style: text.headlineSmall),
+                  ),
                   if (onReminderTap != null)
                     _ReminderBell(
                       minutes: reminderMinutes,
@@ -141,9 +144,7 @@ class _ReminderBell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final on = minutes != null;
-    final ringTime = on
-        ? ReminderRules.formatFireTime(start, minutes!)
-        : null;
+    final ringTime = on ? ReminderRules.formatFireTime(start, minutes!) : null;
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: Tooltip(
@@ -154,7 +155,9 @@ class _ReminderBell extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(4),
             child: Icon(
-              on ? Icons.notifications_active_rounded : Icons.notifications_none_rounded,
+              on
+                  ? Icons.notifications_active_rounded
+                  : Icons.notifications_none_rounded,
               size: 22,
               color: ink,
             ),
@@ -190,8 +193,8 @@ class _StatusPill extends StatelessWidget {
         child: Text(
           label,
           style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                color: status == ClassStatus.done ? textMuted : ink,
-              ),
+            color: status == ClassStatus.done ? textMuted : ink,
+          ),
         ),
       ),
     );
@@ -236,7 +239,9 @@ class _MetaRow extends StatelessWidget {
         const SizedBox(width: 8),
         Text(
           text,
-          style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: textMuted),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyLarge?.copyWith(color: textMuted),
         ),
       ],
     );

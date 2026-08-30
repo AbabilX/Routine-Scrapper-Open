@@ -34,7 +34,8 @@ class EmptyHint extends StatelessWidget {
             children: [
               CuteFace(
                 size: faceSize,
-                kind: CuteFaceKind.values[title.hashCode.abs() % CuteFaceKind.values.length],
+                kind: CuteFaceKind
+                    .values[title.hashCode.abs() % CuteFaceKind.values.length],
               ),
               const SizedBox(width: 14),
               Expanded(

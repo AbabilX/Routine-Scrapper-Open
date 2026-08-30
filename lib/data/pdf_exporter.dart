@@ -25,11 +25,8 @@ class PdfExporter {
     final dir = await getTemporaryDirectory();
     final out = File('${dir.path}/Class_Schedule_$safe.pdf');
     await out.writeAsBytes(bytes, flush: true);
-    await SharePlus.instance.share(
-      ShareParams(
-        files: [XFile(out.path, mimeType: 'application/pdf')],
-        title: 'Class Schedule : $queryLabel',
-      ),
-    );
+    await Share.shareXFiles([
+      XFile(out.path, mimeType: 'application/pdf'),
+    ], text: 'Class Schedule : $queryLabel');
   }
 }

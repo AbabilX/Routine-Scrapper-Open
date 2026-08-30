@@ -20,10 +20,7 @@ class StudentHeader extends StatelessWidget {
     final text = Theme.of(context).textTheme;
     return Row(
       children: [
-        CyclingCuteFace(
-          size: 52,
-          gender: profile.gender,
-        ),
+        CyclingCuteFace(size: 52, gender: profile.gender),
         const SizedBox(width: 14),
         Expanded(
           child: Column(

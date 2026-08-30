@@ -98,7 +98,9 @@ class StudentUiState {
   }) {
     return StudentUiState(
       queryText: queryText ?? this.queryText,
-      parsedQuery: clearParsedQuery ? parsedQuery : (parsedQuery ?? this.parsedQuery),
+      parsedQuery: clearParsedQuery
+          ? parsedQuery
+          : (parsedQuery ?? this.parsedQuery),
       selectedDay: selectedDay ?? this.selectedDay,
       today: today ?? this.today,
       summary: clearSummary ? summary : (summary ?? this.summary),
@@ -127,14 +129,14 @@ class StudentViewModel extends ChangeNotifier {
     RoutinePdfPicker? picker,
   }) : picker = picker ?? RoutinePdfPicker(),
        _state = StudentUiState(
-          selectedDay: RoutineQueries.todayOrSaturday(),
-          today: RoutineQueries.todayOrSaturday(),
-          meta: repository.meta,
-          suggestions: RoutineQueries.suggestChips(repository.slots, ''),
-          reminders: cache.reminders,
-          profile: cache.profile,
-          hasRoutine: repository.hasRoutine,
-        ) {
+         selectedDay: RoutineQueries.todayOrSaturday(),
+         today: RoutineQueries.todayOrSaturday(),
+         meta: repository.meta,
+         suggestions: RoutineQueries.suggestChips(repository.slots, ''),
+         reminders: cache.reminders,
+         profile: cache.profile,
+         hasRoutine: repository.hasRoutine,
+       ) {
     _restore();
     _tick = Timer.periodic(const Duration(seconds: 30), (_) => rebuild());
   }
@@ -188,10 +190,7 @@ class StudentViewModel extends ChangeNotifier {
     notifyListeners();
     try {
       final extracted = await PdfWordExtractor.extract(bytes);
-      final parsed = RoutinePdfParser.parse(
-        extracted,
-        sourcePdf: picked.name,
-      );
+      final parsed = RoutinePdfParser.parse(extracted, sourcePdf: picked.name);
       if (parsed.slots.isEmpty) {
         return 'এই PDF থেকে ক্লাস পাওয়া যায়নি — DIU CSE রুটিন PDF দাও';
       }
@@ -200,7 +199,10 @@ class StudentViewModel extends ChangeNotifier {
       _state = _state.copyWith(
         hasRoutine: true,
         meta: repository.meta,
-        suggestions: RoutineQueries.suggestChips(repository.slots, _state.queryText),
+        suggestions: RoutineQueries.suggestChips(
+          repository.slots,
+          _state.queryText,
+        ),
       );
       applyQuery(_state.queryText, persist: false);
       return null;
@@ -225,7 +227,10 @@ class StudentViewModel extends ChangeNotifier {
       _state = _state.copyWith(
         hasRoutine: true,
         meta: repository.meta,
-        suggestions: RoutineQueries.suggestChips(repository.slots, _state.queryText),
+        suggestions: RoutineQueries.suggestChips(
+          repository.slots,
+          _state.queryText,
+        ),
       );
       applyQuery(_state.queryText, persist: false);
       return null;
@@ -313,7 +318,11 @@ class StudentViewModel extends ChangeNotifier {
       today: today,
       summary: RoutineQueries.summary(matched, parsed, repository.meta.version),
       timeline: RoutineQueries.timeline(daySlots),
-      classStatuses: RoutineQueries.statusesForDay(daySlots, selectedDay, today: today),
+      classStatuses: RoutineQueries.statusesForDay(
+        daySlots,
+        selectedDay,
+        today: today,
+      ),
       nowNext: RoutineQueries.nowOrNext(daySlots, selectedDay, today: today),
       clearNowNext: true,
       hasMatches: matched.isNotEmpty,

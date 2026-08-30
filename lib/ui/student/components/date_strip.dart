@@ -54,7 +54,9 @@ class _DateStripState extends State<DateStrip> {
 
   void _scrollToToday() {
     final chips = weekChips(widget.today);
-    final index = chips.indexWhere((chip) => chip.isToday).clamp(0, chips.length);
+    final index = chips
+        .indexWhere((chip) => chip.isToday)
+        .clamp(0, chips.length);
     if (!_scroll.hasClients) return;
     const itemExtent = 60.0;
     _scroll.animateTo(
@@ -80,8 +82,8 @@ class _DateStripState extends State<DateStrip> {
           final circleColor = active
               ? ink
               : chip.isToday
-                  ? mint
-                  : line.withValues(alpha: 0.45);
+              ? mint
+              : line.withValues(alpha: 0.45);
           return GestureDetector(
             onTap: () {
               HapticFeedback.selectionClick();
@@ -99,23 +101,26 @@ class _DateStripState extends State<DateStrip> {
                       color: circleColor,
                       shape: BoxShape.circle,
                       border: chip.isToday && !active
-                          ? Border.all(color: ink.withValues(alpha: 0.25), width: 2)
+                          ? Border.all(
+                              color: ink.withValues(alpha: 0.25),
+                              width: 2,
+                            )
                           : null,
                     ),
                     alignment: Alignment.center,
                     child: Text(
                       '${chip.date}',
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            color: active ? onInk : ink,
-                          ),
+                        color: active ? onInk : ink,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     chip.isToday ? 'আজ' : chip.day.shortLabel.toUpperCase(),
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: active || chip.isToday ? ink : textMuted,
-                        ),
+                      color: active || chip.isToday ? ink : textMuted,
+                    ),
                   ),
                 ],
               ),
@@ -127,10 +132,17 @@ class _DateStripState extends State<DateStrip> {
   }
 }
 
-List<DayChip> weekChips([RoutineDay today = RoutineDay.saturday, DateTime? now]) {
+List<DayChip> weekChips([
+  RoutineDay today = RoutineDay.saturday,
+  DateTime? now,
+]) {
   final start = now ?? DateTime.now();
   final daysFromSaturday = _javaDayOfWeek(start) % 7;
-  final saturday = DateTime(start.year, start.month, start.day - daysFromSaturday);
+  final saturday = DateTime(
+    start.year,
+    start.month,
+    start.day - daysFromSaturday,
+  );
   return [
     for (var i = 0; i < RoutineDay.values.length; i++)
       DayChip(

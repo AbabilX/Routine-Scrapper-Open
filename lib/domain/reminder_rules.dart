@@ -23,8 +23,8 @@ class ReminderRules {
     final hour = clock.hour == 0
         ? 12
         : clock.hour > 12
-            ? clock.hour - 12
-            : clock.hour;
+        ? clock.hour - 12
+        : clock.hour;
     final hh = hour.toString().padLeft(2, '0');
     final mm = clock.minute.toString().padLeft(2, '0');
     return '$hh:$mm';
@@ -41,5 +41,6 @@ class ReminderRules {
     };
   }
 
-  static int notificationId(String reminderId) => reminderId.hashCode & 0x7fffffff;
+  static int notificationId(String reminderId) =>
+      reminderId.hashCode & 0x7fffffff;
 }

@@ -62,14 +62,10 @@ class AssetRoutineRepository {
 
   static Future<RoutineFileDto> loadBundledFile() async {
     final raw = await rootBundle.loadString(assetPath);
-    return RoutineFileDto.fromJson(
-      jsonDecode(raw) as Map<String, dynamic>,
-    );
+    return RoutineFileDto.fromJson(jsonDecode(raw) as Map<String, dynamic>);
   }
 
-  static Future<AssetRoutineRepository> load([
-    LocalRoutineStore? store,
-  ]) async {
+  static Future<AssetRoutineRepository> load([LocalRoutineStore? store]) async {
     if (store != null) {
       final saved = await store.loadUser();
       if (saved == null) return AssetRoutineRepository.empty();

@@ -5,7 +5,7 @@ import 'picked_pdf.dart';
 /// System PDF picker. Android uses Kotlin SAF in [MainActivity].
 class RoutinePdfPicker {
   RoutinePdfPicker({MethodChannel? channel})
-      : _channel = channel ?? const MethodChannel(channelName);
+    : _channel = channel ?? const MethodChannel(channelName);
 
   static const channelName = 'com.ababilx.diu/pdf_picker';
 

@@ -69,16 +69,16 @@ class ClassBlock {
 
   @override
   int get hashCode => Object.hash(
-        day,
-        startSlot,
-        endSlot,
-        start,
-        end,
-        course,
-        group,
-        teacher,
-        room,
-      );
+    day,
+    startSlot,
+    endSlot,
+    start,
+    end,
+    course,
+    group,
+    teacher,
+    room,
+  );
 }
 
 sealed class TimelineItem {

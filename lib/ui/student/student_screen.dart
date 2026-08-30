@@ -25,7 +25,8 @@ class StudentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<StudentViewModel>();
     final state = viewModel.state;
-    final showChips = state.suggestions.isNotEmpty &&
+    final showChips =
+        state.suggestions.isNotEmpty &&
         (state.queryText.trim().isEmpty ||
             (state.parsedQuery?.section.isEmpty ?? true));
 
@@ -91,7 +92,9 @@ class StudentScreen extends StatelessWidget {
   Future<void> _upload(BuildContext context, StudentViewModel viewModel) async {
     final error = await viewModel.importRoutinePdf();
     if (error != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
     }
   }
 
@@ -101,7 +104,9 @@ class StudentScreen extends StatelessWidget {
   ) async {
     final error = await viewModel.useBundledRoutine();
     if (error != null && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(error)));
     }
   }
 
@@ -132,7 +137,8 @@ class StudentScreen extends StatelessWidget {
       case _BodyKey.noMatch:
         return const EmptyHint(
           title: 'কেউ নেই',
-          body: 'এই ব্যাচ/সেকশনের ক্লাস রুটিনে পাওয়া যায়নি — অন্য চিপ চেষ্টা করো',
+          body:
+              'এই ব্যাচ/সেকশনের ক্লাস রুটিনে পাওয়া যায়নি — অন্য চিপ চেষ্টা করো',
           tint: sky,
         );
       case _BodyKey.ready:
@@ -162,10 +168,12 @@ class _ReadyBody extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final statuses = state.classStatuses.values;
-    final allDone = statuses.isNotEmpty &&
+    final allDone =
+        statuses.isNotEmpty &&
         statuses.every((status) => status == ClassStatus.done);
     final reminderMinutes = {
-      for (final reminder in state.reminders) reminder.id: reminder.minutesBefore,
+      for (final reminder in state.reminders)
+        reminder.id: reminder.minutesBefore,
     };
 
     return Column(
@@ -227,9 +235,9 @@ class _ReadyBody extends StatelessWidget {
     if (choice == null || !context.mounted) return;
     final allowed = await onReminderPicked(block, choice.minutes);
     if (!allowed && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('নোটিফিকেশন পারমিশন দরকার')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('নোটিফিকেশন পারমিশন দরকার')));
     }
   }
 }

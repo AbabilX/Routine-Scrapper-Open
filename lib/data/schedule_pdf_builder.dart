@@ -34,10 +34,7 @@ class SchedulePdfBuilder {
           pw.Center(
             child: pw.Text(
               'Class Schedule : $queryLabel',
-              style: pw.TextStyle(
-                fontSize: 16,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold),
             ),
           ),
           pw.SizedBox(height: 14),
@@ -114,10 +111,7 @@ class SchedulePdfBuilder {
             ),
             pw.Text(
               meta.version,
-              style: pw.TextStyle(
-                fontSize: 8,
-                fontWeight: pw.FontWeight.bold,
-              ),
+              style: pw.TextStyle(fontSize: 8, fontWeight: pw.FontWeight.bold),
             ),
           ],
         ),

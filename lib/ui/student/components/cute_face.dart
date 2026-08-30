@@ -86,10 +86,7 @@ class _CuteFaceState extends State<CuteFace> with TickerProviderStateMixin {
       animation: Listenable.merge([_blink, _bob]),
       builder: (context, child) {
         final lift = widget.animate ? (_bob.value - 0.5) * 3 : 0.0;
-        return Transform.translate(
-          offset: Offset(0, lift),
-          child: child,
-        );
+        return Transform.translate(offset: Offset(0, lift), child: child);
       },
       child: SizedBox(
         width: widget.size,
@@ -103,7 +100,10 @@ class _CuteFaceState extends State<CuteFace> with TickerProviderStateMixin {
                 shape: BoxShape.circle,
               ),
               child: CustomPaint(
-                painter: CuteFacePainter(kind: widget.kind, blink: _blink.value),
+                painter: CuteFacePainter(
+                  kind: widget.kind,
+                  blink: _blink.value,
+                ),
               ),
             );
           },
@@ -114,11 +114,7 @@ class _CuteFaceState extends State<CuteFace> with TickerProviderStateMixin {
 }
 
 class CyclingCuteFace extends StatefulWidget {
-  const CyclingCuteFace({
-    super.key,
-    this.size = 52,
-    this.gender,
-  });
+  const CyclingCuteFace({super.key, this.size = 52, this.gender});
 
   final double size;
   final StudentGender? gender;
@@ -173,11 +169,7 @@ class _CyclingCuteFaceState extends State<CyclingCuteFace> {
       duration: const Duration(milliseconds: 380),
       switchInCurve: Curves.easeOut,
       switchOutCurve: Curves.easeIn,
-      child: CuteFace(
-        key: ValueKey(_kind),
-        size: widget.size,
-        kind: _kind,
-      ),
+      child: CuteFace(key: ValueKey(_kind), size: widget.size, kind: _kind),
     );
   }
 }

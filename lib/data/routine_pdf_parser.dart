@@ -152,8 +152,11 @@ class RoutinePdfParser {
         continue;
       }
       final upper = word.text.toUpperCase();
-      final looksTeacher = teacherRe.hasMatch(word.text) ||
-          (word.text == upper && word.text.length >= 2 && word.text.length <= 6);
+      final looksTeacher =
+          teacherRe.hasMatch(word.text) ||
+          (word.text == upper &&
+              word.text.length >= 2 &&
+              word.text.length <= 6);
       if (!looksTeacher) continue;
       final delta = word.x - course.x;
       if (best == null || delta < best.delta) {
@@ -200,7 +203,9 @@ class RoutinePdfParser {
       if (word.page != page) continue;
       if (word.x < left || word.x >= right) continue;
       final dy = word.y - roomY;
-      if (dy > 0 && dy < 16 * scale && (word.text == '(COM' || word.text == 'LAB)')) {
+      if (dy > 0 &&
+          dy < 16 * scale &&
+          (word.text == '(COM' || word.text == 'LAB)')) {
         return ' (COM LAB)';
       }
     }
@@ -209,8 +214,10 @@ class RoutinePdfParser {
 
   static String _guessVersion(List<PdfWord> words) {
     for (final word in words) {
-      final match = RegExp(r'^V(\d+(?:\.\d+)?)$', caseSensitive: false)
-          .firstMatch(word.text);
+      final match = RegExp(
+        r'^V(\d+(?:\.\d+)?)$',
+        caseSensitive: false,
+      ).firstMatch(word.text);
       if (match != null) return '${match.group(1)}.0'.replaceAll('.0.0', '.0');
     }
     return 'uploaded';

@@ -9,9 +9,6 @@ class PickedPdf {
     final path = raw['path']?.toString() ?? '';
     if (path.isEmpty) return null;
     final name = raw['name']?.toString().trim() ?? '';
-    return PickedPdf(
-      path: path,
-      name: name.isEmpty ? 'routine.pdf' : name,
-    );
+    return PickedPdf(path: path, name: name.isEmpty ? 'routine.pdf' : name);
   }
 }

@@ -107,12 +107,7 @@ void main() {
           teacher: 'AAM',
           room: 'G1-027',
         ),
-        _slot(
-          day: RoutineDay.thursday,
-          slot: 1,
-          start: '10:00',
-          end: '11:30',
-        ),
+        _slot(day: RoutineDay.thursday, slot: 1, start: '10:00', end: '11:30'),
       ]);
       expect(week.keys, [RoutineDay.saturday, RoutineDay.thursday]);
       expect(week[RoutineDay.saturday], hasLength(2));
@@ -208,8 +203,9 @@ void main() {
 
   group('bundled routine JSON', () {
     test('68_C and 71_B have classes in the Summer 2026 file', () {
-      final raw =
-          File('assets/routine/cse_summer_2026_v5.json').readAsStringSync();
+      final raw = File(
+        'assets/routine/cse_summer_2026_v5.json',
+      ).readAsStringSync();
       final file = RoutineFileDto.fromJson(
         jsonDecode(raw) as Map<String, dynamic>,
       );
