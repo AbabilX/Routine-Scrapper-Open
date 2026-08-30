@@ -1,11 +1,10 @@
 {
   "meta": {
-    "schemaVersion": 1,
     "department": "CSE",
     "version": "5.0",
     "semester": "Summer 2026",
     "effectiveFrom": "Saturday 11 July, 2026",
-    "sourcePdf": "CSE_Class_Routine_V5_Summer-2026.pdf"
+    "sourcePdf": "cse_summer_2026_v5.pdf"
   },
   "slots": [
     {
@@ -14885,7 +14884,7 @@
       "end": "02:30",
       "course": "CSE313",
       "group": "RE_A(3C)(CD",
-      "teacher": "?",
+      "teacher": "IST",
       "room": "KT-503 (COM LAB)"
     },
     {

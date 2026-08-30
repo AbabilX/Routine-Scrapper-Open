@@ -21,7 +21,7 @@ class RoutinePdfParser {
     ('04:00', '05:30'),
   ];
 
-  static const slotEdges = [0.0, 230.0, 415.0, 610.0, 800.0, 985.0, 1300.0];
+  static const slotEdges = [0.0, 225.0, 430.0, 640.0, 850.0, 1050.0, 1300.0];
 
   static final courseRe = RegExp(r'^([A-Z]{2,5}\d{3}[A-Z]?)\((.+)\)$');
   static final teacherRe = RegExp(r'^[A-Z]{2,6}(?:[_-]\d+)?$');
@@ -142,7 +142,7 @@ class RoutinePdfParser {
     final right = slotEdges[index + 1] * scale;
     ({double delta, String text})? best;
     for (final word in words) {
-      if (word.page != course.page || (word.y - course.y).abs() > 4 * scale) {
+      if (word.page != course.page || (word.y - course.y).abs() > 10 * scale) {
         continue;
       }
       if (word.x <= course.x || word.x >= right || word.x < left) continue;
