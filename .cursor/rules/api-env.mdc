@@ -14,7 +14,7 @@ This repo is public. Do **not** put the live API hostname or real endpoint paths
 - Store real values in local `.env` (`API_BASE_URL` with no trailing slash; `API_PATH_*` keys from `.env.example`).
 - Run / build with `--dart-define-from-file=.env`.
 - Keep `.env` gitignored. Commit `.env.example` with empty values.
-- GitHub Actions: secrets `API_BASE_URL` and `API_ENDPOINTS_ENV` (KEY=VALUE lines). Workflow writes the gitignored `.env`, then `--dart-define-from-file=.env`.
+- GitHub Actions: one repository secret per `.env` key (`API_BASE_URL`, `API_PATH_*`). Workflow writes the gitignored `.env`, then `--dart-define-from-file=.env`.
 
 ## Must not
 

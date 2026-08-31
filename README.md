@@ -88,7 +88,7 @@ APK (ABI আলাদা — বেশিরভাগ ফোনে `arm64-v8a`):
 flutter build apk --release --split-per-abi --dart-define-from-file=.env
 ```
 
-`main`-এ পুশ হলে Actions `pubspec.yaml` প্যাচ বাম্প করে (`0.1.0+1` → `0.1.1+2`), স্প্লিট APK বানায়, বাম্প কমিট পুশ করে, তারপর [Releases](https://github.com/AbabilX/Routine-Scrapper-Open/releases)-এ তোলে। রেপো Secret লাগে: `API_BASE_URL` আর `API_ENDPOINTS_ENV` (হোস্ট/পাথ কমিট করো না)।
+`main`-এ পুশ হলে Actions `pubspec.yaml` প্যাচ বাম্প করে (`0.1.0+1` → `0.1.1+2`), স্প্লিট APK বানায়, বাম্প কমিট পুশ করে, তারপর [Releases](https://github.com/AbabilX/Routine-Scrapper-Open/releases)-এ তোলে। রেপো Secret লাগে `.env.example`-এর প্রতিটা কী (`API_BASE_URL`, `API_PATH_*`) — হোস্ট/পাথ কমিট করো না।
 
 Cursor / VS Code-এ `.vscode/launch.json` আগে থেকেই সেটআপ করা আছে।
 

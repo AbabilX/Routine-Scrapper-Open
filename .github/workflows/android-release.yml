@@ -21,50 +21,44 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Require compile-time secrets
-        env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
-          API_ENDPOINTS_ENV: ${{ secrets.API_ENDPOINTS_ENV }}
-        run: |
-          if [ -z "$API_BASE_URL" ]; then
-            echo "::error::Add repository secret API_BASE_URL (Settings → Secrets and variables → Actions)."
-            exit 1
-          fi
-          if [ -z "$API_ENDPOINTS_ENV" ]; then
-            echo "::error::Add repository secret API_ENDPOINTS_ENV (KEY=VALUE lines from .env.example path keys)."
-            exit 1
-          fi
-
       - name: Write dart-define env
         env:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
-          API_ENDPOINTS_ENV: ${{ secrets.API_ENDPOINTS_ENV }}
+          API_PATH_ROUTINE_VERSION: ${{ secrets.API_PATH_ROUTINE_VERSION }}
+          API_PATH_AUTOCOMPLETE: ${{ secrets.API_PATH_AUTOCOMPLETE }}
+          API_PATH_SCHEDULE: ${{ secrets.API_PATH_SCHEDULE }}
+          API_PATH_FREE_ROOMS: ${{ secrets.API_PATH_FREE_ROOMS }}
+          API_PATH_ROOMS_STATIC: ${{ secrets.API_PATH_ROOMS_STATIC }}
+          API_PATH_TEACHERS_STATIC: ${{ secrets.API_PATH_TEACHERS_STATIC }}
         run: |
           set -euo pipefail
-          {
-            printf 'API_BASE_URL=%s\n' "$API_BASE_URL"
-            printf '%s\n' "$API_ENDPOINTS_ENV"
-          } > .env
-          required_keys=(
-            API_PATH_ROUTINE_VERSION
-            API_PATH_AUTOCOMPLETE
-            API_PATH_SCHEDULE
-            API_PATH_FREE_ROOMS
-            API_PATH_ROOMS_STATIC
+          missing=0
+          for key in \
+            API_BASE_URL \
+            API_PATH_ROUTINE_VERSION \
+            API_PATH_AUTOCOMPLETE \
+            API_PATH_SCHEDULE \
+            API_PATH_FREE_ROOMS \
+            API_PATH_ROOMS_STATIC \
             API_PATH_TEACHERS_STATIC
-          )
-          for key in "${required_keys[@]}"; do
-            line=$(grep -E "^${key}=" .env || true)
-            if [ -z "$line" ]; then
-              echo "::error::API_ENDPOINTS_ENV is missing ${key}."
-              exit 1
-            fi
-            value="${line#*=}"
-            if [ -z "$value" ]; then
-              echo "::error::${key} is empty in API_ENDPOINTS_ENV."
-              exit 1
+          do
+            if [ -z "${!key}" ]; then
+              echo "::error::Add repository secret ${key} (Settings → Secrets and variables → Actions)."
+              missing=1
             fi
           done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+          {
+            printf 'API_BASE_URL=%s\n' "$API_BASE_URL"
+            printf 'API_PATH_ROUTINE_VERSION=%s\n' "$API_PATH_ROUTINE_VERSION"
+            printf 'API_PATH_AUTOCOMPLETE=%s\n' "$API_PATH_AUTOCOMPLETE"
+            printf 'API_PATH_SCHEDULE=%s\n' "$API_PATH_SCHEDULE"
+            printf 'API_PATH_FREE_ROOMS=%s\n' "$API_PATH_FREE_ROOMS"
+            printf 'API_PATH_ROOMS_STATIC=%s\n' "$API_PATH_ROOMS_STATIC"
+            printf 'API_PATH_TEACHERS_STATIC=%s\n' "$API_PATH_TEACHERS_STATIC"
+          } > .env
 
       - name: Bump pubspec version
         id: bump
