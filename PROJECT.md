@@ -45,3 +45,20 @@ Local files (app documents):
 | `student_cache.json` | Last search, reminders, `seenOnboarding`, `displayName`, `gender`. |
 
 Choosing bundled writes `routine.json` only. Re-upload replaces JSON and `user_routine.pdf`. `RoutineQueries` stays unchanged.
+
+## API environment (open source)
+
+The live API host is **not** in git. Agents and humans must not hardcode it.
+
+| File | Role |
+|---|---|
+| `.env` | Local `API_BASE_URL`. Gitignored. |
+| `.env.example` | Empty `API_BASE_URL=` for contributors. |
+| `lib/data/api/api_config.dart` | Reads `API_BASE_URL` via `--dart-define-from-file=.env`. |
+
+```bash
+cp .env.example .env   # then set API_BASE_URL locally
+flutter run --dart-define-from-file=.env
+```
+
+Use `ApiConfig.uri('/api/…')` from data layer only. Never log the base URL. Cursor rule: `.cursor/rules/api-env.mdc`.

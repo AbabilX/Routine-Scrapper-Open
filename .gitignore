@@ -18,3 +18,9 @@ scripts/.venv
 .pub-cache/
 .pub/
 /coverage/
+
+# Local secrets — never commit real API hosts
+.env
+.env.*
+!.env.example
+api.md

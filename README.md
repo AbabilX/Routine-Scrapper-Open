@@ -60,17 +60,27 @@ Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফার�
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.12+)
 - Android emulator / USB debugging ফোন, অথবা iOS Simulator (Mac)
 
+### এনভ (API বেস URL)
+
+রিপোতে লাইভ API হোস্ট নেই। লোকালে:
+
+```bash
+cp .env.example .env
+```
+
+`.env`-এ `API_BASE_URL` বসাও (ট্রেইলিং স্ল্যাশ না)। `.env` কমিট করো না।
+
 ### কমান্ড
 
 ```bash
 flutter pub get
-flutter run
+flutter run --dart-define-from-file=.env
 ```
 
 শুধু APK:
 
 ```bash
-flutter build apk
+flutter build apk --dart-define-from-file=.env
 ```
 
 অ্যাপে নাম **DIU** — সার্চ বক্সে `68_C`।
@@ -78,7 +88,7 @@ flutter build apk
 লজিক টেস্ট:
 
 ```bash
-flutter test
+flutter test --dart-define-from-file=.env
 ```
 
 ---
@@ -144,6 +154,7 @@ lib/
 │   ├── course_label.dart          "OOP - CSE221(68_A)"
 │   └── model/                      ClassSlot, ClassReminder, ClassStatus, …
 ├── data/
+│   ├── api/api_config.dart            env থেকে API বেস URL
 │   ├── asset_routine_repository.dart   assets থেকে JSON
 │   ├── local_routine_store.dart   ইউজার PDF + routine.json
 │   ├── routine_pdf_picker.dart    MethodChannel → Kotlin SAF
@@ -230,11 +241,13 @@ scripts/.venv/bin/python scripts/parse_routine_pdf.py \
 - `domain`-এ Flutter / `BuildContext` আনবে না
 - সার্চ নিয়ম বদলালে `StudentQuery` / `RoutineQueries`-এ বদলাও, UI-তে নয়
 - রং হার্ডকোড না করে `ui/theme/app_colors.dart`
+- লাইভ API হোস্ট হার্ডকোড নয় — শুধু `ApiConfig` + লোকাল `.env`
 
 ### PR চেকলিস্ট
 
 - [ ] `flutter analyze` চলে
-- [ ] `flutter test` চলে
+- [ ] `flutter test --dart-define-from-file=.env` চলে
+- [ ] PR-এ `.env` বা লাইভ API হোস্ট নেই
 - [ ] নিজে ডিভাইসে `68_C` সার্চ করে দেখেছ
 - [ ] JSON/পার্সার বদলালে আরও একটা ব্যাচ (`71_B`) চেক
 - [ ] README / `PROJECT.md` আপডেট (আর্কিটেকচার বদলালে)
