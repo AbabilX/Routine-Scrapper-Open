@@ -204,6 +204,7 @@ class RoutineQueries {
             start: slot.start,
             end: slot.end,
             course: slot.course,
+            courseTitle: slot.courseTitle,
             group: slot.group,
             teacher: slot.teacher,
             room: slot.room,

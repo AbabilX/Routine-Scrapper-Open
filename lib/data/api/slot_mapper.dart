@@ -44,6 +44,7 @@ class SlotMapper {
       start: times.start,
       end: times.end,
       course: course,
+      courseTitle: item.courseTitle,
       group: group,
       teacher: item.teacher.isEmpty ? 'TBA' : item.teacher,
       room: item.room.isEmpty ? 'TBA' : item.room.replaceAll('\n', ' ').trim(),

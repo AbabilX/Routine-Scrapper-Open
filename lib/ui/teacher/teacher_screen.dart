@@ -2,11 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../../data/course_catalog.dart';
-import '../../data/pdf_exporter.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/student_summary.dart';
-import '../../domain/routine_queries.dart';
 import '../room/components/select_option_modal.dart';
 import '../theme/app_colors.dart';
 import 'teacher_view_model.dart';
@@ -32,26 +29,13 @@ class TeacherScreen extends StatefulWidget {
 }
 
 class _TeacherScreenState extends State<TeacherScreen> {
-  final TextEditingController _searchController = TextEditingController();
-  String _query = '';
-  int _selectedDeptIndex = 0;
-  bool _isWeekView = false;
-  RoutineDay _selectedDay = RoutineQueries.todayOrSaturday();
-  CourseCatalog? _catalog;
-
-  static const List<String> _deptOptions = ['CSE'];
+  late final TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
-    _loadCatalog();
-  }
-
-  Future<void> _loadCatalog() async {
-    final cat = await CourseCatalog.load();
-    if (mounted) {
-      setState(() => _catalog = cat);
-    }
+    final initialQuery = context.read<TeacherViewModel>().state.query;
+    _searchController = TextEditingController(text: initialQuery);
   }
 
   @override
@@ -60,32 +44,18 @@ class _TeacherScreenState extends State<TeacherScreen> {
     super.dispose();
   }
 
-  void _onQueryChanged(String val) {
-    setState(() => _query = val.trim());
-    context.read<TeacherViewModel>().onQueryChanged(val);
-  }
-
-  void _clearQuery() {
-    _searchController.clear();
-    setState(() => _query = '');
-    context.read<TeacherViewModel>().clear();
-  }
-
   @override
   Widget build(BuildContext context) {
     final teacherVm = context.watch<TeacherViewModel>();
-    final teacherSlots = teacherVm.slots;
-    final meta = teacherVm.meta;
+    final state = teacherVm.state;
 
-    final queryClean = _query.trim().toUpperCase();
-
-    final hasMatches = teacherSlots.isNotEmpty;
-
-    // Derived statistics
-    final sections = teacherSlots.map((s) => s.group).toSet().toList()..sort();
-    final courses = teacherSlots.map((s) => s.course).toSet().toList()..sort();
-    final classesPerWeek = teacherSlots.length;
-    final weeklyMap = RoutineQueries.weeklyBlocks(teacherSlots);
+    // Synchronize controller text when state query is modified externally (e.g. on suggestion selection or clear)
+    if (_searchController.text != state.query) {
+      _searchController.value = TextEditingValue(
+        text: state.query,
+        selection: TextSelection.collapsed(offset: state.query.length),
+      );
+    }
 
     return Scaffold(
       backgroundColor: bg,
@@ -103,15 +73,25 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 ),
                 children: [
                   // Search Bar & Department Dropdown
-                  _buildSearchRow(context),
+                  _buildSearchRow(context, teacherVm, state),
 
-                  if (queryClean.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+
+                  // Search Button
+                  _buildSearchButton(context, teacherVm, state),
+
+                  if (state.suggestions.isNotEmpty) ...[
+                    const SizedBox(height: 14),
+                    _buildVerticalSuggestions(teacherVm, state),
+                  ],
+
+                  if (state.cleanQuery.isNotEmpty && state.hasMatches) ...[
                     const SizedBox(height: 10),
-                    // Active Search Chip: "TRA x"
+                    // Active Search Chip
                     Align(
                       alignment: Alignment.centerLeft,
                       child: GestureDetector(
-                        onTap: _clearQuery,
+                        onTap: teacherVm.clear,
                         child: Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 12,
@@ -126,7 +106,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Text(
-                                queryClean,
+                                state.cleanQuery,
                                 style: const TextStyle(
                                   color: ink,
                                   fontWeight: FontWeight.bold,
@@ -148,49 +128,45 @@ class _TeacherScreenState extends State<TeacherScreen> {
 
                   const SizedBox(height: 16),
 
-                  if (hasMatches) ...[
+                  if (state.hasMatches) ...[
                     // Teacher Summary Card
                     _buildSummaryCard(
-                      teacherName: queryClean,
-                      sections: sections,
-                      totalCourses: courses.length,
-                      version: meta.version,
-                      classesPerWeek: classesPerWeek,
-                      onDownloadPdf: () async {
-                        await PdfExporter.shareSchedule(
-                          queryLabel: queryClean,
-                          meta: meta,
-                          week: weeklyMap,
-                        );
-                      },
+                      teacherName: state.cleanQuery,
+                      sections: state.sections,
+                      totalCourses: state.courses.length,
+                      version: state.meta?.version ?? '',
+                      classesPerWeek: state.classesPerWeek,
+                      onDownloadPdf: teacherVm.downloadPdf,
                     ),
 
                     const SizedBox(height: 20),
 
                     // Day View / Week View Toggle Bar
-                    _buildViewToggle(),
+                    _buildViewToggle(teacherVm, state),
 
                     const SizedBox(height: 16),
 
-                    if (!_isWeekView) ...[
+                    if (!state.isWeekView) ...[
                       // Day View Date Strip
-                      _buildDateStrip(),
+                      _buildDateStrip(teacherVm, state),
                       const SizedBox(height: 16),
-                      _buildDayClassesView(weeklyMap[_selectedDay] ?? []),
+                      _buildDayClassesView(state.selectedDayClasses),
                     ] else ...[
-                      // Week View Schedule (All days with Off Days)
-                      _buildWeekScheduleView(weeklyMap),
+                      // Week View Schedule
+                      _buildWeekScheduleView(state.weeklyMap),
                     ],
-                  ] else if (teacherVm.isLoading) ...[
+                  ] else if (state.isLoading) ...[
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 32),
                       child: Center(child: CircularProgressIndicator()),
                     ),
-                  ] else if (queryClean.isNotEmpty) ...[
+                  ] else if (state.suggestions.isNotEmpty) ...[
+                    const SizedBox.shrink(),
+                  ] else if (state.cleanQuery.isNotEmpty) ...[
                     _buildEmptyState(
                       'No Teacher Found',
-                      teacherVm.error ??
-                          'No classes found for teacher initial "$queryClean"',
+                      state.errorMessage ??
+                          'No classes found for teacher initial "${state.cleanQuery}"',
                     ),
                   ] else ...[
                     _buildEmptyState(
@@ -214,7 +190,6 @@ class _TeacherScreenState extends State<TeacherScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       child: Row(
         children: [
-          // Teacher logo badge
           Container(
             width: 42,
             height: 42,
@@ -235,7 +210,6 @@ class _TeacherScreenState extends State<TeacherScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          // Online status pill
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
@@ -296,7 +270,11 @@ class _TeacherScreenState extends State<TeacherScreen> {
     );
   }
 
-  Widget _buildSearchRow(BuildContext context) {
+  Widget _buildSearchRow(
+    BuildContext context,
+    TeacherViewModel teacherVm,
+    TeacherUiState state,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -309,7 +287,11 @@ class _TeacherScreenState extends State<TeacherScreen> {
             ),
             child: TextField(
               controller: _searchController,
-              onChanged: _onQueryChanged,
+              onChanged: teacherVm.onQueryChanged,
+              onSubmitted: (_) {
+                FocusScope.of(context).unfocus();
+                teacherVm.search();
+              },
               textCapitalization: TextCapitalization.characters,
               inputFormatters: [UpperCaseTextFormatter()],
               style: const TextStyle(color: ink, fontSize: 16),
@@ -333,11 +315,11 @@ class _TeacherScreenState extends State<TeacherScreen> {
             final choice = await SelectOptionModal.show(
               context: context,
               title: 'Select Department',
-              options: _deptOptions,
-              selectedIndex: _selectedDeptIndex,
+              options: TeacherUiState.deptOptions,
+              selectedIndex: state.selectedDeptIndex,
             );
             if (choice != null) {
-              setState(() => _selectedDeptIndex = choice);
+              teacherVm.selectDeptIndex(choice);
             }
           },
           child: Container(
@@ -351,7 +333,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
             child: Row(
               children: [
                 Text(
-                  _deptOptions[_selectedDeptIndex],
+                  state.selectedDeptLabel,
                   style: const TextStyle(
                     color: ink,
                     fontWeight: FontWeight.w600,
@@ -369,6 +351,147 @@ class _TeacherScreenState extends State<TeacherScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildSearchButton(
+    BuildContext context,
+    TeacherViewModel teacherVm,
+    TeacherUiState state,
+  ) {
+    final bool canSearch = state.query.trim().isNotEmpty;
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: canSearch ? ink : ink.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: canSearch
+            ? [
+                BoxShadow(
+                  color: ink.withValues(alpha: 0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 3),
+                ),
+              ]
+            : null,
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: state.isLoading || !canSearch
+              ? null
+              : () {
+                  FocusScope.of(context).unfocus();
+                  teacherVm.search();
+                },
+          borderRadius: BorderRadius.circular(14),
+          child: Center(
+            child: state.isLoading
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
+                  )
+                : const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.search, color: Colors.white, size: 20),
+                      SizedBox(width: 8),
+                      Text(
+                        'Search',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildVerticalSuggestions(
+    TeacherViewModel teacherVm,
+    TeacherUiState state,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: line),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+            child: Row(
+              children: [
+                const Icon(Icons.auto_awesome, color: ink, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  'Suggestions (${state.suggestions.length})',
+                  style: const TextStyle(
+                    color: textMuted,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.2,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Divider(height: 1, color: line),
+          ListView.separated(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: state.suggestions.length,
+            separatorBuilder: (_, _) => const Divider(height: 1, color: line),
+            itemBuilder: (context, index) {
+              final suggestion = state.suggestions[index];
+              return ListTile(
+                dense: true,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 2,
+                ),
+                leading: Container(
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    color: lavender.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.person, color: ink, size: 18),
+                ),
+                title: Text(
+                  suggestion,
+                  style: const TextStyle(
+                    color: ink,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                trailing: const Icon(
+                  Icons.north_west,
+                  color: textMuted,
+                  size: 16,
+                ),
+                onTap: () {
+                  HapticFeedback.selectionClick();
+                  teacherVm.onSuggestionTapped(suggestion);
+                },
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 
@@ -409,7 +532,6 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 ),
               ),
               const Spacer(),
-              // Info Icon Button
               Container(
                 width: 32,
                 height: 32,
@@ -424,7 +546,6 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 ),
               ),
               const SizedBox(width: 8),
-              // Bell Icon Button
               Container(
                 width: 32,
                 height: 32,
@@ -454,7 +575,6 @@ class _TeacherScreenState extends State<TeacherScreen> {
 
           const SizedBox(height: 18),
 
-          // Download PDF button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -514,32 +634,32 @@ class _TeacherScreenState extends State<TeacherScreen> {
     );
   }
 
-  Widget _buildViewToggle() {
+  Widget _buildViewToggle(TeacherViewModel teacherVm, TeacherUiState state) {
     return Row(
       children: [
         Expanded(
           child: GestureDetector(
-            onTap: () => setState(() => _isWeekView = false),
+            onTap: () => teacherVm.toggleView(false),
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: !_isWeekView ? ink : surface,
+                color: !state.isWeekView ? ink : surface,
                 borderRadius: BorderRadius.circular(14),
-                border: _isWeekView ? Border.all(color: line) : null,
+                border: state.isWeekView ? Border.all(color: line) : null,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.calendar_today,
-                    color: !_isWeekView ? Colors.white : textMuted,
+                    color: !state.isWeekView ? Colors.white : textMuted,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Day View',
                     style: TextStyle(
-                      color: !_isWeekView ? Colors.white : textMuted,
+                      color: !state.isWeekView ? Colors.white : textMuted,
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                     ),
@@ -552,27 +672,27 @@ class _TeacherScreenState extends State<TeacherScreen> {
         const SizedBox(width: 12),
         Expanded(
           child: GestureDetector(
-            onTap: () => setState(() => _isWeekView = true),
+            onTap: () => teacherVm.toggleView(true),
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                color: _isWeekView ? ink : surface,
+                color: state.isWeekView ? ink : surface,
                 borderRadius: BorderRadius.circular(14),
-                border: !_isWeekView ? Border.all(color: line) : null,
+                border: !state.isWeekView ? Border.all(color: line) : null,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.calendar_month,
-                    color: _isWeekView ? Colors.white : textMuted,
+                    color: state.isWeekView ? Colors.white : textMuted,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Week View',
                     style: TextStyle(
-                      color: _isWeekView ? Colors.white : textMuted,
+                      color: state.isWeekView ? Colors.white : textMuted,
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                     ),
@@ -586,21 +706,21 @@ class _TeacherScreenState extends State<TeacherScreen> {
     );
   }
 
-  Widget _buildDateStrip() {
+  Widget _buildDateStrip(TeacherViewModel teacherVm, TeacherUiState state) {
     final days = RoutineDay.values;
     final dateNumbers = ['29', '30', '31', '1', '2', '3'];
 
     return Row(
       children: List.generate(days.length, (index) {
         final day = days[index];
-        final isSelected = day == _selectedDay;
+        final isSelected = day == state.resolvedDay;
         final dateNum = dateNumbers[index];
 
         return Expanded(
           child: Padding(
             padding: EdgeInsets.only(right: index < days.length - 1 ? 6 : 0),
             child: GestureDetector(
-              onTap: () => setState(() => _selectedDay = day),
+              onTap: () => teacherVm.selectDay(day),
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
@@ -747,7 +867,8 @@ class _TeacherScreenState extends State<TeacherScreen> {
   }
 
   Widget _buildClassCard(ClassBlock block) {
-    final title = _catalog?.nameOf(block.course) ?? block.course;
+    final title =
+        block.courseTitle.isNotEmpty ? block.courseTitle : block.course;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

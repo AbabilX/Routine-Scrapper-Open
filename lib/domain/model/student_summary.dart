@@ -24,6 +24,7 @@ class ClassBlock {
     required this.start,
     required this.end,
     required this.course,
+    this.courseTitle = '',
     required this.group,
     required this.teacher,
     required this.room,
@@ -35,11 +36,16 @@ class ClassBlock {
   final String start;
   final String end;
   final String course;
+  final String courseTitle;
   final String group;
   final String teacher;
   final String room;
 
-  ClassBlock copyWith({int? endSlot, String? end}) {
+  ClassBlock copyWith({
+    int? endSlot,
+    String? end,
+    String? courseTitle,
+  }) {
     return ClassBlock(
       day: day,
       startSlot: startSlot,
@@ -47,6 +53,7 @@ class ClassBlock {
       start: start,
       end: end ?? this.end,
       course: course,
+      courseTitle: courseTitle ?? this.courseTitle,
       group: group,
       teacher: teacher,
       room: room,
@@ -62,6 +69,7 @@ class ClassBlock {
         other.start == start &&
         other.end == end &&
         other.course == course &&
+        other.courseTitle == courseTitle &&
         other.group == group &&
         other.teacher == teacher &&
         other.room == room;
@@ -75,6 +83,7 @@ class ClassBlock {
     start,
     end,
     course,
+    courseTitle,
     group,
     teacher,
     room,

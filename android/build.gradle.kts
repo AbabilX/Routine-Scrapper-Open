@@ -20,13 +20,23 @@ subprojects {
 }
 
 subprojects {
-    afterEvaluate {
+    val configureAndroid = {
         val androidExt = extensions.findByName("android")
-        if (androidExt is com.android.build.gradle.BaseExtension) {
+        if (androidExt is com.android.build.api.dsl.CommonExtension) {
             if ((androidExt.compileSdk ?: 0) < 36) {
                 androidExt.compileSdk = 36
             }
+        } else if (androidExt is com.android.build.gradle.BaseExtension) {
+            val currentSdk = androidExt.compileSdkVersion?.removePrefix("android-")?.toIntOrNull() ?: 0
+            if (currentSdk < 36) {
+                androidExt.compileSdkVersion(36)
+            }
         }
+    }
+    if (state.executed) {
+        configureAndroid()
+    } else {
+        afterEvaluate { configureAndroid() }
     }
 }
 

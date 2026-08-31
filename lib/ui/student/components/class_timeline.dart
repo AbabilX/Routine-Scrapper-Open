@@ -14,12 +14,14 @@ class ClassTimeline extends StatelessWidget {
     this.statuses = const {},
     this.reminderMinutes = const {},
     this.onReminderTap,
+    this.onTeacherTap,
   });
 
   final List<TimelineItem> items;
   final Map<ClassBlock, ClassStatus> statuses;
   final Map<String, int> reminderMinutes;
   final ValueChanged<ClassBlock>? onReminderTap;
+  final ValueChanged<String>? onTeacherTap;
 
   @override
   Widget build(BuildContext context) {
@@ -36,6 +38,7 @@ class ClassTimeline extends StatelessWidget {
             reminderMinutes:
                 reminderMinutes[ClassReminderId.fromBlock(item.block)],
             onReminderTap: onReminderTap,
+            onTeacherTap: onTeacherTap,
           ),
         );
         classIndex += 1;
@@ -65,6 +68,7 @@ class _ClassCard extends StatelessWidget {
     required this.status,
     this.reminderMinutes,
     this.onReminderTap,
+    this.onTeacherTap,
   });
 
   final ClassBlock block;
@@ -72,6 +76,7 @@ class _ClassCard extends StatelessWidget {
   final ClassStatus status;
   final int? reminderMinutes;
   final ValueChanged<ClassBlock>? onReminderTap;
+  final ValueChanged<String>? onTeacherTap;
 
   @override
   Widget build(BuildContext context) {
@@ -90,9 +95,30 @@ class _ClassCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(block.course, style: text.headlineSmall),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          block.courseTitle.isNotEmpty
+                              ? block.courseTitle
+                              : block.course,
+                          style: text.headlineSmall,
+                        ),
+                        if (block.courseTitle.isNotEmpty) ...[
+                          const SizedBox(height: 2),
+                          Text(
+                            block.course,
+                            style: text.labelMedium?.copyWith(
+                              color: textMuted,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
                   if (onReminderTap != null)
                     _ReminderBell(
@@ -119,7 +145,47 @@ class _ClassCard extends StatelessWidget {
               const SizedBox(height: 12),
               _MetaRow(icon: Icons.place_outlined, text: block.room),
               const SizedBox(height: 12),
-              Text(block.teacher, style: text.titleMedium),
+              if (block.teacher.isNotEmpty)
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onTeacherTap != null
+                        ? () => onTeacherTap!(block.teacher)
+                        : null,
+                    borderRadius: BorderRadius.circular(8),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 2,
+                        horizontal: 2,
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.person_outline,
+                            size: 18,
+                            color: ink,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            block.teacher,
+                            style: text.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              decoration: TextDecoration.underline,
+                              decorationStyle: TextDecorationStyle.dotted,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          const Icon(
+                            Icons.info_outline,
+                            size: 14,
+                            color: textMuted,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
               const SizedBox(height: 12),
               Text('Section ${block.group}', style: text.labelSmall),
             ],
@@ -176,7 +242,7 @@ class _StatusPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final (String? label, Color? color) = switch (status) {
+    final (String? label, Color color) = switch (status) {
       ClassStatus.now => ('এখন', mint),
       ClassStatus.next => (ringTime ?? 'পরের', sky),
       ClassStatus.done => ('শেষ', ink.withValues(alpha: 0.18)),

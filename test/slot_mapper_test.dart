@@ -18,6 +18,7 @@ void main() {
     final slot = SlotMapper.mapItem(item)!;
 
     expect(slot.course, 'CSE121');
+    expect(slot.courseTitle, 'Electrical Circuits');
     expect(slot.group, '70_E');
     expect(slot.day, RoutineDay.sunday);
     expect(slot.start, '08:30');

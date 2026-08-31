@@ -14,6 +14,7 @@ import '../../domain/model/routine_day.dart';
 import '../../domain/model/routine_meta.dart';
 import '../../domain/model/student_profile.dart';
 import '../../domain/model/student_summary.dart';
+import '../../domain/model/teacher_info.dart';
 import '../../domain/routine_queries.dart';
 import '../../domain/student_query.dart';
 
@@ -267,6 +268,10 @@ class StudentViewModel extends ChangeNotifier {
       );
       rebuild();
     }
+  }
+
+  Future<TeacherInfo?> getTeacherInfo(String initial) {
+    return live.teacherInfo(initial);
   }
 
   Future<void> downloadSchedule() async {

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../domain/model/class_status.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/student_summary.dart';
+import '../components/teacher_profile_dialog.dart';
 import '../theme/app_colors.dart';
 import 'components/class_timeline.dart';
 import 'components/date_strip.dart';
@@ -123,6 +124,11 @@ class StudentScreen extends StatelessWidget {
           onDaySelected: viewModel.onDaySelected,
           onDownload: viewModel.downloadSchedule,
           onReminderPicked: viewModel.onReminderPicked,
+          onTeacherTap: (initial) => TeacherProfileDialog.show(
+            context: context,
+            initial: initial,
+            fetcher: viewModel.getTeacherInfo,
+          ),
         );
     }
   }
@@ -134,12 +140,14 @@ class _ReadyBody extends StatelessWidget {
     required this.onDaySelected,
     required this.onDownload,
     required this.onReminderPicked,
+    required this.onTeacherTap,
   });
 
   final StudentUiState state;
   final ValueChanged<RoutineDay> onDaySelected;
   final Future<void> Function() onDownload;
   final Future<bool> Function(ClassBlock block, int? minutes) onReminderPicked;
+  final ValueChanged<String> onTeacherTap;
 
   @override
   Widget build(BuildContext context) {
@@ -188,6 +196,7 @@ class _ReadyBody extends StatelessWidget {
             statuses: state.classStatuses,
             reminderMinutes: reminderMinutes,
             onReminderTap: (block) => _pickReminder(context, block),
+            onTeacherTap: onTeacherTap,
           ),
         ] else ...[
           const SizedBox(height: 18),
@@ -196,6 +205,7 @@ class _ReadyBody extends StatelessWidget {
             statuses: state.classStatuses,
             reminderMinutes: reminderMinutes,
             onReminderTap: (block) => _pickReminder(context, block),
+            onTeacherTap: onTeacherTap,
           ),
         ],
       ],
@@ -205,7 +215,9 @@ class _ReadyBody extends StatelessWidget {
   Future<void> _pickReminder(BuildContext context, ClassBlock block) async {
     final choice = await showReminderPickerSheet(
       context: context,
-      course: block.course,
+      course: block.courseTitle.isNotEmpty
+          ? '${block.courseTitle} (${block.course})'
+          : block.course,
       selected: state.reminderMinutesFor(block),
     );
     if (choice == null || !context.mounted) return;

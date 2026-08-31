@@ -1,6 +1,4 @@
 /// Compile-time API host from `--dart-define-from-file=.env`.
-///
-/// The real URL must never appear in committed Dart, docs, or rules.
 class ApiConfig {
   const ApiConfig._();
 
