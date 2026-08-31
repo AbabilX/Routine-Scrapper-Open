@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import '../../data/course_catalog.dart';
@@ -9,6 +10,20 @@ import '../../domain/model/student_summary.dart';
 import '../../domain/routine_queries.dart';
 import '../room/components/select_option_modal.dart';
 import '../student/student_view_model.dart';
+import '../theme/app_colors.dart';
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
 
 class TeacherScreen extends StatefulWidget {
   const TeacherScreen({super.key});
@@ -18,10 +33,8 @@ class TeacherScreen extends StatefulWidget {
 }
 
 class _TeacherScreenState extends State<TeacherScreen> {
-  final TextEditingController _searchController = TextEditingController(
-    text: 'TRA',
-  );
-  String _query = 'TRA';
+  final TextEditingController _searchController = TextEditingController();
+  String _query = '';
   int _selectedDeptIndex = 0;
   bool _isWeekView = false;
   RoutineDay _selectedDay = RoutineQueries.todayOrSaturday();
@@ -68,9 +81,12 @@ class _TeacherScreenState extends State<TeacherScreen> {
     // Matched slots for the teacher
     final teacherSlots = queryClean.isEmpty
         ? <ClassSlot>[]
-        : slots
-              .where((s) => s.teacher.trim().toUpperCase() == queryClean)
-              .toList();
+        : slots.where((s) {
+            final tUpper = s.teacher.trim().toUpperCase();
+            if (tUpper == queryClean) return true;
+            final parts = tUpper.split(RegExp(r'[\s/_,\.-]+'));
+            return parts.contains(queryClean);
+          }).toList();
 
     final hasMatches = teacherSlots.isNotEmpty;
 
@@ -81,7 +97,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
     final weeklyMap = RoutineQueries.weeklyBlocks(teacherSlots);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF13141F),
+      backgroundColor: bg,
       body: SafeArea(
         child: Column(
           children: [
@@ -111,9 +127,9 @@ class _TeacherScreenState extends State<TeacherScreen> {
                             vertical: 6,
                           ),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF1E1F2E),
+                            color: lavender.withValues(alpha: 0.4),
                             borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: const Color(0xFF2E3048)),
+                            border: Border.all(color: line),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
@@ -121,7 +137,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                               Text(
                                 queryClean,
                                 style: const TextStyle(
-                                  color: Colors.white,
+                                  color: ink,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 14,
                                 ),
@@ -129,7 +145,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                               const SizedBox(width: 6),
                               const Icon(
                                 Icons.close,
-                                color: Colors.white70,
+                                color: textMuted,
                                 size: 16,
                               ),
                             ],
@@ -201,25 +217,21 @@ class _TeacherScreenState extends State<TeacherScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       child: Row(
         children: [
-          // Purple Teacher logo badge
+          // Teacher logo badge
           Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6C5CE7), Color(0xFF8E7CFF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: lavender,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.badge, color: Colors.white, size: 24),
+            child: const Icon(Icons.badge, color: ink, size: 24),
           ),
           const SizedBox(width: 12),
           const Text(
             'Teacher',
             style: TextStyle(
-              color: Colors.white,
+              color: ink,
               fontSize: 22,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.3,
@@ -230,19 +242,19 @@ class _TeacherScreenState extends State<TeacherScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF0B281B),
+              color: mint.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF166534)),
+              border: Border.all(color: line),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Icon(Icons.circle, color: Color(0xFF22C55E), size: 8),
+                Icon(Icons.circle, color: Color(0xFF166534), size: 8),
                 SizedBox(width: 6),
                 Text(
                   'Online',
                   style: TextStyle(
-                    color: Color(0xFF22C55E),
+                    color: Color(0xFF166534),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -255,13 +267,14 @@ class _TeacherScreenState extends State<TeacherScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1F2E),
+              color: surface,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: line),
             ),
             child: IconButton(
               icon: const Icon(
                 Icons.chat_bubble_outline,
-                color: Colors.white70,
+                color: ink,
                 size: 20,
               ),
               onPressed: () {},
@@ -272,11 +285,12 @@ class _TeacherScreenState extends State<TeacherScreen> {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1F2E),
+              color: surface,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: line),
             ),
             child: IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white70, size: 22),
+              icon: const Icon(Icons.menu, color: ink, size: 22),
               onPressed: () {},
             ),
           ),
@@ -292,18 +306,20 @@ class _TeacherScreenState extends State<TeacherScreen> {
           child: Container(
             height: 48,
             decoration: BoxDecoration(
-              color: const Color(0xFF1B1C2A),
+              color: surface,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF2B2D42)),
+              border: Border.all(color: line),
             ),
             child: TextField(
               controller: _searchController,
               onChanged: _onQueryChanged,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              textCapitalization: TextCapitalization.characters,
+              inputFormatters: [UpperCaseTextFormatter()],
+              style: const TextStyle(color: ink, fontSize: 16),
               decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search, color: Colors.white54, size: 20),
+                prefixIcon: Icon(Icons.search, color: textMuted, size: 20),
                 hintText: 'Search Teacher Initial (e.g. TRA)',
-                hintStyle: TextStyle(color: Colors.white38, fontSize: 14),
+                hintStyle: TextStyle(color: textMuted, fontSize: 14),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 14,
@@ -314,7 +330,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
           ),
         ),
         const SizedBox(width: 10),
-        // Dept Dropdown Button: CSE v
+        // Dept Dropdown Button
         GestureDetector(
           onTap: () async {
             final choice = await SelectOptionModal.show(
@@ -331,16 +347,16 @@ class _TeacherScreenState extends State<TeacherScreen> {
             height: 48,
             padding: const EdgeInsets.symmetric(horizontal: 14),
             decoration: BoxDecoration(
-              color: const Color(0xFF1B1C2A),
+              color: surface,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: const Color(0xFF2B2D42)),
+              border: Border.all(color: line),
             ),
             child: Row(
               children: [
                 Text(
                   _deptOptions[_selectedDeptIndex],
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: ink,
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
                   ),
@@ -348,7 +364,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 const SizedBox(width: 4),
                 const Icon(
                   Icons.keyboard_arrow_down,
-                  color: Colors.white54,
+                  color: textMuted,
                   size: 18,
                 ),
               ],
@@ -371,9 +387,9 @@ class _TeacherScreenState extends State<TeacherScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1B1C2A),
+        color: surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF2B2D42)),
+        border: Border.all(color: line),
       ),
       padding: const EdgeInsets.all(18),
       child: Column(
@@ -383,14 +399,14 @@ class _TeacherScreenState extends State<TeacherScreen> {
             children: [
               const Icon(
                 Icons.keyboard_arrow_down,
-                color: Colors.white70,
+                color: textMuted,
                 size: 20,
               ),
               const SizedBox(width: 6),
               const Text(
                 'Registered Courses',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: ink,
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
                 ),
@@ -401,27 +417,27 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6C5CE7).withValues(alpha: 0.3),
+                  color: lavender.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
                   Icons.info_outline,
-                  color: Color(0xFF9D8CFF),
+                  color: ink,
                   size: 18,
                 ),
               ),
               const SizedBox(width: 8),
-              // Bell Icon Button matching screenshot
+              // Bell Icon Button
               Container(
                 width: 32,
                 height: 32,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF3A82F6),
+                  color: sky.withValues(alpha: 0.5),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.notifications,
-                  color: Colors.white,
+                  Icons.notifications_none,
+                  color: ink,
                   size: 18,
                 ),
               ),
@@ -441,14 +457,14 @@ class _TeacherScreenState extends State<TeacherScreen> {
 
           const SizedBox(height: 18),
 
-          // Download PDF for TRA button matching screenshot
+          // Download PDF button
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Download PDF for $teacherName',
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: textMuted,
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
                 ),
@@ -459,7 +475,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF8B5CF6),
+                    color: ink,
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Icon(
@@ -482,7 +498,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.white54, fontSize: 14),
+          style: const TextStyle(color: textMuted, fontSize: 14),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -490,7 +506,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
             value,
             textAlign: TextAlign.right,
             style: const TextStyle(
-              color: Colors.white,
+              color: ink,
               fontSize: 14,
               fontWeight: FontWeight.bold,
             ),
@@ -510,30 +526,23 @@ class _TeacherScreenState extends State<TeacherScreen> {
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                gradient: !_isWeekView
-                    ? const LinearGradient(
-                        colors: [Color(0xFF6C5CE7), Color(0xFF8E7CFF)],
-                      )
-                    : null,
-                color: _isWeekView ? const Color(0xFF1B1C2A) : null,
+                color: !_isWeekView ? ink : surface,
                 borderRadius: BorderRadius.circular(14),
-                border: _isWeekView
-                    ? Border.all(color: const Color(0xFF2B2D42))
-                    : null,
+                border: _isWeekView ? Border.all(color: line) : null,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.calendar_today,
-                    color: !_isWeekView ? Colors.white : Colors.white54,
+                    color: !_isWeekView ? Colors.white : textMuted,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Day View',
                     style: TextStyle(
-                      color: !_isWeekView ? Colors.white : Colors.white54,
+                      color: !_isWeekView ? Colors.white : textMuted,
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                     ),
@@ -550,30 +559,23 @@ class _TeacherScreenState extends State<TeacherScreen> {
             child: Container(
               height: 48,
               decoration: BoxDecoration(
-                gradient: _isWeekView
-                    ? const LinearGradient(
-                        colors: [Color(0xFF6C5CE7), Color(0xFF8E7CFF)],
-                      )
-                    : null,
-                color: !_isWeekView ? const Color(0xFF1B1C2A) : null,
+                color: _isWeekView ? ink : surface,
                 borderRadius: BorderRadius.circular(14),
-                border: !_isWeekView
-                    ? Border.all(color: const Color(0xFF2B2D42))
-                    : null,
+                border: !_isWeekView ? Border.all(color: line) : null,
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
                     Icons.calendar_month,
-                    color: _isWeekView ? Colors.white : Colors.white54,
+                    color: _isWeekView ? Colors.white : textMuted,
                     size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
                     'Week View',
                     style: TextStyle(
-                      color: _isWeekView ? Colors.white : Colors.white54,
+                      color: _isWeekView ? Colors.white : textMuted,
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                     ),
@@ -589,7 +591,6 @@ class _TeacherScreenState extends State<TeacherScreen> {
 
   Widget _buildDateStrip() {
     final days = RoutineDay.values;
-    // Map dates matching screenshot: 29 Sat, 30 Sun, 31 Mon, 1 Tue, 2 Wed, 3 Thu
     final dateNumbers = ['29', '30', '31', '1', '2', '3'];
 
     return Row(
@@ -606,36 +607,16 @@ class _TeacherScreenState extends State<TeacherScreen> {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  gradient: isSelected
-                      ? const LinearGradient(
-                          colors: [Color(0xFF6C5CE7), Color(0xFF8E7CFF)],
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                        )
-                      : null,
-                  color: !isSelected ? const Color(0xFF1B1C2A) : null,
+                  color: isSelected ? ink : surface,
                   borderRadius: BorderRadius.circular(16),
-                  border: !isSelected
-                      ? Border.all(color: const Color(0xFF2B2D42))
-                      : null,
-                  boxShadow: isSelected
-                      ? [
-                          BoxShadow(
-                            color: const Color(
-                              0xFF6C5CE7,
-                            ).withValues(alpha: 0.4),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ]
-                      : null,
+                  border: !isSelected ? Border.all(color: line) : null,
                 ),
                 child: Column(
                   children: [
                     Text(
                       dateNum,
                       style: TextStyle(
-                        color: isSelected ? Colors.white : Colors.white70,
+                        color: isSelected ? Colors.white : ink,
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                       ),
@@ -644,7 +625,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                     Text(
                       day.shortLabel,
                       style: TextStyle(
-                        color: isSelected ? Colors.white70 : Colors.white54,
+                        color: isSelected ? Colors.white70 : textMuted,
                         fontSize: 12,
                       ),
                     ),
@@ -663,18 +644,18 @@ class _TeacherScreenState extends State<TeacherScreen> {
       return Container(
         padding: const EdgeInsets.all(28),
         decoration: BoxDecoration(
-          color: const Color(0xFF1B1C2A),
+          color: surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFF2B2D42)),
+          border: Border.all(color: line),
         ),
         child: Column(
           children: const [
-            Icon(Icons.event_available, color: Color(0xFF22C55E), size: 40),
+            Icon(Icons.event_available, color: ink, size: 40),
             SizedBox(height: 10),
             Text(
               'Off Day',
               style: TextStyle(
-                color: Colors.white,
+                color: ink,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -682,7 +663,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
             SizedBox(height: 6),
             Text(
               'No classes scheduled for this teacher on this day.',
-              style: TextStyle(color: Colors.white54, fontSize: 14),
+              style: TextStyle(color: textMuted, fontSize: 14),
               textAlign: TextAlign.center,
             ),
           ],
@@ -704,9 +685,9 @@ class _TeacherScreenState extends State<TeacherScreen> {
         return Container(
           margin: const EdgeInsets.only(bottom: 14),
           decoration: BoxDecoration(
-            color: const Color(0xFF1B1C2A),
+            color: surface,
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: const Color(0xFF2B2D42)),
+            border: Border.all(color: line),
           ),
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -718,7 +699,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                   Text(
                     day.fullLabel,
                     style: const TextStyle(
-                      color: Colors.white,
+                      color: ink,
                       fontSize: 17,
                       fontWeight: FontWeight.bold,
                     ),
@@ -730,16 +711,14 @@ class _TeacherScreenState extends State<TeacherScreen> {
                     ),
                     decoration: BoxDecoration(
                       color: isOffDay
-                          ? const Color(0xFF22C55E).withValues(alpha: 0.15)
-                          : const Color(0xFF6C5CE7).withValues(alpha: 0.2),
+                          ? mint.withValues(alpha: 0.4)
+                          : lavender.withValues(alpha: 0.4),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       isOffDay ? 'Off Day' : '${dayBlocks.length} Classes',
-                      style: TextStyle(
-                        color: isOffDay
-                            ? const Color(0xFF22C55E)
-                            : const Color(0xFF9D8CFF),
+                      style: const TextStyle(
+                        color: ink,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -753,7 +732,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                   padding: EdgeInsets.symmetric(vertical: 8),
                   child: Text(
                     'No classes scheduled',
-                    style: TextStyle(color: Colors.white38, fontSize: 13),
+                    style: TextStyle(color: textMuted, fontSize: 13),
                   ),
                 )
               else
@@ -776,21 +755,21 @@ class _TeacherScreenState extends State<TeacherScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF171826),
+        color: surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF282A40)),
+        border: Border.all(color: line),
       ),
       padding: const EdgeInsets.all(16),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Time Column (Left) matching screenshot
+          // Time Column (Left)
           Column(
             children: [
               Text(
                 block.start,
                 style: const TextStyle(
-                  color: Colors.white70,
+                  color: ink,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
@@ -799,19 +778,19 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 width: 1,
                 height: 36,
                 margin: const EdgeInsets.symmetric(vertical: 4),
-                color: Colors.white24,
+                color: line,
               ),
               Text(
                 block.end,
-                style: const TextStyle(color: Colors.white54, fontSize: 13),
+                style: const TextStyle(color: textMuted, fontSize: 13),
               ),
             ],
           ),
           const SizedBox(width: 16),
-          Container(width: 1, height: 70, color: const Color(0xFF282A40)),
+          Container(width: 1, height: 70, color: line),
           const SizedBox(width: 16),
 
-          // Details Column matching screenshot
+          // Details Column
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -819,7 +798,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 Text(
                   title,
                   style: const TextStyle(
-                    color: Color(0xFF91A7FF),
+                    color: ink,
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                   ),
@@ -832,7 +811,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 _cardDetailRow(
                   'Teacher',
                   block.teacher,
-                  valueColor: const Color(0xFF8B5CF6),
+                  valueColor: ink,
                 ),
                 const SizedBox(height: 4),
                 _cardDetailRow('Room', block.room),
@@ -850,12 +829,12 @@ class _TeacherScreenState extends State<TeacherScreen> {
       children: [
         Text(
           label,
-          style: const TextStyle(color: Colors.white54, fontSize: 13),
+          style: const TextStyle(color: textMuted, fontSize: 13),
         ),
         Text(
           value,
           style: TextStyle(
-            color: valueColor ?? Colors.white,
+            color: valueColor ?? ink,
             fontSize: 13,
             fontWeight: FontWeight.w600,
           ),
@@ -868,22 +847,22 @@ class _TeacherScreenState extends State<TeacherScreen> {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: const Color(0xFF1B1C2A).withValues(alpha: 0.5),
+        color: surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF2B2D42)),
+        border: Border.all(color: line),
       ),
       child: Column(
         children: [
           const Icon(
             Icons.person_search_outlined,
             size: 48,
-            color: Color(0xFF8B5CF6),
+            color: ink,
           ),
           const SizedBox(height: 12),
           Text(
             title,
             style: const TextStyle(
-              color: Colors.white,
+              color: ink,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -892,7 +871,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: const TextStyle(color: Colors.white60, fontSize: 14),
+            style: const TextStyle(color: textMuted, fontSize: 14),
           ),
         ],
       ),

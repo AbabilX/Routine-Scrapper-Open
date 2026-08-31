@@ -29,6 +29,10 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     _showOnboarding = !widget.cache.seenOnboarding;
+    SystemChrome.setEnabledSystemUIMode(
+      SystemUiMode.manual,
+      overlays: [SystemUiOverlay.top],
+    );
   }
 
   Future<void> _finishOnboarding(StudentProfile profile) async {
@@ -39,20 +43,16 @@ class _AppShellState extends State<AppShell> {
 
   @override
   Widget build(BuildContext context) {
-    final isDarkTab = _currentTab == 3;
-
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: SystemUiOverlayStyle(
+      value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: isDarkTab ? Brightness.light : Brightness.dark,
-        statusBarBrightness: isDarkTab ? Brightness.dark : Brightness.light,
-        systemNavigationBarColor: isDarkTab ? const Color(0xFF13141F) : bg,
-        systemNavigationBarIconBrightness: isDarkTab
-            ? Brightness.light
-            : Brightness.dark,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
+        systemNavigationBarColor: bg,
+        systemNavigationBarIconBrightness: Brightness.dark,
       ),
       child: Scaffold(
-        backgroundColor: isDarkTab ? const Color(0xFF13141F) : bg,
+        backgroundColor: bg,
         body: _showOnboarding
             ? OnboardingScreen(
                 initialProfile: widget.cache.profile,
@@ -70,11 +70,11 @@ class _AppShellState extends State<AppShell> {
         bottomNavigationBar: _showOnboarding
             ? null
             : Container(
-                decoration: BoxDecoration(
-                  color: isDarkTab ? const Color(0xFF161622) : surface,
+                decoration: const BoxDecoration(
+                  color: surface,
                   border: Border(
                     top: BorderSide(
-                      color: isDarkTab ? const Color(0xFF262738) : line,
+                      color: line,
                       width: 1,
                     ),
                   ),
@@ -85,8 +85,8 @@ class _AppShellState extends State<AppShell> {
                   type: BottomNavigationBarType.fixed,
                   backgroundColor: Colors.transparent,
                   elevation: 0,
-                  selectedItemColor: isDarkTab ? const Color(0xFF8B5CF6) : ink,
-                  unselectedItemColor: isDarkTab ? Colors.white38 : textMuted,
+                  selectedItemColor: ink,
+                  unselectedItemColor: textMuted,
                   selectedFontSize: 12,
                   unselectedFontSize: 12,
                   items: const [

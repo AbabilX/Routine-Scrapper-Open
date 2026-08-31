@@ -3,11 +3,32 @@ import 'package:provider/provider.dart';
 
 import '../../domain/model/class_slot.dart';
 import '../../domain/model/room_info.dart';
+import '../theme/app_colors.dart';
 import 'components/select_option_modal.dart';
 import 'room_view_model.dart';
 
-class EmptyRoomScreen extends StatelessWidget {
+class EmptyRoomScreen extends StatefulWidget {
   const EmptyRoomScreen({super.key});
+
+  @override
+  State<EmptyRoomScreen> createState() => _EmptyRoomScreenState();
+}
+
+class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
+  late final TextEditingController _roomQueryController;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = context.read<RoomViewModel>().state.roomQueryText;
+    _roomQueryController = TextEditingController(text: initial);
+  }
+
+  @override
+  void dispose() {
+    _roomQueryController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,11 +36,11 @@ class EmptyRoomScreen extends StatelessWidget {
     final state = viewModel.state;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF13141F),
+      backgroundColor: bg,
       body: SafeArea(
         child: Column(
           children: [
-            // Top App Bar matching screenshot 1
+            // Top App Bar
             _buildAppBar(context),
 
             Expanded(
@@ -29,7 +50,7 @@ class EmptyRoomScreen extends StatelessWidget {
                   vertical: 12,
                 ),
                 children: [
-                  // Form Card Box matching screenshot 1
+                  // Form Card Box
                   _buildFormCard(context, viewModel, state),
 
                   const SizedBox(height: 24),
@@ -56,29 +77,21 @@ class EmptyRoomScreen extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       child: Row(
         children: [
-          // Purple Room logo badge
+          // Room logo badge
           Container(
             width: 42,
             height: 42,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF6C5CE7), Color(0xFF8E7CFF)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: lavender,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(
-              Icons.meeting_room,
-              color: Colors.white,
-              size: 24,
-            ),
+            child: const Icon(Icons.meeting_room, color: ink, size: 24),
           ),
           const SizedBox(width: 12),
           const Text(
             'Room',
             style: TextStyle(
-              color: Colors.white,
+              color: ink,
               fontSize: 22,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.3,
@@ -89,19 +102,19 @@ class EmptyRoomScreen extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: const Color(0xFF0B281B),
+              color: mint.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: const Color(0xFF166534)),
+              border: Border.all(color: line),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Icon(Icons.circle, color: Color(0xFF22C55E), size: 8),
+                Icon(Icons.circle, color: Color(0xFF166534), size: 8),
                 SizedBox(width: 6),
                 Text(
                   'Online',
                   style: TextStyle(
-                    color: Color(0xFF22C55E),
+                    color: Color(0xFF166534),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -115,15 +128,12 @@ class EmptyRoomScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1F2E),
+              color: surface,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: line),
             ),
             child: IconButton(
-              icon: const Icon(
-                Icons.chat_bubble_outline,
-                color: Colors.white70,
-                size: 20,
-              ),
+              icon: const Icon(Icons.chat_bubble_outline, color: ink, size: 20),
               onPressed: () {},
             ),
           ),
@@ -132,11 +142,12 @@ class EmptyRoomScreen extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1F2E),
+              color: surface,
               borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: line),
             ),
             child: IconButton(
-              icon: const Icon(Icons.menu, color: Colors.white70, size: 22),
+              icon: const Icon(Icons.menu, color: ink, size: 22),
               onPressed: () {},
             ),
           ),
@@ -152,9 +163,9 @@ class EmptyRoomScreen extends StatelessWidget {
   ) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF1B1C2A),
+        color: surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF2B2D42), width: 1),
+        border: Border.all(color: line, width: 1),
       ),
       padding: const EdgeInsets.all(18),
       child: Column(
@@ -163,15 +174,16 @@ class EmptyRoomScreen extends StatelessWidget {
           // Room Number text field
           Container(
             decoration: BoxDecoration(
-              color: const Color(0xFF13141E),
+              color: bg,
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: const Color(0xFF2E3048)),
+              border: Border.all(color: line),
             ),
             child: TextField(
-              style: const TextStyle(color: Colors.white, fontSize: 16),
+              controller: _roomQueryController,
+              style: const TextStyle(color: ink, fontSize: 16),
               decoration: const InputDecoration(
                 hintText: 'Room Number (e.g., 611)',
-                hintStyle: TextStyle(color: Colors.white38, fontSize: 15),
+                hintStyle: TextStyle(color: textMuted, fontSize: 15),
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16,
@@ -246,19 +258,15 @@ class EmptyRoomScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // Gradient Search Button matching image 1
+          // Search Button
           Container(
             height: 52,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF3A82F6), Color(0xFF8B5CF6)],
-                begin: Alignment.centerLeft,
-                end: Alignment.centerRight,
-              ),
+              color: ink,
               borderRadius: BorderRadius.circular(14),
               boxShadow: [
                 BoxShadow(
-                  color: const Color(0xFF3A82F6).withValues(alpha: 0.3),
+                  color: ink.withValues(alpha: 0.2),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
@@ -302,9 +310,9 @@ class EmptyRoomScreen extends StatelessWidget {
     return Container(
       height: 48,
       decoration: BoxDecoration(
-        color: const Color(0xFF13141E),
+        color: surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF2E3048)),
+        border: Border.all(color: line),
       ),
       child: InkWell(
         onTap: onTap,
@@ -317,15 +325,11 @@ class EmptyRoomScreen extends StatelessWidget {
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(color: Colors.white70, fontSize: 15),
+                  style: const TextStyle(color: ink, fontSize: 15),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              const Icon(
-                Icons.keyboard_arrow_down,
-                color: Colors.white54,
-                size: 20,
-              ),
+              const Icon(Icons.keyboard_arrow_down, color: textMuted, size: 20),
             ],
           ),
         ),
@@ -334,25 +338,24 @@ class EmptyRoomScreen extends StatelessWidget {
   }
 
   Widget _buildResultsHeader(RoomUiState state) {
-    final emptyCount = state.results.where((r) => r.isEmpty).length;
-    final totalCount = state.results.length;
+    final count = state.results.length;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           state.selectedTimeIndex > 0
-              ? '$emptyCount Empty Rooms Available'
-              : 'All Rooms ($totalCount)',
+              ? '$count Empty Rooms Available'
+              : '$count Free Rooms Available',
           style: const TextStyle(
-            color: Colors.white,
+            color: ink,
             fontSize: 17,
             fontWeight: FontWeight.bold,
           ),
         ),
         Text(
-          '${state.selectedDayLabel} ${state.selectedTimeIndex > 0 ? "(${state.selectedTimeLabel})" : ""}',
-          style: const TextStyle(color: Colors.white54, fontSize: 13),
+          '${state.selectedDayIndex > 0 ? state.selectedDayLabel : state.resolvedDay.fullLabel} ${state.selectedTimeIndex > 0 ? "(${state.selectedTimeLabel})" : ""}',
+          style: const TextStyle(color: textMuted, fontSize: 13),
         ),
       ],
     );
@@ -365,7 +368,7 @@ class EmptyRoomScreen extends StatelessWidget {
         alignment: Alignment.center,
         child: const Text(
           'No rooms match your search criteria',
-          style: TextStyle(color: Colors.white54, fontSize: 15),
+          style: TextStyle(color: textMuted, fontSize: 15),
         ),
       );
     }
@@ -381,18 +384,18 @@ class EmptyRoomScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: const Color(0xFF1B1C2A).withValues(alpha: 0.5),
+        color: surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFF2B2D42)),
+        border: Border.all(color: line),
       ),
       child: Column(
         children: const [
-          Icon(Icons.door_sliding_outlined, size: 48, color: Color(0xFF8B5CF6)),
+          Icon(Icons.door_sliding_outlined, size: 48, color: ink),
           SizedBox(height: 12),
           Text(
             'Find Free Classrooms',
             style: TextStyle(
-              color: Colors.white,
+              color: ink,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -401,7 +404,7 @@ class EmptyRoomScreen extends StatelessWidget {
           Text(
             'Select day and time slot above, then tap "Get Schedule" to see all empty rooms.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Colors.white60, fontSize: 14),
+            style: TextStyle(color: textMuted, fontSize: 14),
           ),
         ],
       ),
@@ -429,105 +432,106 @@ class _RoomCardState extends State<_RoomCard> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF1B1C2A),
+        color: surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isFree
-              ? const Color(0xFF22C55E).withValues(alpha: 0.4)
-              : const Color(0xFF2B2D42),
-        ),
+        border: Border.all(color: isFree ? mint : line),
       ),
-      child: Column(
-        children: [
-          ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 6,
-            ),
-            onTap: () => setState(() => _expanded = !_expanded),
-            leading: Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: isFree
-                    ? const Color(0xFF22C55E).withValues(alpha: 0.15)
-                    : const Color(0xFFEF4444).withValues(alpha: 0.15),
-                borderRadius: BorderRadius.circular(12),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          children: [
+            ListTile(
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 6,
               ),
-              child: Icon(
-                isFree ? Icons.door_sliding : Icons.meeting_room,
-                color: isFree
-                    ? const Color(0xFF22C55E)
-                    : const Color(0xFFEF4444),
-                size: 22,
-              ),
-            ),
-            title: Row(
-              children: [
-                Text(
-                  room.roomName,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
+              onTap: () => setState(() => _expanded = !_expanded),
+              leading: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: isFree
+                      ? mint.withValues(alpha: 0.4)
+                      : rose.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: isFree
-                        ? const Color(0xFF22C55E).withValues(alpha: 0.2)
-                        : const Color(0xFFEF4444).withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    isFree ? 'FREE' : 'BUSY',
-                    style: TextStyle(
-                      color: isFree
-                          ? const Color(0xFF22C55E)
-                          : const Color(0xFFEF4444),
-                      fontSize: 11,
+                child: Icon(
+                  isFree ? Icons.door_sliding : Icons.meeting_room,
+                  color: isFree
+                      ? const Color(0xFF166534)
+                      : const Color(0xFF991B1B),
+                  size: 22,
+                ),
+              ),
+              title: Row(
+                children: [
+                  Text(
+                    room.roomName,
+                    style: const TextStyle(
+                      color: ink,
+                      fontSize: 17,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                ),
-              ],
-            ),
-            subtitle: Text(
-              '${room.building} · ${room.daySlots.length} classes scheduled today',
-              style: const TextStyle(color: Colors.white54, fontSize: 13),
-            ),
-            trailing: Icon(
-              _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-              color: Colors.white54,
-            ),
-          ),
-          if (_expanded && room.daySlots.isNotEmpty) ...[
-            const Divider(color: Color(0xFF2B2D42), height: 1),
-            Container(
-              padding: const EdgeInsets.all(14),
-              color: const Color(0xFF151624),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const Text(
-                    'Schedule for this room:',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isFree
+                          ? mint.withValues(alpha: 0.4)
+                          : rose.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      isFree ? 'FREE' : 'BUSY',
+                      style: TextStyle(
+                        color: isFree
+                            ? const Color(0xFF166534)
+                            : const Color(0xFF991B1B),
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  ...room.daySlots.map((slot) => _buildSlotRow(slot)),
                 ],
               ),
+              subtitle: Text(
+                '${room.building} · ${room.daySlots.length} classes scheduled today',
+                style: const TextStyle(color: textMuted, fontSize: 13),
+              ),
+              trailing: Icon(
+                _expanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                color: textMuted,
+              ),
             ),
+            if (_expanded && room.daySlots.isNotEmpty) ...[
+              const Divider(color: line, height: 1),
+              Container(
+                padding: const EdgeInsets.all(14),
+                color: bg,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text(
+                      'Schedule for this room:',
+                      style: TextStyle(
+                        color: ink,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    ...room.daySlots.map((slot) => _buildSlotRow(slot)),
+                  ],
+                ),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -540,13 +544,13 @@ class _RoomCardState extends State<_RoomCard> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
             decoration: BoxDecoration(
-              color: const Color(0xFF2B2D42),
+              color: lavender.withValues(alpha: 0.4),
               borderRadius: BorderRadius.circular(6),
             ),
             child: Text(
               '${slot.start}-${slot.end}',
               style: const TextStyle(
-                color: Colors.white70,
+                color: ink,
                 fontSize: 12,
                 fontWeight: FontWeight.w500,
               ),
@@ -556,7 +560,7 @@ class _RoomCardState extends State<_RoomCard> {
           Expanded(
             child: Text(
               '${slot.course} (${slot.group}) - ${slot.teacher}',
-              style: const TextStyle(color: Colors.white70, fontSize: 13),
+              style: const TextStyle(color: ink, fontSize: 13),
               overflow: TextOverflow.ellipsis,
             ),
           ),

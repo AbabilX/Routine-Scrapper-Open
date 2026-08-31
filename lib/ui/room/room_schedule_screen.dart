@@ -2,7 +2,6 @@ import 'package:diu/domain/model/student_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../domain/model/class_slot.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/room_queries.dart';
 import '../../domain/routine_queries.dart';

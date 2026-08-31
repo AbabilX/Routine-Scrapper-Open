@@ -34,6 +34,9 @@ class ClassReminderScheduler {
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
         iOS: darwin,
         macOS: darwin,
+        linux: LinuxInitializationSettings(
+          defaultActionName: 'Open notification',
+        ),
       ),
     );
     return ClassReminderScheduler(plugin);

@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 
 import '../../data/asset_routine_repository.dart';
-import '../../domain/model/class_slot.dart';
 import '../../domain/model/room_info.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/room_queries.dart';
@@ -10,7 +9,7 @@ import '../../domain/routine_queries.dart';
 class RoomUiState {
   const RoomUiState({
     this.roomQueryText = '',
-    this.selectedDayIndex = 1, // Default: Saturday (or today)
+    this.selectedDayIndex = 0, // Default: Select Day (0)
     this.selectedTimeIndex = 0, // Default: Select Time (0)
     this.selectedDeptIndex = 0, // Default: CSE (0)
     this.results = const [],
@@ -85,33 +84,37 @@ class RoomUiState {
 }
 
 class RoomViewModel extends ChangeNotifier {
-  RoomViewModel({required this.repository}) {
+  RoomViewModel({required AssetRoutineRepository repository})
+    : _repository = repository {
     _init();
   }
 
-  final AssetRoutineRepository repository;
+  AssetRoutineRepository _repository;
+
+  AssetRoutineRepository get repository => _repository;
   late RoomUiState _state;
 
   RoomUiState get state => _state;
 
   void updateRepository(AssetRoutineRepository repo) {
-    _init(repo: repo);
+    if (identical(_repository, repo) || _repository.slots == repo.slots) {
+      return;
+    }
+    _repository = repo;
+    final rooms = RoomQueries.allRooms(repo.slots);
+    _state = _state.copyWith(allRoomNames: rooms);
+    if (_state.isSubmitted) {
+      searchEmptyRooms();
+    } else {
+      notifyListeners();
+    }
   }
 
   void _init({AssetRoutineRepository? repo}) {
-    final activeRepo = repo ?? repository;
-    final today = RoutineQueries.todayOrSaturday();
-    int dayIdx = 1;
-    for (var i = 1; i < RoomUiState.daysOptions.length; i++) {
-      if (RoutineDay.fromName(RoomUiState.daysOptions[i]) == today) {
-        dayIdx = i;
-        break;
-      }
-    }
-
+    final activeRepo = repo ?? _repository;
     final rooms = RoomQueries.allRooms(activeRepo.slots);
 
-    _state = RoomUiState(selectedDayIndex: dayIdx, allRoomNames: rooms);
+    _state = RoomUiState(selectedDayIndex: 0, allRoomNames: rooms);
     notifyListeners();
   }
 

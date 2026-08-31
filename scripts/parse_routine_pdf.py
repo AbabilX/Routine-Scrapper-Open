@@ -27,11 +27,11 @@ TIME_SLOTS = [
 SLOT_EDGES = (0, 225, 430, 640, 850, 1050, 1300)
 
 COURSE_RE = re.compile(
-    r"^([A-Z]{2,5}\d{3}[A-Z]?)\((.+)\)$"
+    r"^([A-Z]{2,6}\s*\d{3,4}[A-Z]?)\s*\((.+)\)$"
 )
-TEACHER_RE = re.compile(r"^[A-Z]{2,6}(?:[_-]\d+)?$")
+TEACHER_RE = re.compile(r"^[A-Za-z]{2,8}(?:[_\.-/]\w+)?$")
 ROOM_RE = re.compile(
-    r"^(KT-\d+(?:\([A-Z]\))?|G1-\d+|ANX1-\d+|SH-\d+|CTBA-\d+|EMBED|IOT)$"
+    r"^(KT-\d+(?:\([A-Z0-9]\))?|G\d+-\d+|ANX\d+-\d+|SH-\d+|CTBA-\d+|EMBED|IOT|\d{3,4})$"
 )
 SKIP = {
     "ROOM",
@@ -152,14 +152,14 @@ def find_teacher(
     left, right = SLOT_EDGES[index], SLOT_EDGES[index + 1]
     best: tuple[float, str] | None = None
     for p, wy, wx, text in words:
-        if p != page or abs(wy - y) > 10:
+        if p != page or abs(wy - y) > 18:
             continue
-        if wx <= x or wx >= right or wx < left:
+        if not (left <= wx < right):
             continue
         if COURSE_RE.match(text) or is_room(text) or text.upper() in SKIP:
             continue
-        if TEACHER_RE.match(text) or (text.isupper() and 2 <= len(text) <= 6):
-            delta = wx - x
+        if TEACHER_RE.match(text) or (text.isupper() and 2 <= len(text) <= 8):
+            delta = abs(wx - x) + abs(wy - y)
             if best is None or delta < best[0]:
                 best = (delta, text)
     return best[1] if best else "?"

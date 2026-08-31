@@ -88,23 +88,21 @@ class RoomQueries {
         }
       }
 
-      results.add(
-        RoomInfo(
-          roomName: roomName,
-          building: RoomInfo.deriveBuilding(roomName),
-          isEmpty: !isOccupied,
-          daySlots: daySlots,
-          currentOccupant: currentOccupant,
-          nextOccupant: nextOccupant,
-        ),
-      );
+      if (!isOccupied) {
+        results.add(
+          RoomInfo(
+            roomName: roomName,
+            building: RoomInfo.deriveBuilding(roomName),
+            isEmpty: true,
+            daySlots: daySlots,
+            currentOccupant: currentOccupant,
+            nextOccupant: nextOccupant,
+          ),
+        );
+      }
     }
 
-    // Sort: Empty rooms first, then by room name
-    results.sort((a, b) {
-      if (a.isEmpty != b.isEmpty) return a.isEmpty ? -1 : 1;
-      return a.roomName.compareTo(b.roomName);
-    });
+    results.sort((a, b) => a.roomName.compareTo(b.roomName));
 
     return results;
   }

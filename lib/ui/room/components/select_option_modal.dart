@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_colors.dart';
+
 class SelectOptionModal extends StatelessWidget {
   const SelectOptionModal({
     super.key,
@@ -39,7 +41,7 @@ class SelectOptionModal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
-        color: Color(0xFF1E1F2E),
+        color: surface,
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -53,7 +55,7 @@ class SelectOptionModal extends StatelessWidget {
                 width: 36,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: line,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -65,7 +67,7 @@ class SelectOptionModal extends StatelessWidget {
                 physics: const BouncingScrollPhysics(),
                 itemCount: options.length,
                 separatorBuilder: (context, index) =>
-                    const Divider(color: Color(0xFF2B2D42), height: 1),
+                    const Divider(color: line, height: 1),
                 itemBuilder: (context, index) {
                   final isSelected = index == selectedIndex;
                   final text = options[index];
@@ -84,9 +86,7 @@ class SelectOptionModal extends StatelessWidget {
                             child: Text(
                               text,
                               style: TextStyle(
-                                color: isSelected
-                                    ? Colors.white
-                                    : Colors.white70,
+                                color: isSelected ? ink : textMuted,
                                 fontSize: 18,
                                 fontWeight: isSelected
                                     ? FontWeight.w600
@@ -100,9 +100,7 @@ class SelectOptionModal extends StatelessWidget {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isSelected
-                                    ? Colors.white
-                                    : Colors.white38,
+                                color: isSelected ? ink : line,
                                 width: 2,
                               ),
                             ),
@@ -113,7 +111,7 @@ class SelectOptionModal extends StatelessWidget {
                                     height: 12,
                                     decoration: const BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: Colors.white,
+                                      color: ink,
                                     ),
                                   )
                                 : null,
