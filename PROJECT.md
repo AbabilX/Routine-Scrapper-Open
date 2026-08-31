@@ -20,6 +20,7 @@ student_cache.json  (query + reminders + profile)
 
 - `lib/domain` has no Flutter UI types.
 - `lib/data` loads and caches routine. UI does not build network details.
+- API host (`ApiConfig`) and paths (`ApiEndpoints`) come from compile-time dart-define (local `.env`). Do not commit host or path literals.
 - `RoutineQueries` builds timelines / now-next from `ClassSlot`.
 - Section PDF is built on-device from the current week (title + table). No PDF download from the API.
 - Department is CSE only for this slice (Teacher also supports BBA).

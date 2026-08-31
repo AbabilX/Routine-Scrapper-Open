@@ -21,14 +21,50 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Require API_BASE_URL secret
+      - name: Require compile-time secrets
         env:
           API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_ENDPOINTS_ENV: ${{ secrets.API_ENDPOINTS_ENV }}
         run: |
           if [ -z "$API_BASE_URL" ]; then
             echo "::error::Add repository secret API_BASE_URL (Settings → Secrets and variables → Actions)."
             exit 1
           fi
+          if [ -z "$API_ENDPOINTS_ENV" ]; then
+            echo "::error::Add repository secret API_ENDPOINTS_ENV (KEY=VALUE lines from .env.example path keys)."
+            exit 1
+          fi
+
+      - name: Write dart-define env
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+          API_ENDPOINTS_ENV: ${{ secrets.API_ENDPOINTS_ENV }}
+        run: |
+          set -euo pipefail
+          {
+            printf 'API_BASE_URL=%s\n' "$API_BASE_URL"
+            printf '%s\n' "$API_ENDPOINTS_ENV"
+          } > .env
+          required_keys=(
+            API_PATH_ROUTINE_VERSION
+            API_PATH_AUTOCOMPLETE
+            API_PATH_SCHEDULE
+            API_PATH_FREE_ROOMS
+            API_PATH_ROOMS_STATIC
+            API_PATH_TEACHERS_STATIC
+          )
+          for key in "${required_keys[@]}"; do
+            line=$(grep -E "^${key}=" .env || true)
+            if [ -z "$line" ]; then
+              echo "::error::API_ENDPOINTS_ENV is missing ${key}."
+              exit 1
+            fi
+            value="${line#*=}"
+            if [ -z "$value" ]; then
+              echo "::error::${key} is empty in API_ENDPOINTS_ENV."
+              exit 1
+            fi
+          done
 
       - name: Bump pubspec version
         id: bump
@@ -50,13 +86,11 @@ jobs:
         run: flutter pub get
 
       - name: Build split-per-ABI APKs
-        env:
-          API_BASE_URL: ${{ secrets.API_BASE_URL }}
         run: >
           flutter build apk --release --split-per-abi
           --build-name="${{ steps.bump.outputs.name }}"
           --build-number="${{ steps.bump.outputs.code }}"
-          --dart-define=API_BASE_URL="$API_BASE_URL"
+          --dart-define-from-file=.env
 
       - name: Package APKs
         run: |

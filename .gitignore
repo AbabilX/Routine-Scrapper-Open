@@ -19,10 +19,9 @@ scripts/.venv
 .pub/
 /coverage/
 
-# Local secrets — never commit real API hosts
+# Local secrets — never commit real API hosts or paths
 .env
 .env.*
 !.env.example
 api.md
 PROJECT.md
-lib/data/api/api_endpoints.dart

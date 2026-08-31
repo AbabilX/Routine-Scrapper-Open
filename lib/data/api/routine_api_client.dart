@@ -10,7 +10,7 @@ import 'api_endpoints.dart';
 import 'routine_api_exception.dart';
 import 'schedule_item_dto.dart';
 
-/// HTTP only. Base host comes from [ApiConfig], endpoint paths from [ApiEndpoints].
+/// HTTP only. Host from [ApiConfig], paths from [ApiEndpoints] (compile-time env).
 class RoutineApiClient {
   RoutineApiClient({http.Client? httpClient, Duration? timeout})
     : _http = httpClient ?? http.Client(),
@@ -180,6 +180,9 @@ class RoutineApiClient {
     if (!ApiConfig.isConfigured) {
       throw const RoutineApiException('API_BASE_URL is not configured');
     }
+    if (!ApiEndpoints.isConfigured) {
+      throw const RoutineApiException('API endpoint paths are not configured');
+    }
     final uri = ApiConfig.uri(path, query);
     _ApiLogger.logRequest(action: action, method: 'GET');
     final stopwatch = Stopwatch()..start();
@@ -215,6 +218,9 @@ class RoutineApiClient {
   }) async {
     if (!ApiConfig.isConfigured) {
       throw const RoutineApiException('API_BASE_URL is not configured');
+    }
+    if (!ApiEndpoints.isConfigured) {
+      throw const RoutineApiException('API endpoint paths are not configured');
     }
     final uri = ApiConfig.uri(path);
     _ApiLogger.logRequest(action: action, method: 'POST', body: body);
