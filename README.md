@@ -1,8 +1,6 @@
 # DIU Routine Scrapper
 
-DIU স্টুডেন্টদের জন্য **অফলাইন ক্লাস রুটিন** অ্যাপ। PDF ঘেঁটে ব্যাচ খুঁজে বের করার বদলে ব্যাচ কোড লিখলেই দিনভিত্তিক রুটিন দেখা যায়।
-
-এখন শুধু **Student** ভিউ আছে। Teacher / Room / Empty পরে যোগ হবে — আর্কিটেকচার সেভাবেই রাখা।
+DIU স্টুডেন্টদের জন্য ক্লাস রুটিন অ্যাপ। লাইভ API থেকে CSE রুটিন আনে; নেট না থাকলে শেষ ক্যাশ দেখায়।
 
 | | |
 |---|---|
@@ -10,7 +8,7 @@ DIU স্টুডেন্টদের জন্য **অফলাইন ক�
 | প্যাকেজ | `com.ababilx.routinescrapper` |
 | অ্যাপ নাম | DIU |
 | ভার্সন | 0.1.0 |
-| ডেটা | CSE Routine **V5 · Summer 2026** (অ্যাপে বান্ডল) |
+| ডেটা | Live CSE schedule API (host in local `.env`) |
 | লাইসেন্স | [MIT](LICENSE) |
 
 Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফারেন্স)। রান করার ডিফল্ট এখন Flutter।
@@ -22,7 +20,7 @@ Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফার�
 ছোট অ্যাপ, কিন্তু আসল অ্যাপের মতো লেয়ার আছে। এখানে পড়লে বোঝা যায়:
 
 1. **UI আলাদা, বিজনেস লজিক আলাদা** — স্ক্রিন বদলালে সার্চ ভাঙে না
-2. **ডেটা সোর্স আলাদা** — আজ JSON, কাল PDF আপলোড; কোয়েরি একই থাকে
+2. **ডেটা সোর্স আলাদা** — আজ লাইভ API, কাল অন্য ক্লায়েন্ট; কোয়েরি একই থাকে
 3. **Flutter widgets** — ছোট ছোট কম্পোনেন্ট জোড়া লাগিয়ে একটা স্ক্রিন
 4. **PDF scraper** — ইউনিভার্সিটি রুটিন PDF কীভাবে স্ট্রাকচার্ড JSON হয়
 
@@ -37,19 +35,17 @@ Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফার�
 
 ## কী কী করা যায়
 
-- সার্চ: `68_C`, `71_B`, `68C`, বা শুধু `68` (সব সেকশন)
-- `68_C` লিখলে `68_C1` / `68_C2` ল্যাব সাবসেকশনও মিলে
+- সার্চ: ব্যাচ টাইপ করলে autocomplete, সিলেক্ট করলে লাইভ রুটিন (`70_E`)
+- Teacher / Room / Empty ট্যাব — API থেকে
 - শনি–বৃহস্পতি ডেট স্ট্রিপ
 - পাশাপাশি ল্যাব স্লট এক কার্ডে, মাঝের ফাঁক **Break**
-- Enrolled Courses সারাংশ + ডাউনলোড: সার্চ করা সেকশনের সাপ্তাহিক PDF (যে দিনে ক্লাস আছে)
-- ক্লাস কার্ডে বেল — ৫ / ১০ / ১৫ / ২০ / ৩০ মিনিট আগে লোকাল রিমাইন্ডার (নেট লাগে না)
-- শেষ সার্চ ও রিমাইন্ডার পছন্দ ফোনে JSON ক্যাশে থাকে
-- ইন্টারনেট লাগে না
+- Enrolled Courses সারাংশ + ডাউনলোড: সার্চ করা সেকশনের সাপ্তাহিক PDF
+- ক্লাস কার্ডে বেল — ৫ / ১০ / ১৫ / ২০ / ৩০ মিনিট আগে লোকাল রিমাইন্ডার
+- শেষ সার্চ, রিমাইন্ডার, API রেসপন্স ফোনে ক্যাশে থাকে
 - অনবোর্ডিং একবারই (স্টোরেজ ক্লিয়ার / অ্যাপ রিসেট না করা পর্যন্ত)
-- অনবোর্ডিংয়ের পর PDF আপলোড **অপশনাল** — পাশে **আছে এমন ডেটা** দিয়ে bundled CSE রুটিন দিয়ে চালিয়ে যাওয়া যায়; পরে হেডার থেকে PDF বদলানো যায়
 - হেডারে জেন্ডার অনুযায়ী ১২ ফেস: মেয়ে (bunny/cat/chick/deer), ছেলে (fox/wolf/raccoon/bear), বলব না → টাক মাথা পুরুষ (হাসি/উইংক/চশমা/টাই)
 
-অ্যাপে ঢুকে **`68_C`** দিয়ে ট্রাই করো — ডেমোর জন্য ভালো উদাহরণ।
+অ্যাপে ঢুকে **`70_E`** দিয়ে ট্রাই করো।
 
 ---
 
@@ -83,7 +79,7 @@ flutter run --dart-define-from-file=.env
 flutter build apk --dart-define-from-file=.env
 ```
 
-অ্যাপে নাম **DIU** — সার্চ বক্সে `68_C`।
+অ্যাপে নাম **DIU** — সার্চ বক্সে `70_E`।
 
 লজিক টেস্ট:
 
@@ -98,32 +94,20 @@ flutter test --dart-define-from-file=.env
 ডেটা একদিকে যায়, স্ক্রিন অন্যদিকে। মাঝখানে **কোয়েরি** — Teacher স্ক্রিন এলেও এই অংশই রিইউজ হবে।
 
 ```
-DIU Routine PDF
+.env → ApiConfig → RoutineApiClient
         │
         ▼
-scripts/parse_routine_pdf.py          ← PDF পড়ে
+data/LiveRoutineRepository        ← version + slot cache
         │
         ▼
-assets/routine/*.json                 ← অ্যাপে বান্ডল
+domain/RoutineQueries             ← সার্চ, সারাংশ, টাইমলাইন, now/next
         │
         ▼
-data/RoutinePdfPicker                 ← Kotlin SAF / iOS document picker
+ui/*/ViewModel                    ← স্টুডেন্ট / টিচার / রুম স্টেট
         │
-        ▼
-data/LocalRoutineStore                ← ইউজার PDF → ফোনের routine.json
-        │
-        ▼
-data/AssetRoutineRepository           ← JSON লোড
-        │
-        ▼
-domain/RoutineQueries                 ← সার্চ, সারাংশ, টাইমলাইন, now/next, chips
-        │
-        ▼
-ui/student/StudentViewModel           ← স্ক্রিন স্টেট + student_cache.json
-        │
-        ├─ ui/app_shell               ← প্রথম লঞ্চ ট্যুর / Student
-        ├─ ui/student/StudentScreen   ← Flutter UI + বেল
-        └─ data/ClassReminderScheduler ← OS নোটিফিকেশন
+        ├─ ui/app_shell
+        ├─ ui/student / teacher / room
+        └─ data/ClassReminderScheduler
 ```
 
 | ফোল্ডার | দায়িত্ব | এখানে কী লিখবে |
@@ -248,7 +232,7 @@ scripts/.venv/bin/python scripts/parse_routine_pdf.py \
 - [ ] `flutter analyze` চলে
 - [ ] `flutter test --dart-define-from-file=.env` চলে
 - [ ] PR-এ `.env` বা লাইভ API হোস্ট নেই
-- [ ] নিজে ডিভাইসে `68_C` সার্চ করে দেখেছ
+- [ ] নিজে ডিভাইসে `70_E` সার্চ করে দেখেছ
 - [ ] JSON/পার্সার বদলালে আরও একটা ব্যাচ (`71_B`) চেক
 - [ ] README / `PROJECT.md` আপডেট (আর্কিটেকচার বদলালে)
 
@@ -260,12 +244,11 @@ scripts/.venv/bin/python scripts/parse_routine_pdf.py \
 
 | ফিচার | কেন পরে |
 |---|---|
-| Teacher / Room / Empty ট্যাব | v1 শুধু Student |
-| কোর্সের পুরো নাম | PDF-এ শুধু কোড |
-| অ্যাপে PDF পিকার | আগে JSON পাইপলাইন স্থির |
-| লাইভ ওয়েব scrape | নেট ছাড়া ভাঙবে; অফলাইন আগে |
+| PDF থেকে রুটিন আপলোড | লাইভ API প্রাইমারি |
+| FCM / community নোটিফিকেশন | আলাদা স্লাইস |
+| BBA department | এই স্লাইস CSE only |
 
-এগুলো যোগ করলেও `RoutineQueries` ও JSON স্কিমা যতটা সম্ভব না ভাঙলেই ভালো।
+`RoutineQueries` ও `ClassSlot` স্কিমা যতটা সম্ভব না ভাঙলেই ভালো।
 
 ---
 
