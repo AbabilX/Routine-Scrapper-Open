@@ -26,10 +26,10 @@ This repo is public. Do **not** put the live API hostname in committed files.
 
 ```dart
 // BAD
-final uri = Uri.parse('https://example-live-host/api/schedule');
+final uri = Uri.parse('https://example-live-host/api/your_routine');
 
 // GOOD
-final uri = ApiConfig.uri('/api/schedule');
+final uri = ApiConfig.uri('/api/your_end_point');
 ```
 
 ```bash

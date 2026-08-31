@@ -25,3 +25,4 @@ scripts/.venv
 !.env.example
 api.md
 PROJECT.md
+lib/data/api/api_endpoints.dart

@@ -6,7 +6,6 @@ import 'package:share_plus/share_plus.dart';
 import '../domain/model/routine_day.dart';
 import '../domain/model/routine_meta.dart';
 import '../domain/model/student_summary.dart';
-import 'course_catalog.dart';
 import 'schedule_pdf_builder.dart';
 
 class PdfExporter {
@@ -20,7 +19,6 @@ class PdfExporter {
       queryLabel: queryLabel,
       meta: meta,
       week: week,
-      catalog: await CourseCatalog.load(),
     );
     final dir = await getTemporaryDirectory();
     final out = File('${dir.path}/Class_Schedule_$safe.pdf');

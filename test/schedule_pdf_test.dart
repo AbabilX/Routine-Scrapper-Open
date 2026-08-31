@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:diu/data/course_catalog.dart';
 import 'package:diu/data/schedule_pdf_builder.dart';
 import 'package:diu/domain/model/routine_day.dart';
 import 'package:diu/domain/model/routine_meta.dart';
@@ -26,13 +25,13 @@ void main() {
             start: '10:00',
             end: '11:30',
             course: 'CSE221',
+            courseTitle: 'Object Oriented Programming',
             group: '68_A',
             teacher: 'MAR',
             room: 'KT-516',
           ),
         ],
       },
-      catalog: CourseCatalog({'CSE221': 'Object Oriented Programming'}),
     );
     expect(bytes.length, greaterThan(200));
     expect(String.fromCharCodes(bytes.take(4)), '%PDF');

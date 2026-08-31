@@ -208,7 +208,9 @@ class _RoomScheduleScreenState extends State<RoomScheduleScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      block.course,
+                      block.courseTitle.isNotEmpty
+                          ? block.courseTitle
+                          : block.course,
                       style: const TextStyle(
                         fontSize: 17,
                         fontWeight: FontWeight.bold,
@@ -217,7 +219,9 @@ class _RoomScheduleScreenState extends State<RoomScheduleScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Group: ${block.group}  ·  Teacher: ${block.teacher}',
+                      block.courseTitle.isNotEmpty
+                          ? '${block.course}  ·  Group: ${block.group}  ·  Teacher: ${block.teacher}'
+                          : 'Group: ${block.group}  ·  Teacher: ${block.teacher}',
                       style: const TextStyle(fontSize: 13, color: textMuted),
                     ),
                   ],

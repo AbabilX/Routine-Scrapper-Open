@@ -2,6 +2,7 @@ import '../../domain/model/class_slot.dart';
 import '../../domain/model/room_info.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/routine_meta.dart';
+import '../../domain/model/teacher_info.dart';
 import 'routine_api_client.dart';
 import 'routine_api_cache.dart';
 import 'routine_api_exception.dart';
@@ -16,6 +17,8 @@ class LiveRoutineRepository {
 
   final RoutineApiClient _client;
   final RoutineApiCache _cache;
+
+  Map<String, TeacherInfo>? _teachersCache;
 
   RoutineVersionDto _version = const RoutineVersionDto(
     version: '',
@@ -54,6 +57,37 @@ class LiveRoutineRepository {
     return _client.autocomplete(query: query, viewMode: 'student');
   }
 
+  Future<List<String>> autocompleteTeacher(
+    String query, [
+    String department = 'cse',
+  ]) {
+    return _client.autocomplete(
+      query: query,
+      viewMode: 'teacher',
+      department: department,
+    );
+  }
+
+  Future<Map<String, TeacherInfo>> allTeachers() async {
+    if (_teachersCache != null && _teachersCache!.isNotEmpty) {
+      return _teachersCache!;
+    }
+    try {
+      final map = await _client.fetchTeachers();
+      _teachersCache = map;
+      return map;
+    } on RoutineApiException {
+      return _teachersCache ?? const {};
+    }
+  }
+
+  Future<TeacherInfo?> teacherInfo(String initial) async {
+    final cleaned = initial.trim().toUpperCase();
+    if (cleaned.isEmpty) return null;
+    final map = await allTeachers();
+    return map[cleaned];
+  }
+
   Future<List<ClassSlot>> studentSchedule(String batch) {
     return _slots(
       key: 'student_$batch',
@@ -62,11 +96,18 @@ class LiveRoutineRepository {
     );
   }
 
-  Future<List<ClassSlot>> teacherSchedule(String initials) {
+  Future<List<ClassSlot>> teacherSchedule(
+    String initials, [
+    String department = 'cse',
+  ]) {
     return _slots(
-      key: 'teacher_$initials',
+      key: 'teacher_${department}_$initials',
       fallbackGroup: '',
-      fetch: () => _client.fetchSchedule(viewMode: 'teacher', batch: initials),
+      fetch: () => _client.fetchSchedule(
+        viewMode: 'teacher',
+        batch: initials,
+        department: department,
+      ),
     );
   }
 

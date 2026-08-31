@@ -482,12 +482,15 @@ class _RoomCardState extends State<_RoomCard> {
               ),
               title: Row(
                 children: [
-                  Text(
-                    room.roomName,
-                    style: const TextStyle(
-                      color: ink,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
+                  Flexible(
+                    child: Text(
+                      room.roomName,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: ink,
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -577,7 +580,9 @@ class _RoomCardState extends State<_RoomCard> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              '${slot.course} (${slot.group}) - ${slot.teacher}',
+              slot.courseTitle.isNotEmpty
+                  ? '${slot.courseTitle} · ${slot.course}(${slot.group}) - ${slot.teacher}'
+                  : '${slot.course} (${slot.group}) - ${slot.teacher}',
               style: const TextStyle(color: ink, fontSize: 13),
               overflow: TextOverflow.ellipsis,
             ),

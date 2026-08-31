@@ -81,6 +81,7 @@ class ClassSlotDto {
     required this.start,
     required this.end,
     required this.course,
+    this.courseTitle = '',
     required this.group,
     required this.teacher,
     required this.room,
@@ -91,6 +92,7 @@ class ClassSlotDto {
   final String start;
   final String end;
   final String course;
+  final String courseTitle;
   final String group;
   final String teacher;
   final String room;
@@ -102,6 +104,7 @@ class ClassSlotDto {
       start: json['start'] as String,
       end: json['end'] as String,
       course: json['course'] as String,
+      courseTitle: json['courseTitle'] as String? ?? json['course_title'] as String? ?? '',
       group: json['group'] as String,
       teacher: json['teacher'] as String,
       room: json['room'] as String,
@@ -115,6 +118,7 @@ class ClassSlotDto {
       'start': start,
       'end': end,
       'course': course,
+      'course_title': courseTitle,
       'group': group,
       'teacher': teacher,
       'room': room,

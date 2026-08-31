@@ -7,6 +7,7 @@ class ClassSlot {
     required this.start,
     required this.end,
     required this.course,
+    this.courseTitle = '',
     required this.group,
     required this.teacher,
     required this.room,
@@ -17,6 +18,7 @@ class ClassSlot {
   final String start;
   final String end;
   final String course;
+  final String courseTitle;
   final String group;
   final String teacher;
   final String room;

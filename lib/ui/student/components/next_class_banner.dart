@@ -62,7 +62,14 @@ class _BannerBody extends StatelessWidget {
                     style: text.labelSmall,
                   ),
                   const SizedBox(height: 4),
-                  Text(hint.block.course, style: text.titleLarge),
+                  Text(
+                    hint.block.courseTitle.isNotEmpty
+                        ? hint.block.courseTitle
+                        : hint.block.course,
+                    style: text.titleLarge,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
               ),
             ),

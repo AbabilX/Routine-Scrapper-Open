@@ -7,7 +7,6 @@ import '../domain/course_label.dart';
 import '../domain/model/routine_day.dart';
 import '../domain/model/routine_meta.dart';
 import '../domain/model/student_summary.dart';
-import 'course_catalog.dart';
 
 /// Builds the section weekly schedule PDF (days with classes only).
 class SchedulePdfBuilder {
@@ -21,7 +20,6 @@ class SchedulePdfBuilder {
     required String queryLabel,
     required RoutineMeta meta,
     required Map<RoutineDay, List<ClassBlock>> week,
-    required CourseCatalog catalog,
   }) async {
     final doc = pw.Document();
     doc.addPage(
@@ -38,7 +36,7 @@ class SchedulePdfBuilder {
             ),
           ),
           pw.SizedBox(height: 14),
-          _scheduleTable(week, catalog),
+          _scheduleTable(week),
         ],
       ),
     );
@@ -141,7 +139,6 @@ class SchedulePdfBuilder {
 
   static pw.Widget _scheduleTable(
     Map<RoutineDay, List<ClassBlock>> week,
-    CourseCatalog catalog,
   ) {
     final rows = <pw.TableRow>[
       pw.TableRow(
@@ -168,7 +165,7 @@ class SchedulePdfBuilder {
                 CourseLabel.format(
                   code: block.course,
                   group: block.group,
-                  name: catalog.nameOf(block.course),
+                  name: block.courseTitle.isNotEmpty ? block.courseTitle : null,
                 ),
                 align: pw.TextAlign.left,
               ),

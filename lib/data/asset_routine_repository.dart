@@ -50,6 +50,7 @@ class AssetRoutineRepository {
               start: dto.start,
               end: dto.end,
               course: dto.course,
+              courseTitle: dto.courseTitle,
               group: dto.group,
               teacher: dto.teacher,
               room: dto.room,
