@@ -53,10 +53,17 @@ Kotlin + Compose অরিজিনাল `app/`-এ আছে (রেফার�
 - [Flutter SDK](https://docs.flutter.dev/get-started/install) (3.12+)
 - Android emulator / USB debugging ফোন, অথবা iOS Simulator (Mac)
 
-লোকাল সেটিংস: `.env.example` কপি করে `.env` বানাও। `.env` কমিট করো না।
+### `.env` সেটআপ (বাধ্যতামূলক)
+
+API হোস্ট কম্পাইল-টাইমে `API_BASE_URL` দিয়ে যায়। শুধু `flutter run` চালালে সার্চে **API_BASE_URL is not configured** দেখাবে।
+
+1. `.env.example` কপি করে `.env` বানাও (`.env` কমিট করো না)
+2. `.env`-এ `API_BASE_URL=` ভ্যালু দাও — ট্রেইলিং স্ল্যাশ ছাড়া
+3. সবসময় `--dart-define-from-file=.env` দিয়ে রান / বিল্ড / টেস্ট করো
 
 ```bash
 cp .env.example .env
+# সম্পাদনা করো: API_BASE_URL=<your-base-url>
 flutter pub get
 flutter run --dart-define-from-file=.env
 ```
@@ -67,13 +74,15 @@ flutter run --dart-define-from-file=.env
 flutter build apk --dart-define-from-file=.env
 ```
 
-অ্যাপে নাম **DIU** — সার্চ বক্সে `70_E`।
-
 লজিক টেস্ট:
 
 ```bash
 flutter test --dart-define-from-file=.env
 ```
+
+Cursor / VS Code থেকে রান করলে `.vscode/launch.json`-এ ইতিমধ্যে `--dart-define-from-file=.env` আছে — সেখান থেকে Run/Debug করলেই হবে।
+
+অ্যাপে নাম **DIU** — সার্চ বক্সে `70_E`।
 
 ---
 
@@ -174,12 +183,13 @@ lib/
 
 ## সমস্যা হলে
 
-| সমস্যা               | কী করবে                                                   |
-| -------------------- | --------------------------------------------------------- |
-| `flutter` কমান্ড নেই | Flutter SDK PATH-এ দাও                                    |
-| সার্চ খালি           | ফরম্যাট `70_E` — স্পেস বাদ, ইংরেজি অক্ষর                  |
-| PDF শেয়ার খোলে না   | emulator-এ শেয়ার টার্গেট নাও থাকতে পারে — ফোনে ট্রাই করো |
-| কোর্সের নাম ভুল      | `assets/routine/course_names.json` আপডেট করো              |
+| সমস্যা                            | কী করবে                                                                 |
+| --------------------------------- | ----------------------------------------------------------------------- |
+| `flutter` কমান্ড নেই              | Flutter SDK PATH-এ দাও                                                  |
+| `API_BASE_URL is not configured`  | `.env` বানাও + `flutter run --dart-define-from-file=.env`               |
+| সার্চ খালি                        | ফরম্যাট `70_E` — স্পেস বাদ, ইংরেজি অক্ষর                                |
+| PDF শেয়ার খোলে না                | emulator-এ শেয়ার টার্গেট নাও থাকতে পারে — ফোনে ট্রাই করো               |
+| কোর্সের নাম ভুল                   | `assets/routine/course_names.json` আপডেট করো                            |
 
 ---
 
