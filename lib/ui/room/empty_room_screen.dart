@@ -7,28 +7,8 @@ import '../theme/app_colors.dart';
 import 'components/select_option_modal.dart';
 import 'room_view_model.dart';
 
-class EmptyRoomScreen extends StatefulWidget {
+class EmptyRoomScreen extends StatelessWidget {
   const EmptyRoomScreen({super.key});
-
-  @override
-  State<EmptyRoomScreen> createState() => _EmptyRoomScreenState();
-}
-
-class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
-  late final TextEditingController _roomQueryController;
-
-  @override
-  void initState() {
-    super.initState();
-    final initial = context.read<RoomViewModel>().state.roomQueryText;
-    _roomQueryController = TextEditingController(text: initial);
-  }
-
-  @override
-  void dispose() {
-    _roomQueryController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +20,7 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Top App Bar
             _buildAppBar(context),
-
             Expanded(
               child: ListView(
                 padding: const EdgeInsets.symmetric(
@@ -50,12 +28,8 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
                   vertical: 12,
                 ),
                 children: [
-                  // Form Card Box
                   _buildFormCard(context, viewModel, state),
-
                   const SizedBox(height: 24),
-
-                  // Results Header & List
                   if (state.isSubmitted) ...[
                     if (state.errorMessage != null) ...[
                       Text(
@@ -84,7 +58,6 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
       child: Row(
         children: [
-          // Room logo badge
           Container(
             width: 42,
             height: 42,
@@ -105,7 +78,6 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          // Online status pill
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
@@ -129,35 +101,6 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
               ],
             ),
           ),
-          const Spacer(),
-          // Header action buttons
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: line),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.chat_bubble_outline, color: ink, size: 20),
-              onPressed: () {},
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: line),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.menu, color: ink, size: 22),
-              onPressed: () {},
-            ),
-          ),
         ],
       ),
     );
@@ -178,32 +121,6 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Room Number text field
-          Container(
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: line),
-            ),
-            child: TextField(
-              controller: _roomQueryController,
-              style: const TextStyle(color: ink, fontSize: 16),
-              decoration: const InputDecoration(
-                hintText: 'Room Number (e.g., 611)',
-                hintStyle: TextStyle(color: textMuted, fontSize: 15),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 14,
-                ),
-              ),
-              onChanged: viewModel.onRoomQueryChanged,
-            ),
-          ),
-
-          const SizedBox(height: 14),
-
-          // Dropdown row: Select Day & Select Time
           Row(
             children: [
               Expanded(
@@ -243,10 +160,7 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
               ),
             ],
           ),
-
           const SizedBox(height: 14),
-
-          // Department Dropdown: CSE
           _buildDropdownButton(
             context,
             label: state.selectedDeptLabel,
@@ -262,10 +176,7 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
               }
             },
           ),
-
           const SizedBox(height: 20),
-
-          // Search Button
           Container(
             height: 52,
             decoration: BoxDecoration(

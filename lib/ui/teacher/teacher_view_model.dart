@@ -161,6 +161,7 @@ class TeacherViewModel extends ChangeNotifier {
 
   void onSuggestionTapped(String rawSuggestion) {
     final initial = extractInitial(rawSuggestion);
+    if (initial.isEmpty) return;
     _state = _state.copyWith(
       query: initial,
       suggestions: const [],
@@ -168,6 +169,7 @@ class TeacherViewModel extends ChangeNotifier {
       errorMessage: null,
     );
     notifyListeners();
+    _load(initial);
   }
 
   void search([String? customInitial]) {

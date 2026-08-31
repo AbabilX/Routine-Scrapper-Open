@@ -17,14 +17,19 @@ class ScheduleItemDto {
 
   factory ScheduleItemDto.fromJson(Map<String, dynamic> json) {
     return ScheduleItemDto(
-      courseCode: (json['course_code'] as String? ?? '').trim(),
-      courseTitle: (json['course_title'] as String? ?? '').trim(),
-      day: (json['day'] as String? ?? '').trim(),
-      room: (json['room'] as String? ?? '').trim(),
-      teacher: (json['teacher'] as String? ?? '').trim(),
-      timeSlot: (json['time_slot'] as String? ?? json['time'] as String? ?? '')
-          .trim(),
+      courseCode: _asString(json['course_code']),
+      courseTitle: _asString(json['course_title']),
+      day: _asString(json['day']),
+      // API may send room as int (1506) or String ("1118(B)").
+      room: _asString(json['room']),
+      teacher: _asString(json['teacher']),
+      timeSlot: _asString(json['time_slot'] ?? json['time']),
     );
+  }
+
+  static String _asString(Object? value) {
+    if (value == null) return '';
+    return '$value'.trim();
   }
 }
 

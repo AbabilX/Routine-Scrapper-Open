@@ -4,6 +4,16 @@ import 'package:provider/provider.dart';
 
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/student_summary.dart';
+import '../../domain/routine_queries.dart';
+import '../components/cute_face_kind.dart';
+import '../components/cute_header.dart';
+import '../components/cute_page.dart';
+import '../components/cute_pill.dart';
+import '../components/cute_primary_button.dart';
+import '../components/date_strip.dart';
+import '../components/empty_hint.dart';
+import '../components/search_row.dart';
+import '../components/suggestion_list.dart';
 import '../room/components/select_option_modal.dart';
 import '../theme/app_colors.dart';
 import 'teacher_view_model.dart';
@@ -21,867 +31,427 @@ class UpperCaseTextFormatter extends TextInputFormatter {
   }
 }
 
-class TeacherScreen extends StatefulWidget {
+class TeacherScreen extends StatelessWidget {
   const TeacherScreen({super.key});
-
-  @override
-  State<TeacherScreen> createState() => _TeacherScreenState();
-}
-
-class _TeacherScreenState extends State<TeacherScreen> {
-  late final TextEditingController _searchController;
-
-  @override
-  void initState() {
-    super.initState();
-    final initialQuery = context.read<TeacherViewModel>().state.query;
-    _searchController = TextEditingController(text: initialQuery);
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final teacherVm = context.watch<TeacherViewModel>();
     final state = teacherVm.state;
 
-    // Synchronize controller text when state query is modified externally (e.g. on suggestion selection or clear)
-    if (_searchController.text != state.query) {
-      _searchController.value = TextEditingValue(
-        text: state.query,
-        selection: TextSelection.collapsed(offset: state.query.length),
-      );
-    }
-
-    return Scaffold(
-      backgroundColor: bg,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Top App Bar
-            _buildAppBar(),
-
-            Expanded(
-              child: ListView(
+    return CutePage(
+      children: [
+        const CuteHeader(
+          title: 'টিচার',
+          subtitle: 'ইনিশিয়াল দিয়ে রুটিন খুঁজে নাও',
+          faceKind: CuteFaceKind.fox,
+        ),
+        const SizedBox(height: 18),
+        SearchRow(
+          query: state.query,
+          onQueryChange: teacherVm.onQueryChanged,
+          hintText: 'TRA',
+          textCapitalization: TextCapitalization.characters,
+          inputFormatters: [UpperCaseTextFormatter()],
+          onSubmitted: (_) {
+            FocusScope.of(context).unfocus();
+            teacherVm.search();
+          },
+          trailing: CutePill(
+            label: state.selectedDeptLabel,
+            onTap: () async {
+              final choice = await SelectOptionModal.show(
+                context: context,
+                title: 'Select Department',
+                options: TeacherUiState.deptOptions,
+                selectedIndex: state.selectedDeptIndex,
+              );
+              if (choice != null) teacherVm.selectDeptIndex(choice);
+            },
+          ),
+        ),
+        const SizedBox(height: 12),
+        CutePrimaryButton(
+          label: 'খুঁজো',
+          loading: state.isLoading,
+          enabled: state.query.trim().isNotEmpty,
+          onTap: () {
+            FocusScope.of(context).unfocus();
+            teacherVm.search();
+          },
+        ),
+        if (state.suggestions.isNotEmpty) ...[
+          const SizedBox(height: 18),
+          SuggestionList(
+            items: state.suggestions,
+            onSelect: teacherVm.onSuggestionTapped,
+          ),
+        ],
+        if (state.cleanQuery.isNotEmpty && state.hasMatches) ...[
+          const SizedBox(height: 14),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: teacherVm.clear,
+              child: Container(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 18,
-                  vertical: 12,
+                  horizontal: 14,
+                  vertical: 8,
                 ),
-                children: [
-                  // Search Bar & Department Dropdown
-                  _buildSearchRow(context, teacherVm, state),
-
-                  const SizedBox(height: 12),
-
-                  // Search Button
-                  _buildSearchButton(context, teacherVm, state),
-
-                  if (state.suggestions.isNotEmpty) ...[
-                    const SizedBox(height: 14),
-                    _buildVerticalSuggestions(teacherVm, state),
-                  ],
-
-                  if (state.cleanQuery.isNotEmpty && state.hasMatches) ...[
-                    const SizedBox(height: 10),
-                    // Active Search Chip
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: GestureDetector(
-                        onTap: teacherVm.clear,
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 6,
-                          ),
-                          decoration: BoxDecoration(
-                            color: lavender.withValues(alpha: 0.4),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(color: line),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                state.cleanQuery,
-                                style: const TextStyle(
-                                  color: ink,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 14,
-                                ),
-                              ),
-                              const SizedBox(width: 6),
-                              const Icon(
-                                Icons.close,
-                                color: textMuted,
-                                size: 16,
-                              ),
-                            ],
-                          ),
-                        ),
+                decoration: BoxDecoration(
+                  color: lavender,
+                  borderRadius: BorderRadius.circular(22),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      state.cleanQuery,
+                      style: const TextStyle(
+                        color: ink,
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
                       ),
                     ),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.close, color: textMuted, size: 16),
                   ],
-
-                  const SizedBox(height: 16),
-
-                  if (state.hasMatches) ...[
-                    // Teacher Summary Card
-                    _buildSummaryCard(
-                      teacherName: state.cleanQuery,
-                      sections: state.sections,
-                      totalCourses: state.courses.length,
-                      version: state.meta?.version ?? '',
-                      classesPerWeek: state.classesPerWeek,
-                      onDownloadPdf: teacherVm.downloadPdf,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Day View / Week View Toggle Bar
-                    _buildViewToggle(teacherVm, state),
-
-                    const SizedBox(height: 16),
-
-                    if (!state.isWeekView) ...[
-                      // Day View Date Strip
-                      _buildDateStrip(teacherVm, state),
-                      const SizedBox(height: 16),
-                      _buildDayClassesView(state.selectedDayClasses),
-                    ] else ...[
-                      // Week View Schedule
-                      _buildWeekScheduleView(state.weeklyMap),
-                    ],
-                  ] else if (state.isLoading) ...[
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 32),
-                      child: Center(child: CircularProgressIndicator()),
-                    ),
-                  ] else if (state.suggestions.isNotEmpty) ...[
-                    const SizedBox.shrink(),
-                  ] else if (state.cleanQuery.isNotEmpty) ...[
-                    _buildEmptyState(
-                      'No Teacher Found',
-                      state.errorMessage ??
-                          'No classes found for teacher initial "${state.cleanQuery}"',
-                    ),
-                  ] else ...[
-                    _buildEmptyState(
-                      'Search Teacher Routine',
-                      'Type a teacher initial (e.g. TRA, MRN) above',
-                    ),
-                  ],
-
-                  const SizedBox(height: 24),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppBar() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-      child: Row(
-        children: [
-          Container(
-            width: 42,
-            height: 42,
-            decoration: BoxDecoration(
-              color: lavender,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: const Icon(Icons.badge, color: ink, size: 24),
-          ),
-          const SizedBox(width: 12),
-          const Text(
-            'Teacher',
-            style: TextStyle(
-              color: ink,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 0.3,
-            ),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: mint.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: line),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Icon(Icons.circle, color: Color(0xFF166534), size: 8),
-                SizedBox(width: 6),
-                Text(
-                  'Online',
-                  style: TextStyle(
-                    color: Color(0xFF166534),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                  ),
                 ),
-              ],
-            ),
-          ),
-          const Spacer(),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: line),
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.chat_bubble_outline,
-                color: ink,
-                size: 20,
               ),
-              onPressed: () {},
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: line),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.menu, color: ink, size: 22),
-              onPressed: () {},
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSearchRow(
-    BuildContext context,
-    TeacherViewModel teacherVm,
-    TeacherUiState state,
-  ) {
-    return Row(
-      children: [
-        Expanded(
-          child: Container(
-            height: 48,
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: line),
-            ),
-            child: TextField(
-              controller: _searchController,
-              onChanged: teacherVm.onQueryChanged,
-              onSubmitted: (_) {
-                FocusScope.of(context).unfocus();
-                teacherVm.search();
-              },
-              textCapitalization: TextCapitalization.characters,
-              inputFormatters: [UpperCaseTextFormatter()],
-              style: const TextStyle(color: ink, fontSize: 16),
-              decoration: const InputDecoration(
-                prefixIcon: Icon(Icons.search, color: textMuted, size: 20),
-                hintText: 'Search Teacher Initial (e.g. TRA)',
-                hintStyle: TextStyle(color: textMuted, fontSize: 14),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 14,
-                  vertical: 12,
-                ),
-              ),
-            ),
+        const SizedBox(height: 18),
+        if (state.hasMatches) ...[
+          _TeacherSummaryCard(
+            teacherName: state.cleanQuery,
+            sections: state.sections,
+            totalCourses: state.courses.length,
+            version: state.meta?.version ?? '',
+            classesPerWeek: state.classesPerWeek,
+            onDownloadPdf: teacherVm.downloadPdf,
           ),
-        ),
-        const SizedBox(width: 10),
-        // Dept Dropdown Button
-        GestureDetector(
-          onTap: () async {
-            final choice = await SelectOptionModal.show(
-              context: context,
-              title: 'Select Department',
-              options: TeacherUiState.deptOptions,
-              selectedIndex: state.selectedDeptIndex,
-            );
-            if (choice != null) {
-              teacherVm.selectDeptIndex(choice);
-            }
-          },
-          child: Container(
-            height: 48,
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: line),
+          const SizedBox(height: 18),
+          _ViewToggle(isWeekView: state.isWeekView, onToggle: teacherVm.toggleView),
+          const SizedBox(height: 16),
+          if (!state.isWeekView) ...[
+            DateStrip(
+              selected: state.resolvedDay,
+              today: RoutineQueries.todayOrSaturday(),
+              onSelect: teacherVm.selectDay,
             ),
-            child: Row(
-              children: [
-                Text(
-                  state.selectedDeptLabel,
-                  style: const TextStyle(
-                    color: ink,
-                    fontWeight: FontWeight.w600,
-                    fontSize: 15,
-                  ),
-                ),
-                const SizedBox(width: 4),
-                const Icon(
-                  Icons.keyboard_arrow_down,
-                  color: textMuted,
-                  size: 18,
-                ),
-              ],
-            ),
+            const SizedBox(height: 16),
+            _DayClassesView(blocks: state.selectedDayClasses),
+          ] else
+            _WeekScheduleView(weeklyMap: state.weeklyMap),
+        ] else if (state.isLoading) ...[
+          const EmptyHint(
+            title: 'খুঁজছি',
+            body: 'টিচারের রুটিন আনছি…',
+            tint: sky,
           ),
-        ),
+        ] else if (state.suggestions.isNotEmpty) ...[
+          const SizedBox.shrink(),
+        ] else if (state.cleanQuery.isNotEmpty) ...[
+          EmptyHint(
+            title: 'কেউ নেই',
+            body: state.errorMessage ??
+                '"${state.cleanQuery}" এর ক্লাস পাওয়া যায়নি',
+            tint: rose,
+          ),
+        ] else ...[
+          const EmptyHint(
+            title: 'শুরু করো',
+            body: 'টিচার ইনিশিয়াল লিখো — যেমন TRA, MRN',
+            tint: peach,
+          ),
+        ],
+        const SizedBox(height: 28),
       ],
     );
   }
+}
 
-  Widget _buildSearchButton(
-    BuildContext context,
-    TeacherViewModel teacherVm,
-    TeacherUiState state,
-  ) {
-    final bool canSearch = state.query.trim().isNotEmpty;
-    return Container(
-      height: 48,
-      decoration: BoxDecoration(
-        color: canSearch ? ink : ink.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(14),
-        boxShadow: canSearch
-            ? [
-                BoxShadow(
-                  color: ink.withValues(alpha: 0.15),
-                  blurRadius: 10,
-                  offset: const Offset(0, 3),
-                ),
-              ]
-            : null,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: state.isLoading || !canSearch
-              ? null
-              : () {
-                  FocusScope.of(context).unfocus();
-                  teacherVm.search();
-                },
-          borderRadius: BorderRadius.circular(14),
-          child: Center(
-            child: state.isLoading
-                ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.search, color: Colors.white, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Search',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-          ),
-        ),
-      ),
-    );
-  }
+class _TeacherSummaryCard extends StatelessWidget {
+  const _TeacherSummaryCard({
+    required this.teacherName,
+    required this.sections,
+    required this.totalCourses,
+    required this.version,
+    required this.classesPerWeek,
+    required this.onDownloadPdf,
+  });
 
-  Widget _buildVerticalSuggestions(
-    TeacherViewModel teacherVm,
-    TeacherUiState state,
-  ) {
-    return Container(
+  final String teacherName;
+  final List<String> sections;
+  final int totalCourses;
+  final String version;
+  final int classesPerWeek;
+  final VoidCallback onDownloadPdf;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return DecoratedBox(
       decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: line),
+        color: lavender,
+        borderRadius: BorderRadius.circular(32),
       ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-            child: Row(
+      child: Padding(
+        padding: const EdgeInsets.all(22),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text('রেজিস্টার্ড কোর্স', style: text.titleLarge),
+            const SizedBox(height: 14),
+            _summaryRow('Teacher', teacherName),
+            const SizedBox(height: 8),
+            _summaryRow('Sections', sections.join(', ')),
+            const SizedBox(height: 8),
+            _summaryRow('Total Courses', '$totalCourses'),
+            const SizedBox(height: 8),
+            _summaryRow('Routine Version', version),
+            const SizedBox(height: 8),
+            _summaryRow('Classes / week', '$classesPerWeek'),
+            const SizedBox(height: 16),
+            Row(
               children: [
-                const Icon(Icons.auto_awesome, color: ink, size: 16),
-                const SizedBox(width: 6),
-                Text(
-                  'Suggestions (${state.suggestions.length})',
-                  style: const TextStyle(
-                    color: textMuted,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.2,
+                Expanded(
+                  child: Text(
+                    'PDF ডাউনলোড — $teacherName',
+                    style: text.bodyMedium,
+                  ),
+                ),
+                Material(
+                  color: ink,
+                  borderRadius: BorderRadius.circular(16),
+                  child: InkWell(
+                    onTap: onDownloadPdf,
+                    borderRadius: BorderRadius.circular(16),
+                    child: const SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Icon(
+                        Icons.file_download_outlined,
+                        color: onInk,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-          ),
-          const Divider(height: 1, color: line),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: state.suggestions.length,
-            separatorBuilder: (_, _) => const Divider(height: 1, color: line),
-            itemBuilder: (context, index) {
-              final suggestion = state.suggestions[index];
-              return ListTile(
-                dense: true,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 2,
-                ),
-                leading: Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: lavender.withValues(alpha: 0.5),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(Icons.person, color: ink, size: 18),
-                ),
-                title: Text(
-                  suggestion,
-                  style: const TextStyle(
-                    color: ink,
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                trailing: const Icon(
-                  Icons.north_west,
-                  color: textMuted,
-                  size: 16,
-                ),
-                onTap: () {
-                  HapticFeedback.selectionClick();
-                  teacherVm.onSuggestionTapped(suggestion);
-                },
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryCard({
-    required String teacherName,
-    required List<String> sections,
-    required int totalCourses,
-    required String version,
-    required int classesPerWeek,
-    required VoidCallback onDownloadPdf,
-  }) {
-    final sectionsText = sections.join(', ');
-
-    return Container(
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: line),
-      ),
-      padding: const EdgeInsets.all(18),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              const Icon(
-                Icons.keyboard_arrow_down,
-                color: textMuted,
-                size: 20,
-              ),
-              const SizedBox(width: 6),
-              const Text(
-                'Registered Courses',
-                style: TextStyle(
-                  color: ink,
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const Spacer(),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: lavender.withValues(alpha: 0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.info_outline,
-                  color: ink,
-                  size: 18,
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: sky.withValues(alpha: 0.5),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.notifications_none,
-                  color: ink,
-                  size: 18,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-
-          _summaryRow('Teacher', teacherName),
-          const SizedBox(height: 8),
-          _summaryRow('Sections', sectionsText),
-          const SizedBox(height: 8),
-          _summaryRow('Total Courses', '$totalCourses'),
-          const SizedBox(height: 8),
-          _summaryRow('Routine Version', version),
-          const SizedBox(height: 8),
-          _summaryRow('Classes per Week', '$classesPerWeek'),
-
-          const SizedBox(height: 18),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Download PDF for $teacherName',
-                style: const TextStyle(
-                  color: textMuted,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              GestureDetector(
-                onTap: onDownloadPdf,
-                child: Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: ink,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: const Icon(
-                    Icons.file_download_outlined,
-                    color: Colors.white,
-                    size: 20,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 
   Widget _summaryRow(String label, String value) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          label,
-          style: const TextStyle(color: textMuted, fontSize: 14),
-        ),
+        Text(label, style: const TextStyle(color: textMuted, fontSize: 14)),
         const SizedBox(width: 16),
         Expanded(
           child: Text(
             value,
             textAlign: TextAlign.right,
+            overflow: TextOverflow.ellipsis,
             style: const TextStyle(
               color: ink,
               fontSize: 14,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w700,
             ),
-            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],
     );
   }
+}
 
-  Widget _buildViewToggle(TeacherViewModel teacherVm, TeacherUiState state) {
-    return Row(
+class _ViewToggle extends StatelessWidget {
+  const _ViewToggle({required this.isWeekView, required this.onToggle});
+
+  final bool isWeekView;
+  final ValueChanged<bool> onToggle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: surface,
+        borderRadius: BorderRadius.circular(28),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: _ToggleChip(
+              label: 'দিন',
+              selected: !isWeekView,
+              onTap: () => onToggle(false),
+            ),
+          ),
+          Expanded(
+            child: _ToggleChip(
+              label: 'সপ্তাহ',
+              selected: isWeekView,
+              onTap: () => onToggle(true),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ToggleChip extends StatelessWidget {
+  const _ToggleChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected ? ink : Colors.transparent,
+      borderRadius: BorderRadius.circular(24),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: selected ? onInk : textMuted,
+              fontWeight: FontWeight.w700,
+              fontSize: 14,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DayClassesView extends StatelessWidget {
+  const _DayClassesView({required this.blocks});
+
+  final List<ClassBlock> blocks;
+
+  @override
+  Widget build(BuildContext context) {
+    if (blocks.isEmpty) {
+      return const EmptyHint(
+        title: 'Off day',
+        body: 'এই দিনে এই টিচারের ক্লাস নেই',
+        tint: mint,
+      );
+    }
+    return Column(
+      children: [for (final block in blocks) _ClassCard(block: block)],
+    );
+  }
+}
+
+class _WeekScheduleView extends StatelessWidget {
+  const _WeekScheduleView({required this.weeklyMap});
+
+  final Map<RoutineDay, List<ClassBlock>> weeklyMap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
       children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () => teacherVm.toggleView(false),
-            child: Container(
-              height: 48,
+        for (final day in RoutineDay.values)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 14),
+            child: DecoratedBox(
               decoration: BoxDecoration(
-                color: !state.isWeekView ? ink : surface,
-                borderRadius: BorderRadius.circular(14),
-                border: state.isWeekView ? Border.all(color: line) : null,
+                color: surface,
+                borderRadius: BorderRadius.circular(28),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.calendar_today,
-                    color: !state.isWeekView ? Colors.white : textMuted,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Day View',
-                    style: TextStyle(
-                      color: !state.isWeekView ? Colors.white : textMuted,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: GestureDetector(
-            onTap: () => teacherVm.toggleView(true),
-            child: Container(
-              height: 48,
-              decoration: BoxDecoration(
-                color: state.isWeekView ? ink : surface,
-                borderRadius: BorderRadius.circular(14),
-                border: !state.isWeekView ? Border.all(color: line) : null,
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.calendar_month,
-                    color: state.isWeekView ? Colors.white : textMuted,
-                    size: 18,
-                  ),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Week View',
-                    style: TextStyle(
-                      color: state.isWeekView ? Colors.white : textMuted,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildDateStrip(TeacherViewModel teacherVm, TeacherUiState state) {
-    final days = RoutineDay.values;
-    final dateNumbers = ['29', '30', '31', '1', '2', '3'];
-
-    return Row(
-      children: List.generate(days.length, (index) {
-        final day = days[index];
-        final isSelected = day == state.resolvedDay;
-        final dateNum = dateNumbers[index];
-
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(right: index < days.length - 1 ? 6 : 0),
-            child: GestureDetector(
-              onTap: () => teacherVm.selectDay(day),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: isSelected ? ink : surface,
-                  borderRadius: BorderRadius.circular(16),
-                  border: !isSelected ? Border.all(color: line) : null,
-                ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(
-                      dateNum,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : ink,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    Row(
+                      children: [
+                        Text(
+                          day.fullLabel,
+                          style: Theme.of(context).textTheme.titleMedium,
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: (weeklyMap[day] ?? []).isEmpty
+                                ? mint
+                                : lavender,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Text(
+                            (weeklyMap[day] ?? []).isEmpty
+                                ? 'Off'
+                                : '${weeklyMap[day]!.length} ক্লাস',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      day.shortLabel,
-                      style: TextStyle(
-                        color: isSelected ? Colors.white70 : textMuted,
-                        fontSize: 12,
-                      ),
-                    ),
+                    const SizedBox(height: 10),
+                    if ((weeklyMap[day] ?? []).isEmpty)
+                      const Text(
+                        'ক্লাস নেই',
+                        style: TextStyle(color: textMuted, fontSize: 13),
+                      )
+                    else
+                      for (final block in weeklyMap[day]!)
+                        _ClassCard(block: block),
                   ],
                 ),
               ),
             ),
           ),
-        );
-      }),
+      ],
     );
   }
+}
 
-  Widget _buildDayClassesView(List<ClassBlock> blocks) {
-    if (blocks.isEmpty) {
-      return Container(
-        padding: const EdgeInsets.all(28),
-        decoration: BoxDecoration(
-          color: surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: line),
-        ),
-        child: Column(
-          children: const [
-            Icon(Icons.event_available, color: ink, size: 40),
-            SizedBox(height: 10),
-            Text(
-              'Off Day',
-              style: TextStyle(
-                color: ink,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 6),
-            Text(
-              'No classes scheduled for this teacher on this day.',
-              style: TextStyle(color: textMuted, fontSize: 14),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
-      );
-    }
+class _ClassCard extends StatelessWidget {
+  const _ClassCard({required this.block});
 
-    return Column(
-      children: blocks.map((block) => _buildClassCard(block)).toList(),
-    );
-  }
+  final ClassBlock block;
 
-  Widget _buildWeekScheduleView(Map<RoutineDay, List<ClassBlock>> weeklyMap) {
-    return Column(
-      children: RoutineDay.values.map((day) {
-        final dayBlocks = weeklyMap[day] ?? [];
-        final isOffDay = dayBlocks.isEmpty;
-
-        return Container(
-          margin: const EdgeInsets.only(bottom: 14),
-          decoration: BoxDecoration(
-            color: surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: line),
-          ),
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    day.fullLabel,
-                    style: const TextStyle(
-                      color: ink,
-                      fontSize: 17,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isOffDay
-                          ? mint.withValues(alpha: 0.4)
-                          : lavender.withValues(alpha: 0.4),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      isOffDay ? 'Off Day' : '${dayBlocks.length} Classes',
-                      style: const TextStyle(
-                        color: ink,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              if (isOffDay)
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    'No classes scheduled',
-                    style: TextStyle(color: textMuted, fontSize: 13),
-                  ),
-                )
-              else
-                ...dayBlocks.map(
-                  (block) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _buildClassCard(block),
-                  ),
-                ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildClassCard(ClassBlock block) {
+  @override
+  Widget build(BuildContext context) {
     final title =
         block.courseTitle.isNotEmpty ? block.courseTitle : block.course;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: line),
-      ),
+      margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: peach.withValues(alpha: 0.35),
+        borderRadius: BorderRadius.circular(24),
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Time Column (Left)
           Column(
             children: [
               Text(
@@ -889,12 +459,12 @@ class _TeacherScreenState extends State<TeacherScreen> {
                 style: const TextStyle(
                   color: ink,
                   fontSize: 14,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
               Container(
                 width: 1,
-                height: 36,
+                height: 28,
                 margin: const EdgeInsets.symmetric(vertical: 4),
                 color: line,
               ),
@@ -904,11 +474,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
               ),
             ],
           ),
-          const SizedBox(width: 16),
-          Container(width: 1, height: 70, color: line),
-          const SizedBox(width: 16),
-
-          // Details Column
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -918,78 +484,16 @@ class _TeacherScreenState extends State<TeacherScreen> {
                   style: const TextStyle(
                     color: ink,
                     fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
-                const SizedBox(height: 8),
-                _cardDetailRow('Course', block.course),
-                const SizedBox(height: 4),
-                _cardDetailRow('Section', '${block.course}(${block.group})'),
-                const SizedBox(height: 4),
-                _cardDetailRow(
-                  'Teacher',
-                  block.teacher,
-                  valueColor: ink,
+                const SizedBox(height: 6),
+                Text(
+                  '${block.course} · ${block.group} · ${block.room}',
+                  style: const TextStyle(color: textMuted, fontSize: 13),
                 ),
-                const SizedBox(height: 4),
-                _cardDetailRow('Room', block.room),
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _cardDetailRow(String label, String value, {Color? valueColor}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(color: textMuted, fontSize: 13),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            color: valueColor ?? ink,
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmptyState(String title, String subtitle) {
-    return Container(
-      padding: const EdgeInsets.all(32),
-      decoration: BoxDecoration(
-        color: surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: line),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            Icons.person_search_outlined,
-            size: 48,
-            color: ink,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            title,
-            style: const TextStyle(
-              color: ink,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            textAlign: TextAlign.center,
-            style: const TextStyle(color: textMuted, fontSize: 14),
           ),
         ],
       ),

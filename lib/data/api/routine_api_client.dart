@@ -92,6 +92,11 @@ class RoutineApiClient {
     final raw = json['result'];
     if (raw is! List) return const [];
     return raw
+        .map((item) {
+          if (item is Map<String, dynamic>) return item;
+          if (item is Map) return Map<String, dynamic>.from(item);
+          return null;
+        })
         .whereType<Map<String, dynamic>>()
         .map(ScheduleItemDto.fromJson)
         .toList();
@@ -281,6 +286,7 @@ class RoutineApiClient {
       throw RoutineApiException.http(response.statusCode);
     }
     if (decoded is Map<String, dynamic>) return decoded;
+    if (decoded is Map) return Map<String, dynamic>.from(decoded);
     if (decoded is List) return {'result': decoded};
     throw RoutineApiException.parse();
   }

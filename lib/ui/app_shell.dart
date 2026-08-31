@@ -69,50 +69,129 @@ class _AppShellState extends State<AppShell> {
               ),
         bottomNavigationBar: _showOnboarding
             ? null
-            : Container(
-                decoration: const BoxDecoration(
-                  color: surface,
-                  border: Border(
-                    top: BorderSide(
-                      color: line,
-                      width: 1,
+            : _CapsuleBottomNav(
+                currentIndex: _currentTab,
+                onTap: (index) => setState(() => _currentTab = index),
+              ),
+      ),
+    );
+  }
+}
+
+class _CapsuleBottomNav extends StatelessWidget {
+  const _CapsuleBottomNav({
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  static const _items = <({IconData icon, IconData activeIcon, String label})>[
+    (icon: Icons.person_outline, activeIcon: Icons.person, label: 'Student'),
+    (icon: Icons.badge_outlined, activeIcon: Icons.badge, label: 'Teacher'),
+    (icon: Icons.search_outlined, activeIcon: Icons.search, label: 'Room'),
+    (
+      icon: Icons.door_sliding_outlined,
+      activeIcon: Icons.door_sliding,
+      label: 'Empty',
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 8, 18, 12),
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(28),
+            border: Border.all(color: line),
+            boxShadow: [
+              BoxShadow(
+                color: ink.withValues(alpha: 0.07),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+            child: Row(
+              children: [
+                for (var i = 0; i < _items.length; i++)
+                  Expanded(
+                    child: _CapsuleNavItem(
+                      icon: _items[i].icon,
+                      activeIcon: _items[i].activeIcon,
+                      label: _items[i].label,
+                      selected: currentIndex == i,
+                      onTap: () => onTap(i),
                     ),
                   ),
-                ),
-                child: BottomNavigationBar(
-                  currentIndex: _currentTab,
-                  onTap: (index) => setState(() => _currentTab = index),
-                  type: BottomNavigationBarType.fixed,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  selectedItemColor: ink,
-                  unselectedItemColor: textMuted,
-                  selectedFontSize: 12,
-                  unselectedFontSize: 12,
-                  items: const [
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.person_outline),
-                      activeIcon: Icon(Icons.person),
-                      label: 'Student',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.badge_outlined),
-                      activeIcon: Icon(Icons.badge),
-                      label: 'Teacher',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.search_outlined),
-                      activeIcon: Icon(Icons.search),
-                      label: 'Room',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.door_sliding_outlined),
-                      activeIcon: Icon(Icons.door_sliding),
-                      label: 'Empty',
-                    ),
-                  ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CapsuleNavItem extends StatelessWidget {
+  const _CapsuleNavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(22),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? peach.withValues(alpha: 0.45) : Colors.transparent,
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                selected ? activeIcon : icon,
+                size: 22,
+                color: selected ? ink : textMuted,
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                  color: selected ? ink : textMuted,
                 ),
               ),
+            ],
+          ),
+        ),
       ),
     );
   }

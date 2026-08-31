@@ -14,7 +14,7 @@ class SlotMapper {
     '04:00',
   ];
 
-  static final _courseCode = RegExp(r'^([A-Za-z]{2,5}\d{3})\((.+)\)$');
+  static final _courseCode = RegExp(r'^([A-Za-z0-9-]+)\((.+)\)$');
 
   static List<ClassSlot> mapItems(
     List<ScheduleItemDto> items, {

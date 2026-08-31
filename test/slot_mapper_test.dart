@@ -47,19 +47,35 @@ void main() {
     expect(slot.room, 'KT-809   (E.C. Lab)');
   });
 
-  test('skips rows without a day or time', () {
-    expect(
-      SlotMapper.mapItem(
-        const ScheduleItemDto(
-          courseCode: 'CSE121(70_E)',
-          courseTitle: '',
-          day: '',
-          room: 'KT-219',
-          teacher: 'MHK',
-          timeSlot: '08:30-10:00',
-        ),
-      ),
-      isNull,
+  test('maps numeric course code and int-like room string', () {
+    const item = ScheduleItemDto(
+      courseCode: '0412-123(68-D)',
+      courseTitle: 'Principles of Finance',
+      day: 'Sunday',
+      room: '1506',
+      teacher: 'MOG',
+      timeSlot: '08:30-10:00',
     );
+
+    final slot = SlotMapper.mapItem(item)!;
+
+    expect(slot.course, '0412-123');
+    expect(slot.group, '68-D');
+    expect(slot.room, '1506');
+    expect(slot.teacher, 'MOG');
+  });
+
+  test('ScheduleItemDto coerces int room from JSON', () {
+    final item = ScheduleItemDto.fromJson({
+      'course_code': '0412-221(67-G)',
+      'course_title': 'Financial Management',
+      'day': 'Thursday',
+      'room': 1501,
+      'teacher': 'MOG',
+      'time_slot': '08:30-10:00',
+    });
+
+    expect(item.room, '1501');
+    expect(SlotMapper.mapItem(item), isNotNull);
   });
 }
