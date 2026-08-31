@@ -32,50 +32,52 @@ class StudentScreen extends StatelessWidget {
       child: Stack(
         children: [
           const DecorBlobs(),
-          ListView(
-            padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
-            children: [
-              StudentHeader(profile: state.profile),
-              const SizedBox(height: 18),
-              SearchRow(
-                query: state.queryText,
-                onQueryChange: viewModel.onQueryChange,
-              ),
-              if (state.isLoading) ...[
-                const SizedBox(height: 10),
-                const LinearProgressIndicator(minHeight: 2, color: ink),
-              ],
-              if (showChips) ...[
+          SafeArea(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
+              children: [
+                StudentHeader(profile: state.profile),
                 const SizedBox(height: 18),
-                QuickChips(
-                  chips: state.suggestions,
-                  onSelect: viewModel.onChipSelected,
+                SearchRow(
+                  query: state.queryText,
+                  onQueryChange: viewModel.onQueryChange,
                 ),
+                if (state.isLoading) ...[
+                  const SizedBox(height: 10),
+                  const LinearProgressIndicator(minHeight: 2, color: ink),
+                ],
+                if (showChips) ...[
+                  const SizedBox(height: 18),
+                  QuickChips(
+                    chips: state.suggestions,
+                    onSelect: viewModel.onChipSelected,
+                  ),
+                ],
+                const SizedBox(height: 18),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 280),
+                  switchInCurve: Curves.easeOut,
+                  switchOutCurve: Curves.easeIn,
+                  transitionBuilder: (child, animation) {
+                    return FadeTransition(
+                      opacity: animation,
+                      child: SlideTransition(
+                        position: Tween<Offset>(
+                          begin: const Offset(0, 0.08),
+                          end: Offset.zero,
+                        ).animate(animation),
+                        child: child,
+                      ),
+                    );
+                  },
+                  child: KeyedSubtree(
+                    key: ValueKey(_contentKey(state)),
+                    child: _body(context, state, viewModel),
+                  ),
+                ),
+                const SizedBox(height: 28),
               ],
-              const SizedBox(height: 18),
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 280),
-                switchInCurve: Curves.easeOut,
-                switchOutCurve: Curves.easeIn,
-                transitionBuilder: (child, animation) {
-                  return FadeTransition(
-                    opacity: animation,
-                    child: SlideTransition(
-                      position: Tween<Offset>(
-                        begin: const Offset(0, 0.08),
-                        end: Offset.zero,
-                      ).animate(animation),
-                      child: child,
-                    ),
-                  );
-                },
-                child: KeyedSubtree(
-                  key: ValueKey(_contentKey(state)),
-                  child: _body(context, state, viewModel),
-                ),
-              ),
-              const SizedBox(height: 28),
-            ],
+            ),
           ),
         ],
       ),
