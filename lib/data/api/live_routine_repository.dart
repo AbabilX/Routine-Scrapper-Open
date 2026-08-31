@@ -10,10 +10,9 @@ import 'slot_mapper.dart';
 
 class LiveRoutineRepository {
   LiveRoutineRepository({
-    required RoutineApiClient client,
-    required RoutineApiCache cache,
-  }) : _client = client,
-       _cache = cache;
+    required this._client,
+    required this._cache,
+  });
 
   final RoutineApiClient _client;
   final RoutineApiCache _cache;
