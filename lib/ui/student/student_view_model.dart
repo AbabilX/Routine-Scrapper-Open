@@ -280,7 +280,6 @@ class StudentViewModel extends ChangeNotifier {
     final matched = RoutineQueries.forStudent(_slots, parsed);
     await PdfExporter.shareSchedule(
       queryLabel: parsed.label,
-      meta: live.meta,
       week: RoutineQueries.weeklyBlocks(matched),
     );
   }

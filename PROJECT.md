@@ -21,7 +21,7 @@ student_cache.json  (query + reminders + profile)
 - `lib/domain` has no Flutter UI types.
 - `lib/data` loads and caches routine. UI does not build network details.
 - `RoutineQueries` builds timelines / now-next from `ClassSlot`.
-- Section PDF export builds from the current week. Upload is not in the UI.
+- Section PDF is built on-device from the current week (title + table). No PDF download from the API.
 - Department is CSE only for this slice (Teacher also supports BBA).
 - Student search: type → suggestions → select batch → show week.
 - Bottom nav: Student · Teacher · Empty rooms · About (no Room-search tab).

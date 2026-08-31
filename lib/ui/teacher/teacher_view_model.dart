@@ -224,7 +224,6 @@ class TeacherViewModel extends ChangeNotifier {
     if (target.isEmpty || _state.slots.isEmpty) return;
     await PdfExporter.shareSchedule(
       queryLabel: target,
-      meta: _state.meta ?? live.meta,
       week: _state.weeklyMap,
     );
   }

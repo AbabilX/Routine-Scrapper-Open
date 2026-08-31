@@ -35,7 +35,7 @@ const onboardingPages = [
     kicker: 'ডাউনলোড + প্রাইভেসি',
     title: 'নিজের সপ্তাহের PDF',
     body:
-        'সার্চ করা সেকশনের যে দিনে ক্লাস আছে, শুধু সেই শিডিউল শেয়ার করো। '
+        'সার্চ করা সেকশনের যে দিনে ক্লাস আছে, শুধু সেই শিডিউল অ্যাপেই PDF হয়। '
         'কোনো ট্র্যাকিং নেই। Open source, privacy-focused।',
     tint: lavender,
     icon: Icons.picture_as_pdf_outlined,
