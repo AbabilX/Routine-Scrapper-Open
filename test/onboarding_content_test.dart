@@ -13,6 +13,6 @@ void main() {
     expect(text, contains('68_C'));
     expect(text, contains('রিমাইন্ডার'));
     expect(text, contains('PDF'));
-    expect(text, contains('MIT'));
+    expect(text, contains('GPL-3.0'));
   });
 }
