@@ -1,0 +1,37 @@
+---
+description: Keep live API hosts out of git; load them from local env.
+alwaysApply: true
+---
+
+# API base URL is a secret-in-repo
+
+This repo is public. Do **not** put the live API hostname in committed files.
+
+## Must
+
+- Read the host only via `ApiConfig` (`lib/data/api/api_config.dart`).
+- Store the real value in local `.env` (`API_BASE_URL`, no trailing slash).
+- Run / build with `--dart-define-from-file=.env`.
+- Keep `.env` gitignored. Commit `.env.example` with an empty value.
+
+## Must not
+
+- Hardcode `https://…` API hosts in Dart, tests, README, PROJECT.md, CLAUDE.md, AGENTS.md, or rules.
+- Commit `.env`, `api.md` dumps, or cURL samples that include the real host.
+- Bundle `.env` as a Flutter asset (`flutter_dotenv` in `pubspec` assets).
+- Print `ApiConfig.baseUrl` in logs, crash reports, or UI.
+
+## Example
+
+```dart
+// BAD
+final uri = Uri.parse('https://example-live-host/api/schedule');
+
+// GOOD
+final uri = ApiConfig.uri('/api/schedule');
+```
+
+```bash
+flutter run --dart-define-from-file=.env
+flutter test --dart-define-from-file=.env
+```
