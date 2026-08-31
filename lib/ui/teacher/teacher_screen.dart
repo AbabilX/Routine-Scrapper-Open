@@ -4,13 +4,12 @@ import 'package:provider/provider.dart';
 
 import '../../data/course_catalog.dart';
 import '../../data/pdf_exporter.dart';
-import '../../domain/model/class_slot.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/student_summary.dart';
 import '../../domain/routine_queries.dart';
 import '../room/components/select_option_modal.dart';
-import '../student/student_view_model.dart';
 import '../theme/app_colors.dart';
+import 'teacher_view_model.dart';
 
 class UpperCaseTextFormatter extends TextInputFormatter {
   @override
@@ -40,7 +39,7 @@ class _TeacherScreenState extends State<TeacherScreen> {
   RoutineDay _selectedDay = RoutineQueries.todayOrSaturday();
   CourseCatalog? _catalog;
 
-  static const List<String> _deptOptions = ['CSE', 'BBA'];
+  static const List<String> _deptOptions = ['CSE'];
 
   @override
   void initState() {
@@ -63,30 +62,22 @@ class _TeacherScreenState extends State<TeacherScreen> {
 
   void _onQueryChanged(String val) {
     setState(() => _query = val.trim());
+    context.read<TeacherViewModel>().onQueryChanged(val);
   }
 
   void _clearQuery() {
     _searchController.clear();
     setState(() => _query = '');
+    context.read<TeacherViewModel>().clear();
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<StudentViewModel>();
-    final slots = viewModel.repository.slots;
-    final meta = viewModel.repository.meta;
+    final teacherVm = context.watch<TeacherViewModel>();
+    final teacherSlots = teacherVm.slots;
+    final meta = teacherVm.meta;
 
     final queryClean = _query.trim().toUpperCase();
-
-    // Matched slots for the teacher
-    final teacherSlots = queryClean.isEmpty
-        ? <ClassSlot>[]
-        : slots.where((s) {
-            final tUpper = s.teacher.trim().toUpperCase();
-            if (tUpper == queryClean) return true;
-            final parts = tUpper.split(RegExp(r'[\s/_,\.-]+'));
-            return parts.contains(queryClean);
-          }).toList();
 
     final hasMatches = teacherSlots.isNotEmpty;
 
@@ -190,10 +181,16 @@ class _TeacherScreenState extends State<TeacherScreen> {
                       // Week View Schedule (All days with Off Days)
                       _buildWeekScheduleView(weeklyMap),
                     ],
+                  ] else if (teacherVm.isLoading) ...[
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 32),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
                   ] else if (queryClean.isNotEmpty) ...[
                     _buildEmptyState(
                       'No Teacher Found',
-                      'No classes found for teacher initial "$queryClean"',
+                      teacherVm.error ??
+                          'No classes found for teacher initial "$queryClean"',
                     ),
                   ] else ...[
                     _buildEmptyState(
