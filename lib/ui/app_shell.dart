@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 
 import '../data/student_cache.dart';
 import '../domain/model/student_profile.dart';
+import 'about/about_screen.dart';
 import 'onboarding/onboarding_screen.dart';
 import 'room/empty_room_screen.dart';
-import 'room/room_schedule_screen.dart';
 import 'student/student_screen.dart';
 import 'student/student_view_model.dart';
 import 'teacher/teacher_screen.dart';
@@ -63,8 +63,8 @@ class _AppShellState extends State<AppShell> {
                 children: const [
                   StudentScreen(),
                   TeacherScreen(),
-                  RoomScheduleScreen(),
                   EmptyRoomScreen(),
+                  AboutScreen(),
                 ],
               ),
         bottomNavigationBar: _showOnboarding
@@ -90,12 +90,12 @@ class _CapsuleBottomNav extends StatelessWidget {
   static const _items = <({IconData icon, IconData activeIcon, String label})>[
     (icon: Icons.person_outline, activeIcon: Icons.person, label: 'Student'),
     (icon: Icons.badge_outlined, activeIcon: Icons.badge, label: 'Teacher'),
-    (icon: Icons.search_outlined, activeIcon: Icons.search, label: 'Room'),
     (
       icon: Icons.door_sliding_outlined,
       activeIcon: Icons.door_sliding,
       label: 'Empty',
     ),
+    (icon: Icons.info_outline, activeIcon: Icons.info, label: 'About'),
   ];
 
   @override

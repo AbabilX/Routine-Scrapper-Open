@@ -7,11 +7,11 @@ The running app is **Flutter**. Kotlin + Compose remains under `app/` as a behav
 ```
 data/  (load + cache)
         ↓
-domain/RoutineQueries
+    domain/RoutineQueries
         ↓
 StudentViewModel / TeacherViewModel / RoomViewModel
         ↓
-StudentScreen / TeacherScreen / Room / Empty
+StudentScreen / TeacherScreen / Empty / About
         ↓
 ClassReminderScheduler + PdfExporter
         ↓
@@ -22,9 +22,12 @@ student_cache.json  (query + reminders + profile)
 - `lib/data` loads and caches routine. UI does not build network details.
 - `RoutineQueries` builds timelines / now-next from `ClassSlot`.
 - Section PDF export builds from the current week. Upload is not in the UI.
-- Department is CSE only for this slice.
+- Department is CSE only for this slice (Teacher also supports BBA).
 - Student search: type → suggestions → select batch → show week.
+- Bottom nav: Student · Teacher · Empty rooms · About (no Room-search tab).
+- `AboutScreen` is trust copy (open source, no data collection) + GitHub link `AbabilX/Routine-Scrapper-Open`.
 - Theme is light and cute (`lib/ui/theme/app_colors.dart`); screens must not hardcode colors.
+- Shared cute shell: `lib/ui/components/cute_page.dart` (+ header, blobs, empty hint).
 
 Local files (app documents):
 
