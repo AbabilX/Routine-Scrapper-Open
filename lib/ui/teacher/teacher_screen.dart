@@ -14,6 +14,7 @@ import '../components/date_strip.dart';
 import '../components/empty_hint.dart';
 import '../components/search_row.dart';
 import '../components/suggestion_list.dart';
+import '../components/teacher_avatar.dart';
 import '../room/components/select_option_modal.dart';
 import '../theme/app_colors.dart';
 import 'teacher_view_model.dart';
@@ -123,7 +124,9 @@ class TeacherScreen extends StatelessWidget {
           )
         else if (state.hasMatches) ...[
           _TeacherSummaryCard(
-            teacherName: state.cleanQuery,
+            displayName: state.displayName,
+            designation: state.profile?.designation ?? '',
+            imageUrl: state.profile?.imageUrl ?? '',
             sections: state.sections,
             totalCourses: state.courses.length,
             version: state.meta?.version ?? '',
@@ -170,7 +173,9 @@ class TeacherScreen extends StatelessWidget {
 
 class _TeacherSummaryCard extends StatelessWidget {
   const _TeacherSummaryCard({
-    required this.teacherName,
+    required this.displayName,
+    required this.designation,
+    required this.imageUrl,
     required this.sections,
     required this.totalCourses,
     required this.version,
@@ -178,7 +183,9 @@ class _TeacherSummaryCard extends StatelessWidget {
     required this.onDownloadPdf,
   });
 
-  final String teacherName;
+  final String displayName;
+  final String designation;
+  final String imageUrl;
   final List<String> sections;
   final int totalCourses;
   final String version;
@@ -198,10 +205,34 @@ class _TeacherSummaryCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text('রেজিস্টার্ড কোর্স', style: text.titleLarge),
-            const SizedBox(height: 14),
-            _summaryRow('Teacher', teacherName),
-            const SizedBox(height: 8),
+            Row(
+              children: [
+                TeacherAvatar(
+                  imageUrl: imageUrl,
+                  size: 64,
+                  backgroundColor: surface,
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        displayName,
+                        style: text.titleLarge,
+                      ),
+                      if (designation.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(designation, style: text.labelSmall),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 18),
+            Text('রেজিস্টার্ড কোর্স', style: text.titleMedium),
+            const SizedBox(height: 12),
             _summaryRow('Sections', sections.join(', ')),
             const SizedBox(height: 8),
             _summaryRow('Total Courses', '$totalCourses'),
@@ -214,7 +245,7 @@ class _TeacherSummaryCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    'PDF ডাউনলোড — $teacherName',
+                    'PDF ডাউনলোড — $displayName',
                     style: text.bodyMedium,
                   ),
                 ),

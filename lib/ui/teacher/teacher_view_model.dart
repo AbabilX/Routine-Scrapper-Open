@@ -8,6 +8,7 @@ import '../../domain/model/class_slot.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/routine_meta.dart';
 import '../../domain/model/student_summary.dart';
+import '../../domain/model/teacher_info.dart';
 import '../../domain/routine_queries.dart';
 
 class TeacherUiState {
@@ -21,6 +22,7 @@ class TeacherUiState {
     this.selectedDeptIndex = 0,
     this.isWeekView = false,
     this.selectedDay,
+    this.profile,
   });
 
   final String query;
@@ -32,8 +34,16 @@ class TeacherUiState {
   final int selectedDeptIndex;
   final bool isWeekView;
   final RoutineDay? selectedDay;
+  final TeacherInfo? profile;
 
   static const List<String> deptOptions = ['CSE', 'BBA'];
+
+  String get displayName {
+    final info = profile;
+    if (info == null) return cleanQuery;
+    if (info.titleWithInitial.isNotEmpty) return info.titleWithInitial;
+    return cleanQuery;
+  }
 
   String get cleanQuery => query.trim().toUpperCase();
   bool get hasMatches => slots.isNotEmpty;
@@ -65,6 +75,8 @@ class TeacherUiState {
     int? selectedDeptIndex,
     bool? isWeekView,
     RoutineDay? selectedDay,
+    TeacherInfo? profile,
+    bool clearProfile = false,
   }) {
     return TeacherUiState(
       query: query ?? this.query,
@@ -78,6 +90,7 @@ class TeacherUiState {
       selectedDeptIndex: selectedDeptIndex ?? this.selectedDeptIndex,
       isWeekView: isWeekView ?? this.isWeekView,
       selectedDay: selectedDay ?? this.selectedDay,
+      profile: clearProfile ? null : (profile ?? this.profile),
     );
   }
 }
@@ -154,6 +167,7 @@ class TeacherViewModel extends ChangeNotifier {
       slots: cleaned.isEmpty ? const [] : _state.slots,
       suggestions: cleaned.isEmpty ? const [] : _state.suggestions,
       isLoading: cleaned.isEmpty ? false : _state.isLoading,
+      clearProfile: cleaned.isEmpty,
     );
     _querySubject.add(cleaned);
     notifyListeners();
@@ -192,6 +206,7 @@ class TeacherViewModel extends ChangeNotifier {
       isLoading: false,
       clearError: true,
       errorMessage: null,
+      clearProfile: true,
     );
     _querySubject.add('');
     notifyListeners();
@@ -236,17 +251,22 @@ class TeacherViewModel extends ChangeNotifier {
     );
     notifyListeners();
     try {
-      final slots = await live.teacherSchedule(
+      final scheduleFuture = live.teacherSchedule(
         initials,
         _state.selectedDeptLabel.toLowerCase(),
       );
+      final profileFuture = _loadProfile(initials);
+      final slots = await scheduleFuture;
+      final profile = await profileFuture;
       if (_state.cleanQuery != initials) return;
       _state = _state.copyWith(
         slots: slots,
+        profile: profile,
         isLoading: false,
         clearError: true,
         errorMessage: null,
         meta: live.meta,
+        clearProfile: profile == null,
       );
       notifyListeners();
     } on RoutineApiException catch (error) {
@@ -254,6 +274,7 @@ class TeacherViewModel extends ChangeNotifier {
       _state = _state.copyWith(
         slots: const [],
         isLoading: false,
+        clearProfile: true,
         errorMessage: error.statusCode == 404
             ? 'No schedule found for teacher "$initials" in ${_state.selectedDeptLabel}'
             : 'Failed to load teacher schedule',
@@ -264,9 +285,18 @@ class TeacherViewModel extends ChangeNotifier {
       _state = _state.copyWith(
         slots: const [],
         isLoading: false,
+        clearProfile: true,
         errorMessage: 'Something went wrong',
       );
       notifyListeners();
+    }
+  }
+
+  Future<TeacherInfo?> _loadProfile(String initials) async {
+    try {
+      return await live.teacherInfo(initials);
+    } catch (_) {
+      return null;
     }
   }
 

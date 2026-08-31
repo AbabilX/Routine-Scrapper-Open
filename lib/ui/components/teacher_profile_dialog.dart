@@ -4,6 +4,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/model/teacher_info.dart';
 import '../theme/app_colors.dart';
+import 'teacher_avatar.dart';
 
 /// Teacher profile as a modal bottom sheet (not a centered dialog).
 class TeacherProfileDialog extends StatelessWidget {
@@ -48,7 +49,6 @@ class TeacherProfileDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
     final title = info?.titleWithInitial ?? initial;
-    final hasImage = info != null && info!.imageUrl.isNotEmpty;
     return Padding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.viewInsetsOf(context).bottom,
@@ -80,18 +80,10 @@ class TeacherProfileDialog extends StatelessWidget {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (hasImage)
-                      ClipOval(
-                        child: Image.network(
-                          info!.imageUrl,
-                          width: 52,
-                          height: 52,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, _, _) => _fallbackAvatar(),
-                        ),
-                      )
-                    else
-                      _fallbackAvatar(),
+                    TeacherAvatar(
+                      imageUrl: info?.imageUrl ?? '',
+                      size: 52,
+                    ),
                     const SizedBox(width: 14),
                     Expanded(
                       child: Column(
@@ -200,18 +192,6 @@ class TeacherProfileDialog extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _fallbackAvatar() {
-    return Container(
-      width: 52,
-      height: 52,
-      decoration: const BoxDecoration(
-        color: lavender,
-        shape: BoxShape.circle,
-      ),
-      child: const Icon(Icons.person, color: ink, size: 26),
     );
   }
 
