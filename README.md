@@ -1,14 +1,19 @@
 # DIU Routine
 
+<p align="center">
+  <img src="docs/readme-banner.jpg" alt="DIU Routine — Smart Routine Assistant for DIU Students" width="100%">
+</p>
+
 DIU স্টুডেন্টদের জন্য সহজ ক্লাস রুটিন অ্যাপ। ব্যাচ লিখো — আজকের ক্লাস, ব্রেক, আর সারা সপ্তাহ এক জায়গায়।
 
 অ্যাকাউন্ট লাগে না। বিজ্ঞাপন নেই। ডেটা সংগ্রহ নেই। কোড খোলা (GPL-3.0)।
 
 |             |                               |
 | ----------- | ----------------------------- |
-| অ্যাপ নাম   | DIU                           |
+| অ্যাপ নাম   | DIU Routine                   |
 | প্ল্যাটফর্ম | Android + iOS                 |
 | ভার্সন      | 0.1.0                         |
+| ডাউনলোড     | [GitHub Releases](https://github.com/AbabilX/Routine-Scrapper-Open/releases) (Android APK) |
 | লাইসেন্স    | [GPL-3.0](LICENSE)            |
 | সোর্স       | [GitHub](https://github.com/AbabilX/Routine-Scrapper-Open) |
 
@@ -77,11 +82,13 @@ flutter pub get
 flutter run --dart-define-from-file=.env
 ```
 
-APK:
+APK (ABI আলাদা — বেশিরভাগ ফোনে `arm64-v8a`):
 
 ```bash
-flutter build apk --dart-define-from-file=.env
+flutter build apk --release --split-per-abi --dart-define-from-file=.env
 ```
+
+`main`-এ পুশ হলে Actions `pubspec.yaml` প্যাচ বাম্প করে (`0.1.0+1` → `0.1.1+2`), স্প্লিট APK বানায়, বাম্প কমিট পুশ করে, তারপর [Releases](https://github.com/AbabilX/Routine-Scrapper-Open/releases)-এ তোলে। রেপো Secret লাগে: `API_BASE_URL` (হোস্ট কমিট করো না)।
 
 Cursor / VS Code-এ `.vscode/launch.json` আগে থেকেই সেটআপ করা আছে।
 

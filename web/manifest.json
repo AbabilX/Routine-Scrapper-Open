@@ -1,11 +1,11 @@
 {
-    "name": "diu",
-    "short_name": "diu",
+    "name": "DIU Routine",
+    "short_name": "DIU Routine",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#FBF3EB",
     "theme_color": "#FBF3EB",
-    "description": "A new Flutter project.",
+    "description": "DIU student offline class routine",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

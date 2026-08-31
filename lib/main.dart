@@ -60,7 +60,7 @@ class DIUApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'DIU',
+        title: 'DIU Routine',
         debugShowCheckedModeBanner: false,
         theme: DIUTheme(),
         home: AppShell(cache: cache),

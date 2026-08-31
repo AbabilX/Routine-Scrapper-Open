@@ -1,0 +1,108 @@
+name: Android release
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: android-release
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Split ABI APKs
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore: bump version') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Require API_BASE_URL secret
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+        run: |
+          if [ -z "$API_BASE_URL" ]; then
+            echo "::error::Add repository secret API_BASE_URL (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+
+      - name: Bump pubspec version
+        id: bump
+        run: bash .github/scripts/bump-pubspec-version.sh "${{ github.run_number }}"
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build split-per-ABI APKs
+        env:
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
+        run: >
+          flutter build apk --release --split-per-abi
+          --build-name="${{ steps.bump.outputs.name }}"
+          --build-number="${{ steps.bump.outputs.code }}"
+          --dart-define=API_BASE_URL="$API_BASE_URL"
+
+      - name: Package APKs
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.bump.outputs.version }}"
+          FILE_TAG="${VERSION//+/-}"
+          mkdir -p dist
+          shopt -s nullglob
+          found=0
+          for apk in build/app/outputs/flutter-apk/app-*-release.apk; do
+            abi=$(basename "$apk" | sed -E 's/app-(.+)-release\.apk/\1/')
+            dest="dist/diu-${FILE_TAG}-${abi}.apk"
+            cp "$apk" "$dest"
+            echo "Packed $dest"
+            found=1
+          done
+          if [ "$found" -ne 1 ]; then
+            echo "::error::No split-per-ABI APKs under build/app/outputs/flutter-apk/"
+            ls -la build/app/outputs/flutter-apk/ || true
+            exit 1
+          fi
+
+      - name: Push version bump
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pubspec.yaml
+          if git diff --cached --quiet; then
+            echo "Version already up to date"
+            exit 0
+          fi
+          git commit -m "chore: bump version to ${{ steps.bump.outputs.version }}"
+          git push
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.bump.outputs.name }}
+          name: v${{ steps.bump.outputs.name }}
+          generate_release_notes: true
+          make_latest: true
+          files: dist/*.apk
+          body: |
+            Android `${{ steps.bump.outputs.version }}` from `${{ github.sha }}`.
+
+            - Most phones: `*-arm64-v8a.apk`
+            - Older 32-bit phones: `*-armeabi-v7a.apk`
+            - x86 emulator: `*-x86_64.apk`
