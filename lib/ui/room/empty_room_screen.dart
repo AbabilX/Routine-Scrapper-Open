@@ -57,6 +57,13 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
 
                   // Results Header & List
                   if (state.isSubmitted) ...[
+                    if (state.errorMessage != null) ...[
+                      Text(
+                        state.errorMessage!,
+                        style: const TextStyle(color: textMuted),
+                      ),
+                      const SizedBox(height: 14),
+                    ],
                     _buildResultsHeader(state),
                     const SizedBox(height: 14),
                     _buildResultsList(context, state),
@@ -275,24 +282,33 @@ class _EmptyRoomScreenState extends State<EmptyRoomScreen> {
             child: Material(
               color: Colors.transparent,
               child: InkWell(
-                onTap: viewModel.searchEmptyRooms,
+                onTap: state.isLoading ? null : viewModel.searchEmptyRooms,
                 borderRadius: BorderRadius.circular(14),
                 child: Center(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: const [
-                      Icon(Icons.search, color: Colors.white, size: 20),
-                      SizedBox(width: 8),
-                      Text(
-                        'Get Schedule',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
+                  child: state.isLoading
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.search, color: Colors.white, size: 20),
+                            SizedBox(width: 8),
+                            Text(
+                              'Get Schedule',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
             ),
@@ -500,7 +516,9 @@ class _RoomCardState extends State<_RoomCard> {
                 ],
               ),
               subtitle: Text(
-                '${room.building} · ${room.daySlots.length} classes scheduled today',
+                room.daySlots.isEmpty
+                    ? '${room.building} · free this slot'
+                    : '${room.building} · ${room.daySlots.length} classes scheduled today',
                 style: const TextStyle(color: textMuted, fontSize: 13),
               ),
               trailing: Icon(

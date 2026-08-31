@@ -1,5 +1,4 @@
 import 'class_slot.dart';
-import 'routine_day.dart';
 
 class RoomInfo {
   const RoomInfo({

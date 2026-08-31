@@ -28,6 +28,7 @@ class TeacherViewModel extends ChangeNotifier {
   void onQueryChanged(String value) {
     _query = value.trim().toUpperCase();
     _error = null;
+    _slots = const [];
     _fetchJob?.cancel();
     if (_query.isEmpty) {
       _slots = const [];

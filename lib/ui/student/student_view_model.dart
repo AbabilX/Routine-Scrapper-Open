@@ -1,19 +1,14 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 
-import '../../data/asset_routine_repository.dart';
+import '../../data/api/live_routine_repository.dart';
+import '../../data/api/routine_api_exception.dart';
 import '../../data/class_reminder_scheduler.dart';
-import '../../data/local_routine_store.dart';
 import '../../data/pdf_exporter.dart';
-import '../../data/pdf_word_extractor.dart';
-import '../../data/routine_pdf_parser.dart';
-import '../../data/picked_pdf.dart';
-import '../../data/routine_pdf_picker.dart';
 import '../../data/student_cache.dart';
 import '../../domain/model/class_reminder.dart';
+import '../../domain/model/class_slot.dart';
 import '../../domain/model/class_status.dart';
 import '../../domain/model/routine_day.dart';
 import '../../domain/model/routine_meta.dart';
@@ -39,8 +34,8 @@ class StudentUiState {
     this.restored = false,
     this.reminders = const [],
     this.profile = StudentProfile.empty,
-    this.hasRoutine = false,
-    this.isImporting = false,
+    this.isLoading = false,
+    this.errorMessage,
   });
 
   final String queryText;
@@ -58,8 +53,8 @@ class StudentUiState {
   final bool restored;
   final List<ClassReminder> reminders;
   final StudentProfile profile;
-  final bool hasRoutine;
-  final bool isImporting;
+  final bool isLoading;
+  final String? errorMessage;
 
   RoutineDay get resolvedSelectedDay =>
       selectedDay ?? RoutineQueries.todayOrSaturday();
@@ -93,8 +88,9 @@ class StudentUiState {
     bool? restored,
     List<ClassReminder>? reminders,
     StudentProfile? profile,
-    bool? hasRoutine,
-    bool? isImporting,
+    bool? isLoading,
+    String? errorMessage,
+    bool clearError = false,
   }) {
     return StudentUiState(
       queryText: queryText ?? this.queryText,
@@ -114,54 +110,55 @@ class StudentUiState {
       restored: restored ?? this.restored,
       reminders: reminders ?? this.reminders,
       profile: profile ?? this.profile,
-      hasRoutine: hasRoutine ?? this.hasRoutine,
-      isImporting: isImporting ?? this.isImporting,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: clearError ? errorMessage : (errorMessage ?? this.errorMessage),
     );
   }
 }
 
 class StudentViewModel extends ChangeNotifier {
   StudentViewModel({
-    required this.repository,
+    required this.live,
     required this.cache,
     required this.scheduler,
-    required this.store,
-    RoutinePdfPicker? picker,
-  }) : picker = picker ?? RoutinePdfPicker(),
-       _state = StudentUiState(
+  }) : _state = StudentUiState(
          selectedDay: RoutineQueries.todayOrSaturday(),
          today: RoutineQueries.todayOrSaturday(),
-         meta: repository.meta,
-         suggestions: RoutineQueries.suggestChips(repository.slots, ''),
+         meta: live.meta,
          reminders: cache.reminders,
          profile: cache.profile,
-         hasRoutine: repository.hasRoutine,
        ) {
-    _restore();
+    _boot();
     _tick = Timer.periodic(const Duration(seconds: 30), (_) => rebuild());
   }
 
-  AssetRoutineRepository repository;
+  final LiveRoutineRepository live;
   final StudentCache cache;
   final ClassReminderScheduler scheduler;
-  final LocalRoutineStore store;
-  final RoutinePdfPicker picker;
+
   StudentUiState _state;
+  List<ClassSlot> _slots = const [];
   Timer? _saveJob;
   Timer? _tick;
+  Timer? _suggestJob;
+  Timer? _fetchJob;
+  int _fetchSeq = 0;
 
   StudentUiState get state => _state;
 
-  Future<void> _restore() async {
+  Future<void> _boot() async {
+    await live.syncVersion();
+    _state = _state.copyWith(meta: live.meta);
     final saved = cache.lastQuery();
     if (saved.isNotEmpty) {
-      applyQuery(saved, persist: false);
+      applyQuery(saved, persist: false, fetchNow: true);
     }
     await scheduler.sync(cache.reminders);
     _state = _state.copyWith(
       restored: true,
       reminders: cache.reminders,
       profile: cache.profile,
+      meta: live.meta,
     );
     notifyListeners();
   }
@@ -172,110 +169,113 @@ class StudentViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<String?> importRoutinePdf() async {
-    final PickedPdf? picked;
-    try {
-      picked = await picker.pick();
-    } on PlatformException catch (error) {
-      if (error.code == 'busy') return null;
-      return 'PDF পড়া যায়নি';
-    } on MissingPluginException {
-      return 'এই প্ল্যাটফর্মে PDF পিকার নেই';
-    }
-    if (picked == null) return null;
-    final bytes = await File(picked.path).readAsBytes();
-    if (bytes.isEmpty) return 'PDF পড়া যায়নি';
-
-    _state = _state.copyWith(isImporting: true);
-    notifyListeners();
-    try {
-      final extracted = await PdfWordExtractor.extract(bytes);
-      final parsed = RoutinePdfParser.parse(extracted, sourcePdf: picked.name);
-      if (parsed.slots.isEmpty) {
-        return 'এই PDF থেকে ক্লাস পাওয়া যায়নি — DIU CSE রুটিন PDF দাও';
-      }
-      await store.saveUser(routine: parsed, pdfBytes: bytes);
-      repository = AssetRoutineRepository.fromFile(parsed);
-      _state = _state.copyWith(
-        hasRoutine: true,
-        meta: repository.meta,
-        suggestions: RoutineQueries.suggestChips(
-          repository.slots,
-          _state.queryText,
-        ),
-      );
-      applyQuery(_state.queryText, persist: false);
-      return null;
-    } catch (_) {
-      return 'PDF পার্স করা যায়নি — অন্য ফাইল চেষ্টা করো';
-    } finally {
-      _state = _state.copyWith(isImporting: false);
-      notifyListeners();
-    }
-  }
-
-  Future<String?> useBundledRoutine() async {
-    _state = _state.copyWith(isImporting: true);
-    notifyListeners();
-    try {
-      final bundled = await AssetRoutineRepository.loadBundledFile();
-      if (bundled.slots.isEmpty) {
-        return 'bundled রুটিন খালি — PDF আপলোড করো';
-      }
-      await store.saveRoutine(routine: bundled);
-      repository = AssetRoutineRepository.fromFile(bundled);
-      _state = _state.copyWith(
-        hasRoutine: true,
-        meta: repository.meta,
-        suggestions: RoutineQueries.suggestChips(
-          repository.slots,
-          _state.queryText,
-        ),
-      );
-      applyQuery(_state.queryText, persist: false);
-      return null;
-    } catch (_) {
-      return 'bundled ডেটা লোড হয়নি — PDF আপলোড করে দেখো';
-    } finally {
-      _state = _state.copyWith(isImporting: false);
-      notifyListeners();
-    }
-  }
-
   void onQueryChange(String value) => applyQuery(value, persist: true);
 
-  void onChipSelected(String chip) => applyQuery(chip, persist: true);
+  void onChipSelected(String chip) {
+    applyQuery(chip, persist: true, fetchNow: true);
+  }
 
   void onDaySelected(RoutineDay day) {
     _state = _state.copyWith(selectedDay: day);
     rebuild();
   }
 
-  void applyQuery(String value, {required bool persist}) {
+  void applyQuery(
+    String value, {
+    required bool persist,
+    bool fetchNow = false,
+  }) {
     final parsed = StudentQuery.parse(value);
     _state = _state.copyWith(
       queryText: value,
       parsedQuery: parsed,
       clearParsedQuery: parsed == null,
       invalidQuery: value.trim().isNotEmpty && parsed == null,
-      suggestions: RoutineQueries.suggestChips(repository.slots, value),
+      clearError: true,
+      errorMessage: null,
     );
-    rebuild();
-    if (persist && parsed != null) {
-      _saveJob?.cancel();
-      _saveJob = Timer(const Duration(milliseconds: 350), () {
-        cache.saveQuery(parsed.label);
-      });
+    if (parsed == null || parsed.section.isEmpty) {
+      _slots = const [];
+      rebuild();
+    }
+    _scheduleSuggestions(value);
+    if (parsed != null && parsed.section.isNotEmpty) {
+      if (fetchNow) {
+        _loadSchedule(parsed);
+      } else {
+        _fetchJob?.cancel();
+        _fetchJob = Timer(const Duration(milliseconds: 400), () {
+          _loadSchedule(parsed);
+        });
+      }
+      if (persist) {
+        _saveJob?.cancel();
+        _saveJob = Timer(const Duration(milliseconds: 350), () {
+          cache.saveQuery(parsed.label);
+        });
+      }
+    } else {
+      _fetchJob?.cancel();
+    }
+  }
+
+  void _scheduleSuggestions(String value) {
+    _suggestJob?.cancel();
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) {
+      _state = _state.copyWith(suggestions: const []);
+      notifyListeners();
+      return;
+    }
+    _suggestJob = Timer(const Duration(milliseconds: 250), () {
+      _loadSuggestions(trimmed);
+    });
+  }
+
+  Future<void> _loadSuggestions(String query) async {
+    try {
+      final suggestions = await live.autocompleteStudent(query);
+      if (_state.queryText.trim() != query) return;
+      _state = _state.copyWith(suggestions: suggestions);
+      notifyListeners();
+    } on RoutineApiException {
+      if (_state.queryText.trim() != query) return;
+      _state = _state.copyWith(suggestions: const []);
+      notifyListeners();
+    }
+  }
+
+  Future<void> _loadSchedule(StudentQuery parsed) async {
+    final seq = ++_fetchSeq;
+    _state = _state.copyWith(isLoading: true, clearError: true, errorMessage: null);
+    notifyListeners();
+    try {
+      final slots = await live.studentSchedule(parsed.label);
+      if (seq != _fetchSeq) return;
+      _slots = slots;
+      _state = _state.copyWith(
+        isLoading: false,
+        meta: live.meta,
+      );
+      rebuild();
+    } on RoutineApiException catch (error) {
+      if (seq != _fetchSeq) return;
+      _slots = const [];
+      _state = _state.copyWith(
+        isLoading: false,
+        errorMessage: error.message,
+      );
+      rebuild();
     }
   }
 
   Future<void> downloadSchedule() async {
     final parsed = _state.parsedQuery;
     if (parsed == null) return;
-    final matched = RoutineQueries.forStudent(repository.slots, parsed);
+    final matched = RoutineQueries.forStudent(_slots, parsed);
     await PdfExporter.shareSchedule(
       queryLabel: parsed.label,
-      meta: repository.meta,
+      meta: live.meta,
       week: RoutineQueries.weeklyBlocks(matched),
     );
   }
@@ -297,7 +297,7 @@ class StudentViewModel extends ChangeNotifier {
   void rebuild() {
     final today = RoutineQueries.todayOrSaturday();
     final parsed = _state.parsedQuery;
-    if (parsed == null) {
+    if (parsed == null || parsed.section.isEmpty) {
       _state = _state.copyWith(
         today: today,
         summary: null,
@@ -311,12 +311,12 @@ class StudentViewModel extends ChangeNotifier {
       notifyListeners();
       return;
     }
-    final matched = RoutineQueries.forStudent(repository.slots, parsed);
+    final matched = RoutineQueries.forStudent(_slots, parsed);
     final selectedDay = _state.resolvedSelectedDay;
     final daySlots = matched.where((slot) => slot.day == selectedDay).toList();
     _state = _state.copyWith(
       today: today,
-      summary: RoutineQueries.summary(matched, parsed, repository.meta.version),
+      summary: RoutineQueries.summary(matched, parsed, live.meta.version),
       timeline: RoutineQueries.timeline(daySlots),
       classStatuses: RoutineQueries.statusesForDay(
         daySlots,
@@ -334,6 +334,8 @@ class StudentViewModel extends ChangeNotifier {
   void dispose() {
     _saveJob?.cancel();
     _tick?.cancel();
+    _suggestJob?.cancel();
+    _fetchJob?.cancel();
     super.dispose();
   }
 }

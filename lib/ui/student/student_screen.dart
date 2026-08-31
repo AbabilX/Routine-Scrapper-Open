@@ -15,7 +15,6 @@ import 'components/reminder_picker_sheet.dart';
 import 'components/search_row.dart';
 import 'components/student_header.dart';
 import 'components/summary_card.dart';
-import 'components/upload_routine_card.dart';
 import 'student_view_model.dart';
 
 class StudentScreen extends StatelessWidget {
@@ -25,10 +24,7 @@ class StudentScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final viewModel = context.watch<StudentViewModel>();
     final state = viewModel.state;
-    final showChips =
-        state.suggestions.isNotEmpty &&
-        (state.queryText.trim().isEmpty ||
-            (state.parsedQuery?.section.isEmpty ?? true));
+    final showChips = state.suggestions.isNotEmpty;
 
     return ColoredBox(
       color: bg,
@@ -38,28 +34,24 @@ class StudentScreen extends StatelessWidget {
           ListView(
             padding: const EdgeInsets.fromLTRB(22, 12, 22, 40),
             children: [
-              StudentHeader(
-                profile: state.profile,
-                onReplacePdf: state.hasRoutine
-                    ? () => _upload(context, viewModel)
-                    : null,
-                replacing: state.isImporting,
-              ),
+              StudentHeader(profile: state.profile),
               const SizedBox(height: 18),
-              if (state.hasRoutine) ...[
-                SearchRow(
-                  query: state.queryText,
-                  onQueryChange: viewModel.onQueryChange,
-                ),
-                if (showChips) ...[
-                  const SizedBox(height: 18),
-                  QuickChips(
-                    chips: state.suggestions,
-                    onSelect: viewModel.onChipSelected,
-                  ),
-                ],
-                const SizedBox(height: 18),
+              SearchRow(
+                query: state.queryText,
+                onQueryChange: viewModel.onQueryChange,
+              ),
+              if (state.isLoading) ...[
+                const SizedBox(height: 10),
+                const LinearProgressIndicator(minHeight: 2, color: ink),
               ],
+              if (showChips) ...[
+                const SizedBox(height: 18),
+                QuickChips(
+                  chips: state.suggestions,
+                  onSelect: viewModel.onChipSelected,
+                ),
+              ],
+              const SizedBox(height: 18),
               AnimatedSwitcher(
                 duration: const Duration(milliseconds: 280),
                 switchInCurve: Curves.easeOut,
@@ -89,56 +81,40 @@ class StudentScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _upload(BuildContext context, StudentViewModel viewModel) async {
-    final error = await viewModel.importRoutinePdf();
-    if (error != null && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error)));
-    }
-  }
-
-  Future<void> _useExisting(
-    BuildContext context,
-    StudentViewModel viewModel,
-  ) async {
-    final error = await viewModel.useBundledRoutine();
-    if (error != null && context.mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(error)));
-    }
-  }
-
   Widget _body(
     BuildContext context,
     StudentUiState state,
     StudentViewModel viewModel,
   ) {
     switch (_contentKey(state)) {
-      case _BodyKey.needsUpload:
-        return UploadRoutineCard(
-          busy: state.isImporting,
-          onUpload: () => _upload(context, viewModel),
-          onUseExisting: () => _useExisting(context, viewModel),
-        );
       case _BodyKey.blank:
         return const EmptyHint(
           title: 'শুরু করো',
-          body: 'ব্যাচ লিখো, অথবা নিচের চিপ ট্যাপ করো — যেমন 68_C',
+          body: 'ব্যাচ লিখো, সাজেশন থেকে বেছে নাও — যেমন 70_E',
           tint: peach,
         );
       case _BodyKey.invalid:
         return const EmptyHint(
           title: 'উফ, ফরম্যাট মিলেনি',
-          body: 'চেষ্টা করো: 68_C  বা শুধু  68',
+          body: 'চেষ্টা করো: 70_E  বা শুধু  70',
+          tint: rose,
+        );
+      case _BodyKey.loading:
+        return const EmptyHint(
+          title: 'খুঁজছি',
+          body: 'সার্ভার থেকে রুটিন আনছি…',
+          tint: sky,
+        );
+      case _BodyKey.error:
+        return EmptyHint(
+          title: 'নেট লাগবে',
+          body: state.errorMessage ?? 'রুটিন আনা যায়নি — আবার চেষ্টা করো',
           tint: rose,
         );
       case _BodyKey.noMatch:
         return const EmptyHint(
           title: 'কেউ নেই',
-          body:
-              'এই ব্যাচ/সেকশনের ক্লাস রুটিনে পাওয়া যায়নি — অন্য চিপ চেষ্টা করো',
+          body: 'এই ব্যাচের ক্লাস পাওয়া যায়নি — অন্য সাজেশন চেষ্টা করো',
           tint: sky,
         );
       case _BodyKey.ready:
@@ -242,12 +218,15 @@ class _ReadyBody extends StatelessWidget {
   }
 }
 
-enum _BodyKey { needsUpload, blank, invalid, noMatch, ready }
+enum _BodyKey { blank, invalid, loading, error, noMatch, ready }
 
 _BodyKey _contentKey(StudentUiState state) {
-  if (!state.hasRoutine) return _BodyKey.needsUpload;
   if (state.queryText.trim().isEmpty) return _BodyKey.blank;
   if (state.invalidQuery) return _BodyKey.invalid;
+  final parsed = state.parsedQuery;
+  if (parsed == null || parsed.section.isEmpty) return _BodyKey.blank;
+  if (state.isLoading && !state.hasMatches) return _BodyKey.loading;
+  if (state.errorMessage != null && !state.hasMatches) return _BodyKey.error;
   if (!state.hasMatches) return _BodyKey.noMatch;
   return _BodyKey.ready;
 }

@@ -1,12 +1,11 @@
-import 'package:diu/domain/model/student_summary.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../domain/model/student_summary.dart';
 import '../../domain/model/routine_day.dart';
-import '../../domain/room_queries.dart';
 import '../../domain/routine_queries.dart';
-import '../student/student_view_model.dart';
 import '../theme/app_colors.dart';
+import 'room_view_model.dart';
 
 class RoomScheduleScreen extends StatefulWidget {
   const RoomScheduleScreen({super.key});
@@ -19,15 +18,24 @@ class _RoomScheduleScreenState extends State<RoomScheduleScreen> {
   String _selectedRoom = '';
   RoutineDay _selectedDay = RoutineQueries.todayOrSaturday();
 
+  void _selectRoom(String room) {
+    setState(() => _selectedRoom = room);
+    context.read<RoomViewModel>().loadRoomDay(room, _selectedDay);
+  }
+
+  void _selectDay(RoutineDay day) {
+    setState(() => _selectedDay = day);
+    if (_selectedRoom.isNotEmpty) {
+      context.read<RoomViewModel>().loadRoomDay(_selectedRoom, day);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<StudentViewModel>();
-    final slots = viewModel.repository.slots;
-    final allRooms = RoomQueries.allRooms(slots);
-
-    final roomSchedule = _selectedRoom.isEmpty
-        ? <ClassBlock>[]
-        : RoomQueries.scheduleForRoom(slots, _selectedRoom, _selectedDay);
+    final viewModel = context.watch<RoomViewModel>();
+    final state = viewModel.state;
+    final allRooms = state.allRoomNames;
+    final roomSchedule = RoutineQueries.merge(state.roomDaySlots);
 
     return Scaffold(
       backgroundColor: bg,
@@ -51,8 +59,6 @@ class _RoomScheduleScreenState extends State<RoomScheduleScreen> {
                 style: TextStyle(fontSize: 14, color: textMuted),
               ),
               const SizedBox(height: 18),
-
-              // Room Autocomplete Input
               Autocomplete<String>(
                 optionsBuilder: (textEditingValue) {
                   if (textEditingValue.text.isEmpty) {
@@ -64,15 +70,16 @@ class _RoomScheduleScreenState extends State<RoomScheduleScreen> {
                     ),
                   );
                 },
-                onSelected: (selection) {
-                  setState(() => _selectedRoom = selection);
-                },
+                onSelected: _selectRoom,
                 fieldViewBuilder:
                     (context, controller, focusNode, onFieldSubmitted) {
                       return TextField(
                         controller: controller,
                         focusNode: focusNode,
-                        onChanged: (val) => setState(() => _selectedRoom = val),
+                        onChanged: (val) {
+                          setState(() => _selectedRoom = val);
+                        },
+                        onSubmitted: _selectRoom,
                         decoration: InputDecoration(
                           hintText: 'Enter Room Number (e.g. KT-201, 611)',
                           prefixIcon: const Icon(
@@ -84,7 +91,7 @@ class _RoomScheduleScreenState extends State<RoomScheduleScreen> {
                                   icon: const Icon(Icons.clear, size: 18),
                                   onPressed: () {
                                     controller.clear();
-                                    setState(() => _selectedRoom = '');
+                                    _selectRoom('');
                                   },
                                 )
                               : null,
@@ -106,10 +113,7 @@ class _RoomScheduleScreenState extends State<RoomScheduleScreen> {
                       );
                     },
               ),
-
               const SizedBox(height: 16),
-
-              // Day Selector Chips
               SingleChildScrollView(
                 scrollDirection: Axis.horizontal,
                 child: Row(
@@ -129,104 +133,100 @@ class _RoomScheduleScreenState extends State<RoomScheduleScreen> {
                         ),
                         backgroundColor: surface,
                         onSelected: (selected) {
-                          if (selected) setState(() => _selectedDay = day);
+                          if (selected) _selectDay(day);
                         },
                       ),
                     );
                   }).toList(),
                 ),
               ),
-
               const SizedBox(height: 20),
-
-              // Schedule Results
-              Expanded(
-                child: _selectedRoom.isEmpty
-                    ? const Center(
-                        child: Text(
-                          'Type or select a room number above to see its classes',
-                          style: TextStyle(color: textMuted, fontSize: 15),
-                        ),
-                      )
-                    : roomSchedule.isEmpty
-                    ? Center(
-                        child: Text(
-                          'No classes scheduled in $_selectedRoom on ${_selectedDay.fullLabel}',
-                          style: const TextStyle(
-                            color: textMuted,
-                            fontSize: 15,
-                          ),
-                        ),
-                      )
-                    : ListView.separated(
-                        itemCount: roomSchedule.length,
-                        separatorBuilder: (context, index) =>
-                            const SizedBox(height: 12),
-                        itemBuilder: (context, index) {
-                          final block = roomSchedule[index];
-                          return Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: surface,
-                              borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: line),
-                            ),
-                            child: Row(
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: lavender.withValues(alpha: 0.4),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Text(
-                                    '${block.start}\n${block.end}',
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 13,
-                                      color: ink,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 14),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        block.course,
-                                        style: const TextStyle(
-                                          fontSize: 17,
-                                          fontWeight: FontWeight.bold,
-                                          color: ink,
-                                        ),
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Text(
-                                        'Group: ${block.group}  ·  Teacher: ${block.teacher}',
-                                        style: const TextStyle(
-                                          fontSize: 13,
-                                          color: textMuted,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      ),
-              ),
+              Expanded(child: _results(state.scheduleLoading, roomSchedule)),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _results(bool loading, List<ClassBlock> roomSchedule) {
+    if (_selectedRoom.isEmpty) {
+      return const Center(
+        child: Text(
+          'Type or select a room number above to see its classes',
+          style: TextStyle(color: textMuted, fontSize: 15),
+        ),
+      );
+    }
+    if (loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (roomSchedule.isEmpty) {
+      return Center(
+        child: Text(
+          'No classes scheduled in $_selectedRoom on ${_selectedDay.fullLabel}',
+          style: const TextStyle(color: textMuted, fontSize: 15),
+        ),
+      );
+    }
+    return ListView.separated(
+      itemCount: roomSchedule.length,
+      separatorBuilder: (context, index) => const SizedBox(height: 12),
+      itemBuilder: (context, index) {
+        final block = roomSchedule[index];
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: line),
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: lavender.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${block.start}\n${block.end}',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: ink,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      block.course,
+                      style: const TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                        color: ink,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Group: ${block.group}  ·  Teacher: ${block.teacher}',
+                      style: const TextStyle(fontSize: 13, color: textMuted),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }
