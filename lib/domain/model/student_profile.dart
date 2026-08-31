@@ -13,10 +13,7 @@ class StudentProfile {
 
   String get greeting => name.isEmpty ? 'Hello' : 'Hello, $name';
 
-  StudentProfile copyWith({
-    String? name,
-    StudentGender? gender,
-  }) {
+  StudentProfile copyWith({String? name, StudentGender? gender}) {
     return StudentProfile(
       name: name ?? this.name,
       gender: gender ?? this.gender,

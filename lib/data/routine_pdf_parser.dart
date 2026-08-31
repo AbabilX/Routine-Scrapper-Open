@@ -21,12 +21,12 @@ class RoutinePdfParser {
     ('04:00', '05:30'),
   ];
 
-  static const slotEdges = [0.0, 230.0, 415.0, 610.0, 800.0, 985.0, 1300.0];
+  static const slotEdges = [0.0, 225.0, 430.0, 640.0, 850.0, 1050.0, 1300.0];
 
-  static final courseRe = RegExp(r'^([A-Z]{2,5}\d{3}[A-Z]?)\((.+)\)$');
-  static final teacherRe = RegExp(r'^[A-Z]{2,6}(?:[_-]\d+)?$');
+  static final courseRe = RegExp(r'^([A-Z]{2,6}\s*\d{3,4}[A-Z]?)\s*\((.+)\)$');
+  static final teacherRe = RegExp(r'^[A-Za-z]{2,8}(?:[_\.-/]\w+)?$');
   static final roomRe = RegExp(
-    r'^(KT-\d+(?:\([A-Z]\))?|G1-\d+|ANX1-\d+|SH-\d+|CTBA-\d+|EMBED|IOT)$',
+    r'^(KT-\d+(?:\([A-Z0-9]\))?|G\d+-\d+|ANX\d+-\d+|SH-\d+|CTBA-\d+|EMBED|IOT|\d{3,4})$',
   );
 
   static const skip = {
@@ -142,20 +142,24 @@ class RoutinePdfParser {
     final right = slotEdges[index + 1] * scale;
     ({double delta, String text})? best;
     for (final word in words) {
-      if (word.page != course.page || (word.y - course.y).abs() > 4 * scale) {
+      if (word.page != course.page || (word.y - course.y).abs() > 18 * scale) {
         continue;
       }
-      if (word.x <= course.x || word.x >= right || word.x < left) continue;
-      if (courseRe.hasMatch(word.text) ||
+      if (word.x < left || word.x >= right) continue;
+      if (word == course ||
+          courseRe.hasMatch(word.text) ||
           isRoom(word.text) ||
           skip.contains(word.text.toUpperCase())) {
         continue;
       }
       final upper = word.text.toUpperCase();
-      final looksTeacher = teacherRe.hasMatch(word.text) ||
-          (word.text == upper && word.text.length >= 2 && word.text.length <= 6);
+      final looksTeacher =
+          teacherRe.hasMatch(word.text) ||
+          (word.text == upper &&
+              word.text.length >= 2 &&
+              word.text.length <= 8);
       if (!looksTeacher) continue;
-      final delta = word.x - course.x;
+      final delta = (word.x - course.x).abs() + (word.y - course.y).abs();
       if (best == null || delta < best.delta) {
         best = (delta: delta, text: word.text);
       }
@@ -200,7 +204,9 @@ class RoutinePdfParser {
       if (word.page != page) continue;
       if (word.x < left || word.x >= right) continue;
       final dy = word.y - roomY;
-      if (dy > 0 && dy < 16 * scale && (word.text == '(COM' || word.text == 'LAB)')) {
+      if (dy > 0 &&
+          dy < 16 * scale &&
+          (word.text == '(COM' || word.text == 'LAB)')) {
         return ' (COM LAB)';
       }
     }
@@ -209,8 +215,10 @@ class RoutinePdfParser {
 
   static String _guessVersion(List<PdfWord> words) {
     for (final word in words) {
-      final match = RegExp(r'^V(\d+(?:\.\d+)?)$', caseSensitive: false)
-          .firstMatch(word.text);
+      final match = RegExp(
+        r'^V(\d+(?:\.\d+)?)$',
+        caseSensitive: false,
+      ).firstMatch(word.text);
       if (match != null) return '${match.group(1)}.0'.replaceAll('.0.0', '.0');
     }
     return 'uploaded';

@@ -39,7 +39,10 @@ void main() {
       expect(ReminderRules.fireClock('01:00', 20), (hour: 12, minute: 40));
       expect(ReminderRules.formatFireTime('10:00', 20), '09:40');
       expect(ReminderRules.formatFireTime('01:00', 20), '12:40');
-      expect(ReminderRules.dateTimeWeekday(RoutineDay.saturday), DateTime.saturday);
+      expect(
+        ReminderRules.dateTimeWeekday(RoutineDay.saturday),
+        DateTime.saturday,
+      );
     });
 
     test('presets stay 5–30', () {
@@ -52,7 +55,11 @@ void main() {
   group('CourseLabel', () {
     test('uses name - CODE(group) when a name exists', () {
       expect(
-        CourseLabel.format(code: 'CSE221', group: '68_A', name: 'Object Oriented Programming'),
+        CourseLabel.format(
+          code: 'CSE221',
+          group: '68_A',
+          name: 'Object Oriented Programming',
+        ),
         'Object Oriented Programming - CSE221(68_A)',
       );
       expect(CourseLabel.format(code: 'CSE221', group: '68_A'), 'CSE221(68_A)');
@@ -99,13 +106,18 @@ void main() {
         };
       }
 
-      expect(RoutineFileDto.fromJson(json(origin: 'user')).isPersistedRoutine, isTrue);
+      expect(
+        RoutineFileDto.fromJson(json(origin: 'user')).isPersistedRoutine,
+        isTrue,
+      );
       expect(
         RoutineFileDto.fromJson(json(origin: 'bundled')).isPersistedRoutine,
         isTrue,
       );
       expect(
-        RoutineFileDto.fromJson(json(origin: 'bundled', slots: 0)).isPersistedRoutine,
+        RoutineFileDto.fromJson(
+          json(origin: 'bundled', slots: 0),
+        ).isPersistedRoutine,
         isFalse,
       );
       expect(
@@ -116,10 +128,7 @@ void main() {
 
     test('student cache round-trips reminders', () {
       final reminder = ClassReminder.fromBlock(block, 15);
-      final data = StudentCacheData(
-        lastQuery: '68_C',
-        reminders: [reminder],
-      );
+      final data = StudentCacheData(lastQuery: '68_C', reminders: [reminder]);
       final parsed = StudentCacheData.fromJson(data.toJson());
       expect(parsed.lastQuery, '68_C');
       expect(parsed.schemaVersion, 1);

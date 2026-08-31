@@ -27,7 +27,10 @@ class NextClassBanner extends StatelessWidget {
       },
       child: hint == null
           ? const SizedBox.shrink()
-          : _BannerBody(key: ValueKey(hint!.block.course + hint!.status.name), hint: hint!),
+          : _BannerBody(
+              key: ValueKey(hint!.block.course + hint!.status.name),
+              hint: hint!,
+            ),
     );
   }
 }
@@ -54,7 +57,10 @@ class _BannerBody extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(isNow ? 'এখন চলছে' : 'পরের ক্লাস', style: text.labelSmall),
+                  Text(
+                    isNow ? 'এখন চলছে' : 'পরের ক্লাস',
+                    style: text.labelSmall,
+                  ),
                   const SizedBox(height: 4),
                   Text(hint.block.course, style: text.titleLarge),
                 ],

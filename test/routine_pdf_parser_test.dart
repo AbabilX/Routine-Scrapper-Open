@@ -40,4 +40,28 @@ void main() {
     );
     expect(parsed.slots, isEmpty);
   });
+
+  test(
+    'parser reads slot 3 teacher initials across expanded column boundaries',
+    () {
+      final parsed = RoutinePdfParser.parse(
+        const ExtractedPdfText(
+          pageWidth: 1300,
+          words: [
+            PdfWord(page: 0, y: 40, x: 620, text: 'SATURDAY'),
+            PdfWord(page: 0, y: 80, x: 672, text: 'KT-503'),
+            PdfWord(page: 0, y: 80, x: 733, text: 'ACT327(66_N)'),
+            PdfWord(page: 0, y: 85, x: 828, text: 'IK'),
+          ],
+        ),
+        sourcePdf: 'routine.pdf',
+      );
+
+      expect(parsed.slots, hasLength(1));
+      expect(parsed.slots.first.slot, 3);
+      expect(parsed.slots.first.course, 'ACT327');
+      expect(parsed.slots.first.group, '66_N');
+      expect(parsed.slots.first.teacher, 'IK');
+    },
+  );
 }

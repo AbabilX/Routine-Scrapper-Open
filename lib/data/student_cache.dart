@@ -27,7 +27,8 @@ class StudentCacheData {
 
   factory StudentCacheData.empty() => const StudentCacheData();
 
-  StudentProfile get profile => StudentProfile(name: displayName, gender: gender);
+  StudentProfile get profile =>
+      StudentProfile(name: displayName, gender: gender);
 
   factory StudentCacheData.fromJson(Map<String, dynamic> json) {
     return StudentCacheData(

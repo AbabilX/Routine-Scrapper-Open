@@ -56,16 +56,15 @@ Future<ReminderChoice?> showReminderPickerSheet({
                 _PresetChip(
                   label: 'বন্ধ',
                   selected: selected == null,
-                  onTap: () => Navigator.pop(context, const ReminderChoice.off()),
+                  onTap: () =>
+                      Navigator.pop(context, const ReminderChoice.off()),
                 ),
                 for (final minutes in ReminderRules.presets)
                   _PresetChip(
                     label: reminderLabel(minutes),
                     selected: selected == minutes,
-                    onTap: () => Navigator.pop(
-                      context,
-                      ReminderChoice.minutes(minutes),
-                    ),
+                    onTap: () =>
+                        Navigator.pop(context, ReminderChoice.minutes(minutes)),
                   ),
               ],
             ),

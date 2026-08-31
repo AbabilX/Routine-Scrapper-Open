@@ -13,10 +13,7 @@ class PdfWord {
 }
 
 class ExtractedPdfText {
-  const ExtractedPdfText({
-    required this.words,
-    required this.pageWidth,
-  });
+  const ExtractedPdfText({required this.words, required this.pageWidth});
 
   final List<PdfWord> words;
   final double pageWidth;

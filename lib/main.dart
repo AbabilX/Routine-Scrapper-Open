@@ -6,6 +6,7 @@ import 'data/class_reminder_scheduler.dart';
 import 'data/local_routine_store.dart';
 import 'data/student_cache.dart';
 import 'ui/app_shell.dart';
+import 'ui/room/room_view_model.dart';
 import 'ui/student/student_view_model.dart';
 import 'ui/theme/app_theme.dart';
 
@@ -41,13 +42,26 @@ class DIUApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => StudentViewModel(
-        repository: repository,
-        cache: cache,
-        scheduler: scheduler,
-        store: store,
-      ),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => StudentViewModel(
+            repository: repository,
+            cache: cache,
+            scheduler: scheduler,
+            store: store,
+          ),
+        ),
+        ChangeNotifierProxyProvider<StudentViewModel, RoomViewModel>(
+          create: (context) => RoomViewModel(repository: repository),
+          update: (context, studentVm, roomVm) {
+            final vm =
+                roomVm ?? RoomViewModel(repository: studentVm.repository);
+            vm.updateRepository(studentVm.repository);
+            return vm;
+          },
+        ),
+      ],
       child: MaterialApp(
         title: 'DIU',
         debugShowCheckedModeBanner: false,

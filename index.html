@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>rDIU Routine Scrapper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./web/style.css">
+</head>
+<body class="dark">
+  <div id="app">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="header-container">
+        <div class="logo-group">
+          <div class="logo-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M8 2v4M16 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+              <path d="m9 16 2 2 4-4"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="logo-title">rDIU <span class="badge-tag">Routine Scrapper</span></h1>
+            <p class="logo-subtitle">DIU CSE Offline Class Routine • Summer 2026 (V5)</p>
+          </div>
+        </div>
+        <div class="header-actions">
+          <button id="themeToggleBtn" class="icon-button" title="Toggle Theme">
+            <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+            <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="main-container">
+      <!-- Search & Controls Section -->
+      <section class="search-section card">
+        <div class="search-input-wrapper">
+          <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Enter Batch/Section (e.g. 68_C), Teacher (SRH), or Room (KT-201)..." autocomplete="off" spellcheck="false" value="68_C">
+          <button id="clearSearchBtn" class="clear-btn" title="Clear">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Preset quick search chips -->
+        <div class="preset-chips">
+          <span class="chip-label">Quick Search:</span>
+          <button class="chip" data-query="68_C">68_C</button>
+          <button class="chip" data-query="71_B">71_B</button>
+          <button class="chip" data-query="69_A">69_A</button>
+          <button class="chip" data-query="72_E">72_E</button>
+          <button class="chip" data-query="SRH">Teacher (SRH)</button>
+          <button class="chip" data-query="KT-201">Room (KT-201)</button>
+        </div>
+      </section>
+
+      <!-- Routine Summary Card -->
+      <section id="summaryCard" class="summary-card card">
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="summary-label">Batch / Section</span>
+            <span id="summaryTarget" class="summary-value highlight">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Enrolled Courses</span>
+            <span id="summaryCourses" class="summary-value">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Classes per Week</span>
+            <span id="summaryClasses" class="summary-value">-</span>
+          </div>
+          <div class="summary-item">
+            <span class="summary-label">Routine Version</span>
+            <span id="summaryVersion" class="summary-value muted">-</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Day Navigation Tabs -->
+      <nav class="day-tabs-nav">
+        <div class="day-tabs" id="dayTabsContainer">
+          <button class="day-tab" data-day="SATURDAY">Sat <span class="count-badge">0</span></button>
+          <button class="day-tab" data-day="SUNDAY">Sun <span class="count-badge">0</span></button>
+          <button class="day-tab" data-day="MONDAY">Mon <span class="count-badge">0</span></button>
+          <button class="day-tab" data-day="TUESDAY">Tue <span class="count-badge">0</span></button>
+          <button class="day-tab" data-day="WEDNESDAY">Wed <span class="count-badge">0</span></button>
+          <button class="day-tab" data-day="THURSDAY">Thu <span class="count-badge">0</span></button>
+        </div>
+      </nav>
+
+      <!-- Timeline & Schedule View -->
+      <section class="schedule-section">
+        <div class="section-header">
+          <h2 id="currentDayTitle" class="section-title">Saturday Schedule</h2>
+          <div id="dayMetaStats" class="day-meta">0 Classes</div>
+        </div>
+
+        <div id="timelineContainer" class="timeline-container">
+          <!-- Dynamically populated timeline cards -->
+        </div>
+
+        <div id="emptyState" class="empty-state hidden">
+          <div class="empty-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <circle cx="12" cy="12" r="10"/><line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          <h3>No Classes Found</h3>
+          <p id="emptyStateMsg">No schedule matches for the selected query on this day.</p>
+        </div>
+      </section>
+
+      <!-- Courses List View -->
+      <section class="courses-summary-section card">
+        <h3 class="courses-title">Enrolled Courses Breakdown</h3>
+        <div id="coursesGrid" class="courses-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>rDIU Class Routine • Data Source: CSE Class Routine V5 (Summer 2026)</p>
+      <p class="subtext">Offline-first architecture • Kotlin + Jetpack Compose / Web Interactive</p>
+    </footer>
+  </div>
+
+  <script type="module" src="./web/main.js"></script>
+</body>
+</html>

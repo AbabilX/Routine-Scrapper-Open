@@ -1,6 +1,5 @@
 {
   "meta": {
-    "schemaVersion": 1,
     "department": "CSE",
     "version": "5.0",
     "semester": "Summer 2026",
@@ -35,7 +34,7 @@
       "end": "02:30",
       "course": "CSE426",
       "group": "RE_A(3C",
-      "teacher": "?",
+      "teacher": "MNT_2",
       "room": "ANX1-103"
     },
     {
@@ -575,7 +574,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_F2",
-      "teacher": "AKM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -585,7 +584,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_O2",
-      "teacher": "MNS",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -615,7 +614,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "RE_A1(1.5C)",
-      "teacher": "LRA",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -625,7 +624,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_Q2",
-      "teacher": "MHI",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -1115,7 +1114,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_F1",
-      "teacher": "AKM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -1125,7 +1124,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_G2",
-      "teacher": "MRIS",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -1155,7 +1154,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_C1",
-      "teacher": "NAB",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -1165,7 +1164,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_J2",
-      "teacher": "SMA",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -1445,7 +1444,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_F1",
-      "teacher": "AKM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -1455,7 +1454,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_G2",
-      "teacher": "MRIS",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -1485,7 +1484,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_C1",
-      "teacher": "NAB",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -1495,7 +1494,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_J2",
-      "teacher": "SMA",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -1945,7 +1944,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_R1",
-      "teacher": "EHL",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -1955,7 +1954,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_G1",
-      "teacher": "MRIS",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -1985,7 +1984,7 @@
       "end": "10:00",
       "course": "CSE216",
       "group": "68_D1",
-      "teacher": "MSU",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -1995,7 +1994,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_J1",
-      "teacher": "SMA",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -2585,7 +2584,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_R1",
-      "teacher": "EHL",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -2595,7 +2594,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_G1",
-      "teacher": "MRIS",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -2625,7 +2624,7 @@
       "end": "11:30",
       "course": "CSE216",
       "group": "68_D1",
-      "teacher": "MSU",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -2635,7 +2634,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_J1",
-      "teacher": "SMA",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -3185,7 +3184,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_F2",
-      "teacher": "AKM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -3195,7 +3194,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_O2",
-      "teacher": "MNS",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -3225,7 +3224,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "RE_A1(1.5C)",
-      "teacher": "LRA",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -3235,7 +3234,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_Q2",
-      "teacher": "MHI",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -3355,7 +3354,7 @@
       "end": "02:30",
       "course": "CSE234",
       "group": "RE_A2(2C)",
-      "teacher": "SRRS",
+      "teacher": "LAB-",
       "room": "EMBED"
     },
     {
@@ -3575,7 +3574,7 @@
       "end": "02:30",
       "course": "CSE224",
       "group": "RE_A(2C)",
-      "teacher": "EEE_11",
+      "teacher": "LAB-",
       "room": "IOT"
     },
     {
@@ -3875,7 +3874,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_P1",
-      "teacher": "MHI",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -3885,7 +3884,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_N2",
-      "teacher": "EHL",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -3915,7 +3914,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_A2",
-      "teacher": "SHD",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -3925,7 +3924,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_B2",
-      "teacher": "MSU",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -4035,7 +4034,7 @@
       "end": "04:00",
       "course": "CSE234",
       "group": "RE_A2(2C)",
-      "teacher": "SRRS",
+      "teacher": "LAB-",
       "room": "EMBED"
     },
     {
@@ -4145,7 +4144,7 @@
       "end": "04:00",
       "course": "CSE224",
       "group": "RE_A(2C)",
-      "teacher": "EEE_11",
+      "teacher": "LAB-",
       "room": "IOT"
     },
     {
@@ -4455,7 +4454,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_I1",
-      "teacher": "BM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -4465,7 +4464,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_Q1",
-      "teacher": "MHI",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -4495,7 +4494,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_O1",
-      "teacher": "MNS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -4505,7 +4504,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_R2",
-      "teacher": "EHL",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -4535,7 +4534,7 @@
       "end": "05:30",
       "course": "CSE234",
       "group": "RE_A2(2C)",
-      "teacher": "SRRS",
+      "teacher": "LAB-",
       "room": "EMBED"
     },
     {
@@ -4565,7 +4564,7 @@
       "end": "05:30",
       "course": "CSE114",
       "group": "71_H1",
-      "teacher": "MHN",
+      "teacher": "C))",
       "room": "G1-020 (COM LAB)"
     },
     {
@@ -4595,7 +4594,7 @@
       "end": "05:30",
       "course": "CSE224",
       "group": "RE_A(2C)",
-      "teacher": "EEE_11",
+      "teacher": "LAB-",
       "room": "IOT"
     },
     {
@@ -4815,7 +4814,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_I1",
-      "teacher": "BM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -4825,7 +4824,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_Q1",
-      "teacher": "MHI",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -4855,7 +4854,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_O1",
-      "teacher": "MNS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -4865,7 +4864,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_R2",
-      "teacher": "EHL",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -4955,7 +4954,7 @@
       "end": "10:00",
       "course": "CSE234",
       "group": "RE_A1(2C)",
-      "teacher": "SRRS",
+      "teacher": "LAB-",
       "room": "EMBED"
     },
     {
@@ -5175,7 +5174,7 @@
       "end": "10:00",
       "course": "CSE213",
       "group": "RE_A(2C)",
-      "teacher": "NUM",
+      "teacher": "LAB-",
       "room": "IOT"
     },
     {
@@ -5485,7 +5484,7 @@
       "end": "10:00",
       "course": "CSE216",
       "group": "68_H1",
-      "teacher": "MBM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -5495,7 +5494,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_N1",
-      "teacher": "EHL",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -5525,7 +5524,7 @@
       "end": "10:00",
       "course": "CSE216",
       "group": "68_M2",
-      "teacher": "MLR",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -5645,7 +5644,7 @@
       "end": "11:30",
       "course": "CSE234",
       "group": "RE_A1(2C)",
-      "teacher": "SRRS",
+      "teacher": "LAB-",
       "room": "EMBED"
     },
     {
@@ -5875,7 +5874,7 @@
       "end": "11:30",
       "course": "CSE213",
       "group": "RE_A(2C)",
-      "teacher": "NUM",
+      "teacher": "LAB-",
       "room": "IOT"
     },
     {
@@ -6185,7 +6184,7 @@
       "end": "11:30",
       "course": "CSE216",
       "group": "68_H1",
-      "teacher": "MBM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -6195,7 +6194,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_N1",
-      "teacher": "EHL",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -6225,7 +6224,7 @@
       "end": "11:30",
       "course": "CSE216",
       "group": "68_M2",
-      "teacher": "MLR",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -6345,7 +6344,7 @@
       "end": "01:00",
       "course": "CSE234",
       "group": "RE_A1(2C)",
-      "teacher": "SRRS",
+      "teacher": "LAB-",
       "room": "EMBED"
     },
     {
@@ -6575,7 +6574,7 @@
       "end": "01:00",
       "course": "CSE213",
       "group": "RE_A(2C)",
-      "teacher": "NUM",
+      "teacher": "LAB-",
       "room": "IOT"
     },
     {
@@ -6885,7 +6884,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_P1",
-      "teacher": "MHI",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -6895,7 +6894,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_N2",
-      "teacher": "EHL",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -6925,7 +6924,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_A2",
-      "teacher": "SHD",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -6935,7 +6934,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_B2",
-      "teacher": "MSU",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -7565,7 +7564,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_D2",
-      "teacher": "MHK",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -7575,7 +7574,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_L1",
-      "teacher": "MHH",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -7605,7 +7604,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_B1",
-      "teacher": "MSU",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -7615,7 +7614,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_G1",
-      "teacher": "SOM",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -8165,7 +8164,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_H2",
-      "teacher": "MBM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -8175,7 +8174,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_L1",
-      "teacher": "MLR",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -8205,7 +8204,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_N2",
-      "teacher": "BM",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -8215,7 +8214,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_P2",
-      "teacher": "MHI",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -8635,7 +8634,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_H2",
-      "teacher": "MBM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -8645,7 +8644,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_L1",
-      "teacher": "MLR",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -8675,7 +8674,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_N2",
-      "teacher": "BM",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -8685,7 +8684,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_P2",
-      "teacher": "MHI",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -9265,7 +9264,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_D1",
-      "teacher": "MHK",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -9275,7 +9274,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_L2",
-      "teacher": "MHH",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -9305,7 +9304,7 @@
       "end": "10:00",
       "course": "CSE216",
       "group": "68_F1",
-      "teacher": "NAB",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -9315,7 +9314,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_O2",
-      "teacher": "MAI",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -9915,7 +9914,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_D1",
-      "teacher": "MHK",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -9925,7 +9924,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_L2",
-      "teacher": "MHH",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -9955,7 +9954,7 @@
       "end": "11:30",
       "course": "CSE216",
       "group": "68_F1",
-      "teacher": "NAB",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -9965,7 +9964,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_O2",
-      "teacher": "MAI",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -10595,7 +10594,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_D2",
-      "teacher": "MHK",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -10605,7 +10604,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_L1",
-      "teacher": "MHH",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -10635,7 +10634,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_B1",
-      "teacher": "MSU",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -10645,7 +10644,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_G1",
-      "teacher": "SOM",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -11285,7 +11284,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_L2",
-      "teacher": "MLR",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -11295,7 +11294,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_C1",
-      "teacher": "SMC",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -11325,7 +11324,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_H2",
-      "teacher": "NTS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -11335,7 +11334,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_J1",
-      "teacher": "SOM",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -11875,7 +11874,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_B2",
-      "teacher": "MAI",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -11885,7 +11884,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_M1",
-      "teacher": "MLR",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -11915,7 +11914,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_I2",
-      "teacher": "BM",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -11925,7 +11924,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_E2",
-      "teacher": "MHK",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -12295,7 +12294,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_B2",
-      "teacher": "MAI",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -12305,7 +12304,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_M1",
-      "teacher": "MLR",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -12335,7 +12334,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_I2",
-      "teacher": "BM",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -12345,7 +12344,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_E2",
-      "teacher": "MHK",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -12945,7 +12944,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_B1",
-      "teacher": "MAI",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -12955,7 +12954,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_C2",
-      "teacher": "SMC",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -12985,7 +12984,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_H1",
-      "teacher": "NTS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -12995,7 +12994,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_E1",
-      "teacher": "MHK",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -13615,7 +13614,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_B1",
-      "teacher": "MAI",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -13625,7 +13624,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_C2",
-      "teacher": "SMC",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -13655,7 +13654,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_H1",
-      "teacher": "NTS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -13665,7 +13664,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_E1",
-      "teacher": "MHK",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -14305,7 +14304,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_L2",
-      "teacher": "MLR",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -14315,7 +14314,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_C1",
-      "teacher": "SMC",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -14345,7 +14344,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_H2",
-      "teacher": "NTS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -14355,7 +14354,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_J1",
-      "teacher": "SOM",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -14885,7 +14884,7 @@
       "end": "02:30",
       "course": "CSE313",
       "group": "RE_A(3C)(CD",
-      "teacher": "?",
+      "teacher": "IST",
       "room": "KT-503 (COM LAB)"
     },
     {
@@ -14975,7 +14974,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_A2",
-      "teacher": "SMC",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -14985,7 +14984,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_J2",
-      "teacher": "SOM",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -15015,7 +15014,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_D2",
-      "teacher": "MSU",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -15025,7 +15024,7 @@
       "end": "02:30",
       "course": "CSE122",
       "group": "70_M2",
-      "teacher": "MHH",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -15545,7 +15544,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_G2",
-      "teacher": "SOM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -15555,7 +15554,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_I2",
-      "teacher": "MTF",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -15585,7 +15584,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_F2",
-      "teacher": "NAB",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -15595,7 +15594,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_O1",
-      "teacher": "MAI",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -15945,7 +15944,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_G2",
-      "teacher": "SOM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -15955,7 +15954,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_I2",
-      "teacher": "MTF",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -15985,7 +15984,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_F2",
-      "teacher": "NAB",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -15995,7 +15994,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_O1",
-      "teacher": "MAI",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -16035,7 +16034,7 @@
       "end": "10:00",
       "course": "ENG101",
       "group": "72_D",
-      "teacher": "ASA",
+      "teacher": "D))",
       "room": "ANX1-203"
     },
     {
@@ -16595,7 +16594,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_A1",
-      "teacher": "SMC",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -16605,7 +16604,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_I1",
-      "teacher": "MTF",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -16635,7 +16634,7 @@
       "end": "10:00",
       "course": "CSE216",
       "group": "68_A1",
-      "teacher": "SHD",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -16645,7 +16644,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_M1",
-      "teacher": "MHH",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -17275,7 +17274,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_A1",
-      "teacher": "SMC",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -17285,7 +17284,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_I1",
-      "teacher": "MTF",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -17315,7 +17314,7 @@
       "end": "11:30",
       "course": "CSE216",
       "group": "68_A1",
-      "teacher": "SHD",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -17325,7 +17324,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_M1",
-      "teacher": "MHH",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -17945,7 +17944,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_A2",
-      "teacher": "SMC",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -17955,7 +17954,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_J2",
-      "teacher": "SOM",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -17985,7 +17984,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_D2",
-      "teacher": "MSU",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -17995,7 +17994,7 @@
       "end": "01:00",
       "course": "CSE122",
       "group": "70_M2",
-      "teacher": "MHH",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -18355,7 +18354,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "RE_A1",
-      "teacher": "MSAR",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -18365,7 +18364,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_P1",
-      "teacher": "LRA",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -18395,7 +18394,7 @@
       "end": "02:30",
       "course": "CSE216",
       "group": "68_C2",
-      "teacher": "NAB",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -18695,7 +18694,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_E2",
-      "teacher": "MBM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -18705,7 +18704,7 @@
       "end": "04:00",
       "course": "CSE122",
       "group": "70_K1",
-      "teacher": "MTF",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -18725,7 +18724,7 @@
       "end": "04:00",
       "course": "CSE216",
       "group": "68_K2",
-      "teacher": "MNS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -18825,7 +18824,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_E2",
-      "teacher": "MBM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -18835,7 +18834,7 @@
       "end": "05:30",
       "course": "CSE122",
       "group": "70_K1",
-      "teacher": "MTF",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -18855,7 +18854,7 @@
       "end": "05:30",
       "course": "CSE216",
       "group": "68_K2",
-      "teacher": "MNS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -19105,7 +19104,7 @@
       "end": "10:00",
       "course": "CSE216",
       "group": "68_E1",
-      "teacher": "MBM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -19115,7 +19114,7 @@
       "end": "10:00",
       "course": "CSE122",
       "group": "70_K2",
-      "teacher": "MTF",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -19145,7 +19144,7 @@
       "end": "10:00",
       "course": "CSE216",
       "group": "68_K1",
-      "teacher": "MNS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -19155,7 +19154,7 @@
       "end": "10:00",
       "course": "CSE216",
       "group": "68_N1",
-      "teacher": "BM",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -19535,7 +19534,7 @@
       "end": "11:30",
       "course": "CSE216",
       "group": "68_E1",
-      "teacher": "MBM",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -19545,7 +19544,7 @@
       "end": "11:30",
       "course": "CSE122",
       "group": "70_K2",
-      "teacher": "MTF",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -19575,7 +19574,7 @@
       "end": "11:30",
       "course": "CSE216",
       "group": "68_K1",
-      "teacher": "MNS",
+      "teacher": "and",
       "room": "SH-103"
     },
     {
@@ -19585,7 +19584,7 @@
       "end": "11:30",
       "course": "CSE216",
       "group": "68_N1",
-      "teacher": "BM",
+      "teacher": "and",
       "room": "SH-105"
     },
     {
@@ -19915,7 +19914,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "RE_A1",
-      "teacher": "MSAR",
+      "teacher": "and",
       "room": "KT-809"
     },
     {
@@ -19925,7 +19924,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_P1",
-      "teacher": "LRA",
+      "teacher": "and",
       "room": "KT-810"
     },
     {
@@ -19955,7 +19954,7 @@
       "end": "01:00",
       "course": "CSE216",
       "group": "68_C2",
-      "teacher": "NAB",
+      "teacher": "and",
       "room": "SH-103"
     }
   ]

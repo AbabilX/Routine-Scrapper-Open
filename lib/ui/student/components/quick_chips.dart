@@ -4,21 +4,17 @@ import 'package:flutter/services.dart';
 import '../../theme/app_colors.dart';
 
 class QuickChips extends StatelessWidget {
-  const QuickChips({
-    super.key,
-    required this.chips,
-    required this.onSelect,
-  });
+  const QuickChips({super.key, required this.chips, required this.onSelect});
 
   final List<String> chips;
   final ValueChanged<String> onSelect;
 
   static List<Color> get _tints => [
-        peach,
-        lavender,
-        sky,
-        peach.withValues(alpha: 0.85),
-      ];
+    peach,
+    lavender,
+    sky,
+    peach.withValues(alpha: 0.85),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +39,10 @@ class QuickChips extends StatelessWidget {
               },
               borderRadius: BorderRadius.circular(22),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 child: Text(chip, style: text.labelLarge),
               ),
             ),

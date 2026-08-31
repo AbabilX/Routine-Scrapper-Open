@@ -14,8 +14,6 @@ import re
 import sys
 from pathlib import Path
 
-import pymupdf
-
 DAYS = ("SATURDAY", "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY")
 TIME_SLOTS = [
     ("08:30", "10:00"),
@@ -26,14 +24,14 @@ TIME_SLOTS = [
     ("04:00", "05:30"),
 ]
 # Room-column x of the 6 slots on the landscape A3 sheet.
-SLOT_EDGES = (0, 230, 415, 610, 800, 985, 1300)
+SLOT_EDGES = (0, 225, 430, 640, 850, 1050, 1300)
 
 COURSE_RE = re.compile(
-    r"^([A-Z]{2,5}\d{3}[A-Z]?)\((.+)\)$"
+    r"^([A-Z]{2,6}\s*\d{3,4}[A-Z]?)\s*\((.+)\)$"
 )
-TEACHER_RE = re.compile(r"^[A-Z]{2,6}(?:[_-]\d+)?$")
+TEACHER_RE = re.compile(r"^[A-Za-z]{2,8}(?:[_\.-/]\w+)?$")
 ROOM_RE = re.compile(
-    r"^(KT-\d+(?:\([A-Z]\))?|G1-\d+|ANX1-\d+|SH-\d+|CTBA-\d+|EMBED|IOT)$"
+    r"^(KT-\d+(?:\([A-Z0-9]\))?|G\d+-\d+|ANX\d+-\d+|SH-\d+|CTBA-\d+|EMBED|IOT|\d{3,4})$"
 )
 SKIP = {
     "ROOM",
@@ -66,13 +64,31 @@ def is_room(text: str) -> bool:
 
 
 def parse_pdf(pdf_path: Path) -> dict:
-    doc = pymupdf.open(pdf_path)
     words: list[tuple[int, float, float, str]] = []
-    for page_index, page in enumerate(doc):
-        for x0, y0, _x1, _y1, text, *_ in page.get_text("words"):
-            token = text.strip()
-            if token:
-                words.append((page_index, y0, x0, token))
+    try:
+        import pymupdf
+        doc = pymupdf.open(pdf_path)
+        for page_index, page in enumerate(doc):
+            for x0, y0, _x1, _y1, text, *_ in page.get_text("words"):
+                token = text.strip()
+                if token:
+                    words.append((page_index, y0, x0, token))
+    except ImportError:
+        import subprocess
+        import xml.etree.ElementTree as ET
+        cmd = ["pdftotext", "-bbox-layout", str(pdf_path), "-"]
+        res = subprocess.run(cmd, capture_output=True, text=True, check=True)
+        xml_data = re.sub(r'xmlns="[^"]+"', "", res.stdout)
+        root = ET.fromstring(xml_data)
+        for page_index, page in enumerate(root.findall(".//page")):
+            p_w = float(page.attrib.get("width", 1191.12))
+            scale = 1300.0 / p_w if p_w > 0 else 1.0
+            for word in page.findall(".//word"):
+                x = float(word.attrib["xMin"]) * scale
+                y = float(word.attrib["yMin"]) * scale
+                token = (word.text or "").strip()
+                if token:
+                    words.append((page_index, y, x, token))
 
     current_day = "SATURDAY"
     slots: list[dict] = []
@@ -136,14 +152,14 @@ def find_teacher(
     left, right = SLOT_EDGES[index], SLOT_EDGES[index + 1]
     best: tuple[float, str] | None = None
     for p, wy, wx, text in words:
-        if p != page or abs(wy - y) > 4:
+        if p != page or abs(wy - y) > 18:
             continue
-        if wx <= x or wx >= right or wx < left:
+        if not (left <= wx < right):
             continue
         if COURSE_RE.match(text) or is_room(text) or text.upper() in SKIP:
             continue
-        if TEACHER_RE.match(text) or (text.isupper() and 2 <= len(text) <= 6):
-            delta = wx - x
+        if TEACHER_RE.match(text) or (text.isupper() and 2 <= len(text) <= 8):
+            delta = abs(wx - x) + abs(wy - y)
             if best is None or delta < best[0]:
                 best = (delta, text)
     return best[1] if best else "?"

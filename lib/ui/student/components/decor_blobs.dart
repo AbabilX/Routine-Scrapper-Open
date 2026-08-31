@@ -7,10 +7,7 @@ class DecorBlobs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const CustomPaint(
-      painter: _BlobPainter(),
-      child: SizedBox.expand(),
-    );
+    return const CustomPaint(painter: _BlobPainter(), child: SizedBox.expand());
   }
 }
 

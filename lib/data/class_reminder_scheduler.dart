@@ -34,14 +34,19 @@ class ClassReminderScheduler {
         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
         iOS: darwin,
         macOS: darwin,
+        linux: LinuxInitializationSettings(
+          defaultActionName: 'Open notification',
+        ),
       ),
     );
     return ClassReminderScheduler(plugin);
   }
 
   Future<bool> requestPermission() async {
-    final android = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     if (android != null) {
       final allowed = await android.requestNotificationsPermission();
       if (allowed == false) return false;
@@ -52,8 +57,10 @@ class ClassReminderScheduler {
       return true;
     }
 
-    final ios = _plugin.resolvePlatformSpecificImplementation<
-        IOSFlutterLocalNotificationsPlugin>();
+    final ios = _plugin
+        .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin
+        >();
     if (ios != null) {
       return await ios.requestPermissions(
             alert: true,
@@ -67,8 +74,10 @@ class ClassReminderScheduler {
 
   Future<void> sync(List<ClassReminder> reminders) async {
     await _plugin.cancelAll();
-    final android = _plugin.resolvePlatformSpecificImplementation<
-        AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
     final exact = await android?.canScheduleExactNotifications() ?? false;
     final mode = exact
         ? AndroidScheduleMode.exactAllowWhileIdle
