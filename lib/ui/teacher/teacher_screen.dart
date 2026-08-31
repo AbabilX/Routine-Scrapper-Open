@@ -40,7 +40,7 @@ class TeacherScreen extends StatelessWidget {
     final state = teacherVm.state;
 
     return CutePage(
-      children: [
+      header: [
         const CuteHeader(
           title: 'টিচার',
           subtitle: 'ইনিশিয়াল দিয়ে রুটিন খুঁজে নাও',
@@ -80,13 +80,6 @@ class TeacherScreen extends StatelessWidget {
             teacherVm.search();
           },
         ),
-        if (state.suggestions.isNotEmpty) ...[
-          const SizedBox(height: 18),
-          SuggestionList(
-            items: state.suggestions,
-            onSelect: teacherVm.onSuggestionTapped,
-          ),
-        ],
         if (state.cleanQuery.isNotEmpty && state.hasMatches) ...[
           const SizedBox(height: 14),
           Align(
@@ -121,8 +114,14 @@ class TeacherScreen extends StatelessWidget {
             ),
           ),
         ],
-        const SizedBox(height: 18),
-        if (state.hasMatches) ...[
+      ],
+      body: [
+        if (state.suggestions.isNotEmpty)
+          SuggestionList(
+            items: state.suggestions,
+            onSelect: teacherVm.onSuggestionTapped,
+          )
+        else if (state.hasMatches) ...[
           _TeacherSummaryCard(
             teacherName: state.cleanQuery,
             sections: state.sections,
@@ -150,8 +149,6 @@ class TeacherScreen extends StatelessWidget {
             body: 'টিচারের রুটিন আনছি…',
             tint: sky,
           ),
-        ] else if (state.suggestions.isNotEmpty) ...[
-          const SizedBox.shrink(),
         ] else if (state.cleanQuery.isNotEmpty) ...[
           EmptyHint(
             title: 'কেউ নেই',
@@ -166,7 +163,6 @@ class TeacherScreen extends StatelessWidget {
             tint: peach,
           ),
         ],
-        const SizedBox(height: 28),
       ],
     );
   }

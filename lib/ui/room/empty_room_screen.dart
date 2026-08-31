@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../domain/model/class_slot.dart';
 import '../../domain/model/room_info.dart';
 import '../components/cute_face_kind.dart';
 import '../components/cute_header.dart';
@@ -23,7 +22,7 @@ class EmptyRoomScreen extends StatelessWidget {
     final text = Theme.of(context).textTheme;
 
     return CutePage(
-      children: [
+      header: [
         const CuteHeader(
           title: 'খালি রুম',
           subtitle: 'দিন ও সময় বেছে ফাঁকা ক্লাসরুম খুঁজে নাও',
@@ -31,7 +30,8 @@ class EmptyRoomScreen extends StatelessWidget {
         ),
         const SizedBox(height: 18),
         _FilterCard(viewModel: viewModel, state: state),
-        const SizedBox(height: 18),
+      ],
+      body: [
         if (!state.isSubmitted)
           const EmptyHint(
             title: 'খালি রুম খুঁজো',
@@ -71,7 +71,6 @@ class EmptyRoomScreen extends StatelessWidget {
                 child: _RoomCard(roomInfo: room),
               ),
         ],
-        const SizedBox(height: 28),
       ],
     );
   }
@@ -170,21 +169,14 @@ class _FilterCard extends StatelessWidget {
   }
 }
 
-class _RoomCard extends StatefulWidget {
+class _RoomCard extends StatelessWidget {
   const _RoomCard({required this.roomInfo});
 
   final RoomInfo roomInfo;
 
   @override
-  State<_RoomCard> createState() => _RoomCardState();
-}
-
-class _RoomCardState extends State<_RoomCard> {
-  bool _expanded = false;
-
-  @override
   Widget build(BuildContext context) {
-    final room = widget.roomInfo;
+    final room = roomInfo;
     final isFree = room.isEmpty;
     final text = Theme.of(context).textTheme;
     final tint = isFree ? mint : peach;
@@ -194,94 +186,53 @@ class _RoomCardState extends State<_RoomCard> {
         color: surface,
         borderRadius: BorderRadius.circular(28),
       ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(28),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        child: Row(
           children: [
-            InkWell(
-              onTap: () => setState(() => _expanded = !_expanded),
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: tint,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Icon(
-                        isFree ? Icons.door_sliding : Icons.meeting_room,
-                        color: ink,
-                        size: 22,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Flexible(
-                                child: Text(
-                                  room.roomName,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: text.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              _StatusChip(free: isFree),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            room.daySlots.isEmpty
-                                ? '${room.building} · এই স্লটে ফাঁকা'
-                                : '${room.building} · আজ ${room.daySlots.length} ক্লাস',
-                            style: text.labelSmall,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Icon(
-                      _expanded
-                          ? Icons.keyboard_arrow_up
-                          : Icons.keyboard_arrow_down,
-                      color: textMuted,
-                    ),
-                  ],
-                ),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: tint,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(
+                isFree ? Icons.door_sliding : Icons.meeting_room,
+                color: ink,
+                size: 22,
               ),
             ),
-            if (_expanded && room.daySlots.isNotEmpty) ...[
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    color: tint.withValues(alpha: 0.45),
-                    borderRadius: BorderRadius.circular(20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          room.roomName,
+                          overflow: TextOverflow.ellipsis,
+                          style: text.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      _StatusChip(free: isFree),
+                    ],
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text('আজকের শিডিউল', style: text.labelSmall),
-                        const SizedBox(height: 8),
-                        for (final slot in room.daySlots)
-                          _SlotRow(slot: slot),
-                      ],
-                    ),
+                  const SizedBox(height: 4),
+                  Text(
+                    room.daySlots.isEmpty
+                        ? '${room.building} · এই স্লটে ফাঁকা'
+                        : '${room.building} · আজ ${room.daySlots.length} ক্লাস',
+                    style: text.labelSmall,
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ],
         ),
       ),
@@ -309,50 +260,6 @@ class _StatusChip extends StatelessWidget {
               fontWeight: FontWeight.w700,
               fontSize: 11,
             ),
-      ),
-    );
-  }
-}
-
-class _SlotRow extends StatelessWidget {
-  const _SlotRow({required this.slot});
-
-  final ClassSlot slot;
-
-  @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    final label = slot.courseTitle.isNotEmpty
-        ? '${slot.courseTitle} · ${slot.course}(${slot.group}) — ${slot.teacher}'
-        : '${slot.course} (${slot.group}) — ${slot.teacher}';
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: surface,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Text(
-              '${slot.start}-${slot.end}',
-              style: text.labelSmall?.copyWith(
-                color: ink,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              label,
-              style: text.bodyMedium?.copyWith(fontSize: 13),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
       ),
     );
   }
