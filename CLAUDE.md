@@ -1,12 +1,10 @@
 # CLAUDE.md
 
-## API environment
+## Architecture
 
-- Real `API_BASE_URL` lives in gitignored `.env`.
-- Committed placeholder: `.env.example`.
-- App reads it at compile time: `lib/data/api/api_config.dart`.
-- Network: `RoutineApiClient` → `LiveRoutineRepository` (version cache).
-- Never hardcode the live host in source or docs.
-- Launch: `flutter run --dart-define-from-file=.env` (also `.vscode/launch.json`).
+- UI (`lib/ui`) renders. Domain (`lib/domain`) has no Flutter UI types.
+- Data (`lib/data`) loads and caches routine. Widgets do not contain search rules.
+- Theme tokens live in `lib/ui/theme/`. Do not hardcode colors.
+- Do not put private URLs or credentials in markdown or committed source.
 
-Rule file: `.cursor/rules/api-env.mdc`.
+Full map: [PROJECT.md](PROJECT.md).

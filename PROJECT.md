@@ -1,56 +1,34 @@
 # Architecture
 
-DIU keeps UI, query logic, and data files separate so Teacher/Room views plug in without rewriting Student.
+DIU keeps UI, query logic, and data separate so Teacher/Room views plug in without rewriting Student.
 
-The running app is **Flutter**. Live routine data comes from the remote API. The host is **not** in git — see `.env.example` and `ApiConfig`.
+The running app is **Flutter**. Kotlin + Compose remains under `app/` as a behavior reference.
 
 ```
-.env  API_BASE_URL  →  --dart-define-from-file=.env  →  ApiConfig
-                                              ↓
-                                    RoutineApiClient (HTTP)
-                                              ↓
-                               LiveRoutineRepository  (map + version cache)
-                                    ↙        ↓         ↘
-                    StudentViewModel  TeacherViewModel  RoomViewModel
-                         ↓                  ↓               ↓
-                   StudentScreen      TeacherScreen    Room / Empty
-                         ↓
-              ClassReminderScheduler + PdfExporter (from fetched slots)
-                         ↓
-              student_cache.json  (query + reminders + profile)
-              api_cache/          (version + last schedules)
+data/  (load + cache)
+        ↓
+domain/RoutineQueries
+        ↓
+StudentViewModel / TeacherViewModel / RoomViewModel
+        ↓
+StudentScreen / TeacherScreen / Room / Empty
+        ↓
+ClassReminderScheduler + PdfExporter
+        ↓
+student_cache.json  (query + reminders + profile)
 ```
 
 - `lib/domain` has no Flutter UI types.
-- `lib/data/api` talks to the network and disk cache. UI never builds URLs.
-- `RoutineQueries` still builds timelines / now-next from `ClassSlot`.
-- PDF **upload** is removed. Section PDF **export** still builds from the fetched week.
+- `lib/data` loads and caches routine. UI does not build network details.
+- `RoutineQueries` builds timelines / now-next from `ClassSlot`.
+- Section PDF export builds from the current week. Upload is not in the UI.
 - Department is CSE only for this slice.
-- Student search: autocomplete → select batch → `POST /api/schedule`.
-- Teacher / Room / Empty keep their screens; data is live.
-- `/api/routine_version` invalidates `api_cache/` when the remote version changes.
+- Student search: type → suggestions → select batch → show week.
 - Theme is light and cute (`lib/ui/theme/app_colors.dart`); screens must not hardcode colors.
-
-## API environment (open source)
-
-The live API host is **not** in git. Agents and humans must not hardcode it.
-
-| File | Role |
-|---|---|
-| `.env` | Local `API_BASE_URL`. Gitignored. |
-| `.env.example` | Empty `API_BASE_URL=` for contributors. |
-| `lib/data/api/api_config.dart` | Reads `API_BASE_URL` via `--dart-define-from-file=.env`. |
-
-```bash
-cp .env.example .env   # then set API_BASE_URL locally
-flutter run --dart-define-from-file=.env
-```
-
-Use `ApiConfig.uri('/api/…')` from data layer only. Never log the base URL. Cursor rule: `.cursor/rules/api-env.mdc`.
 
 Local files (app documents):
 
 | File | Role |
 |---|---|
-| `api_cache/` | Version + last successful schedule / room lists. |
-| `student_cache.json` | Last search, reminders, `seenOnboarding`, `displayName`, `gender`. |
+| on-device cache | Last successful routine lists |
+| `student_cache.json` | Last search, reminders, `seenOnboarding`, `displayName`, `gender` |

@@ -17,6 +17,7 @@ This repo is public. Do **not** put the live API hostname in committed files.
 ## Must not
 
 - Hardcode `https://…` API hosts in Dart, tests, README, PROJECT.md, CLAUDE.md, AGENTS.md, or rules.
+- Describe APIs, servers, hosts, or endpoints in any `*.md` file (this repo is public).
 - Commit `.env`, `api.md` dumps, or cURL samples that include the real host.
 - Bundle `.env` as a Flutter asset (`flutter_dotenv` in `pubspec` assets).
 - Print `ApiConfig.baseUrl` in logs, crash reports, or UI.
