@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/model/teacher_info.dart';
 import '../theme/app_colors.dart';
 
+/// Teacher profile as a modal bottom sheet (not a centered dialog).
 class TeacherProfileDialog extends StatelessWidget {
   const TeacherProfileDialog({
     super.key,
@@ -20,20 +22,20 @@ class TeacherProfileDialog extends StatelessWidget {
     required BuildContext context,
     required String initial,
     required Future<TeacherInfo?> Function(String initial) fetcher,
-  }) async {
-    showDialog<void>(
+  }) {
+    return showModalBottomSheet<void>(
       context: context,
-      barrierColor: Colors.black54,
-      builder: (dialogContext) {
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (sheetContext) {
         return FutureBuilder<TeacherInfo?>(
           future: fetcher(initial),
           builder: (context, snapshot) {
             final loading =
                 snapshot.connectionState == ConnectionState.waiting;
-            final teacher = snapshot.data;
             return TeacherProfileDialog(
               initial: initial,
-              info: teacher,
+              info: snapshot.data,
               isLoading: loading,
             );
           },
@@ -44,124 +46,158 @@ class TeacherProfileDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
     final title = info?.titleWithInitial ?? initial;
     final hasImage = info != null && info!.imageUrl.isNotEmpty;
-
-    return Dialog(
-      backgroundColor: surface,
-      elevation: 12,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: const BorderSide(color: line, width: 1),
+    return Padding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.viewInsetsOf(context).bottom,
       ),
-      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: Padding(
-        padding: const EdgeInsets.all(22),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Header: Title & Close Button
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: surface,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(22, 12, 22, 18),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                if (hasImage) ...[
-                  ClipOval(
-                    child: Image.network(
-                      info!.imageUrl,
-                      width: 44,
-                      height: 44,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, _, _) => _fallbackAvatar(),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                ],
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      color: ink,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 0.2,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                InkWell(
-                  onTap: () => Navigator.of(context).pop(),
-                  borderRadius: BorderRadius.circular(16),
+                Center(
                   child: Container(
-                    padding: const EdgeInsets.all(4),
+                    width: 40,
+                    height: 4,
                     decoration: BoxDecoration(
-                      color: bg,
-                      shape: BoxShape.circle,
-                      border: Border.all(color: line),
-                    ),
-                    child: const Icon(Icons.close, size: 18, color: textMuted),
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 18),
-            const Divider(color: line, height: 1),
-            const SizedBox(height: 14),
-
-            if (isLoading) ...[
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 28),
-                child: Center(
-                  child: SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2.5,
-                      color: ink,
+                      color: line,
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
                 ),
-              ),
-            ] else if (info == null) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
+                const SizedBox(height: 18),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.info_outline, size: 36, color: textMuted),
-                    const SizedBox(height: 10),
-                    Text(
-                      'No detailed profile found for $initial',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: textMuted, fontSize: 14),
+                    if (hasImage)
+                      ClipOval(
+                        child: Image.network(
+                          info!.imageUrl,
+                          width: 52,
+                          height: 52,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => _fallbackAvatar(),
+                        ),
+                      )
+                    else
+                      _fallbackAvatar(),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: text.titleLarge,
+                          ),
+                          if (info != null &&
+                              info!.designation.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            Text(
+                              info!.designation,
+                              style: text.labelSmall,
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    Material(
+                      color: bg,
+                      shape: const CircleBorder(),
+                      child: InkWell(
+                        customBorder: const CircleBorder(),
+                        onTap: () => Navigator.of(context).pop(),
+                        child: const Padding(
+                          padding: EdgeInsets.all(8),
+                          child: Icon(Icons.close, size: 18, color: textMuted),
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
-            ] else ...[
-              if (info!.designation.isNotEmpty)
-                _buildFieldRow(context, 'Desig', info!.designation),
-              if (info!.id.isNotEmpty)
-                _buildFieldRow(context, 'ID', info!.id),
-              if (info!.cell.isNotEmpty)
-                _buildFieldRow(
-                  context,
-                  'Cell',
-                  info!.cell,
-                  isHighlight: true,
-                  onCopy: () => _copy(context, info!.cell, 'Phone number copied'),
-                ),
-              if (info!.email.isNotEmpty)
-                _buildFieldRow(
-                  context,
-                  'Email',
-                  info!.email,
-                  onCopy: () => _copy(context, info!.email, 'Email copied'),
-                ),
-              if (info!.room.isNotEmpty)
-                _buildFieldRow(context, 'Room', info!.room),
-            ],
-          ],
+                const SizedBox(height: 18),
+                if (isLoading)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 36),
+                    child: Center(
+                      child: SizedBox(
+                        width: 28,
+                        height: 28,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.5,
+                          color: ink,
+                        ),
+                      ),
+                    ),
+                  )
+                else if (info == null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 24),
+                    child: Text(
+                      'No detailed profile found for $initial',
+                      textAlign: TextAlign.center,
+                      style: text.bodyMedium,
+                    ),
+                  )
+                else
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: lavender.withValues(alpha: 0.55),
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      child: Column(
+                        children: [
+                          if (info!.id.isNotEmpty)
+                            _FieldRow(label: 'ID', value: info!.id),
+                          if (info!.cell.isNotEmpty)
+                            _FieldRow(
+                              label: 'Cell',
+                              value: info!.cell,
+                              highlight: true,
+                              actionIcon: Icons.phone_rounded,
+                              onTap: () => _launchPhone(context, info!.cell),
+                              onLongPress: () => _copy(
+                                context,
+                                info!.cell,
+                                'Phone number copied',
+                              ),
+                            ),
+                          if (info!.email.isNotEmpty)
+                            _FieldRow(
+                              label: 'Email',
+                              value: info!.email,
+                              highlight: true,
+                              actionIcon: Icons.mail_outline_rounded,
+                              onTap: () => _launchEmail(context, info!.email),
+                              onLongPress: () => _copy(
+                                context,
+                                info!.email,
+                                'Email copied',
+                              ),
+                            ),
+                          if (info!.room.isNotEmpty)
+                            _FieldRow(label: 'Room', value: info!.room),
+                        ],
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -169,67 +205,136 @@ class TeacherProfileDialog extends StatelessWidget {
 
   Widget _fallbackAvatar() {
     return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        color: lavender.withValues(alpha: 0.5),
+      width: 52,
+      height: 52,
+      decoration: const BoxDecoration(
+        color: lavender,
         shape: BoxShape.circle,
       ),
-      child: const Icon(Icons.person, color: ink, size: 24),
+      child: const Icon(Icons.person, color: ink, size: 26),
     );
   }
 
-  Widget _buildFieldRow(
-    BuildContext context,
-    String label,
-    String value, {
-    bool isHighlight = false,
-    VoidCallback? onCopy,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 70,
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: textMuted,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: GestureDetector(
-              onTap: onCopy,
-              child: Text(
-                value,
-                textAlign: TextAlign.right,
-                style: TextStyle(
-                  color: isHighlight ? const Color(0xFF2563EB) : ink,
-                  fontSize: 14,
-                  fontWeight: isHighlight ? FontWeight.w600 : FontWeight.w500,
-                ),
-              ),
-            ),
-          ),
-        ],
+  static String _digitsForTel(String raw) {
+    return raw.replaceAll(RegExp(r'[^\d+]'), '');
+  }
+
+  Future<void> _launchPhone(BuildContext context, String phone) async {
+    final cleaned = _digitsForTel(phone);
+    if (cleaned.isEmpty) return;
+    await _launchUri(
+      context,
+      Uri.parse('tel:$cleaned'),
+      fallbackText: phone,
+      fallbackMessage: 'Phone number copied',
+    );
+  }
+
+  Future<void> _launchEmail(BuildContext context, String email) async {
+    final trimmed = email.trim();
+    if (trimmed.isEmpty) return;
+    await _launchUri(
+      context,
+      Uri(
+        scheme: 'mailto',
+        path: trimmed,
       ),
+      fallbackText: trimmed,
+      fallbackMessage: 'Email copied',
     );
   }
 
-  void _copy(BuildContext context, String text, String message) {
-    Clipboard.setData(ClipboardData(text: text));
+  Future<void> _launchUri(
+    BuildContext context,
+    Uri uri, {
+    required String fallbackText,
+    required String fallbackMessage,
+  }) async {
+    HapticFeedback.selectionClick();
+    final ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (!ok && context.mounted) {
+      await _copy(context, fallbackText, fallbackMessage);
+    }
+  }
+
+  Future<void> _copy(
+    BuildContext context,
+    String text,
+    String message,
+  ) async {
+    await Clipboard.setData(ClipboardData(text: text));
     HapticFeedback.lightImpact();
+    if (!context.mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+}
+
+class _FieldRow extends StatelessWidget {
+  const _FieldRow({
+    required this.label,
+    required this.value,
+    this.highlight = false,
+    this.actionIcon,
+    this.onTap,
+    this.onLongPress,
+  });
+
+  final String label;
+  final String value;
+  final bool highlight;
+  final IconData? actionIcon;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    final interactive = onTap != null;
+    final valueStyle = text.bodyMedium?.copyWith(
+      color: highlight ? const Color(0xFF2563EB) : ink,
+      fontWeight: highlight ? FontWeight.w600 : FontWeight.w500,
+      decoration: interactive ? TextDecoration.underline : null,
+      decorationColor: highlight ? const Color(0xFF2563EB) : null,
+    );
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 64,
+            child: Text(label, style: text.labelSmall),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: onTap,
+              onLongPress: onLongPress,
+              child: Text(
+                value,
+                textAlign: TextAlign.right,
+                style: valueStyle,
+              ),
+            ),
+          ),
+          if (actionIcon != null) ...[
+            const SizedBox(width: 6),
+            GestureDetector(
+              onTap: onTap,
+              child: Icon(
+                actionIcon,
+                size: 16,
+                color: const Color(0xFF2563EB),
+              ),
+            ),
+          ],
+        ],
       ),
     );
   }
