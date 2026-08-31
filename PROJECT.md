@@ -28,7 +28,7 @@ student_cache.json  (query + reminders + profile)
 - License is **GPL-3.0-or-later** (open source / copyleft). See `LICENSE`.
 - `AboutScreen` is trust copy (open source, no data collection) + GitHub link `AbabilX/Routine-Scrapper-Open`.
 - Theme is light and cute (`lib/ui/theme/app_colors.dart`); screens must not hardcode colors.
-- Shared cute shell: `lib/ui/components/cute_page.dart` (+ header, blobs, empty hint).
+- Shared cute shell: `lib/ui/components/cute_page.dart` (+ header, blobs, empty hint). Student / Teacher / Empty / About all use it.
 
 Local files (app documents):
 

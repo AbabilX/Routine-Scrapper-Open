@@ -9,11 +9,15 @@ class CutePill extends StatelessWidget {
     required this.label,
     required this.onTap,
     this.height = 48,
+    this.expand = false,
   });
 
   final String label;
   final VoidCallback onTap;
   final double height;
+
+  /// When true, fills the parent width (e.g. inside [Expanded]).
+  final bool expand;
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +29,11 @@ class CutePill extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         child: Container(
           height: height,
+          width: expand ? double.infinity : null,
           padding: const EdgeInsets.symmetric(horizontal: 14),
           alignment: Alignment.center,
           child: Row(
-            mainAxisSize: MainAxisSize.min,
+            mainAxisSize: expand ? MainAxisSize.max : MainAxisSize.min,
             children: [
               Flexible(
                 child: Text(
